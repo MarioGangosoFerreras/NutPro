@@ -1,5 +1,5 @@
 .login-content {
-  --background: #f0f4f8;
+  --background: #f0f4f8; 
 }
 
 .login-container {
@@ -13,33 +13,79 @@
 .login-card {
   width: 100%;
   max-width: 400px;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 24px; 
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  background: #ffffff;
+  overflow: hidden;
+  padding-bottom: 10px;
 }
 
-ion-card-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #2d6a4f;
+/* --- LOGO MAS GRANDE Y BONITO --- */
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 40px;
+  
+  .login-logo {
+    width: 140px;      /* Tamaño aumentado */
+    height: 140px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05); 
+    }
+  }
 }
 
-ion-card-header p {
-  color: #666;
-  margin-top: 4px;
+/* --- TITULO DUAL NUT (Dorado) PRO (Verde) --- */
+.brand-title {
+  font-size: 32px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+
+  .nut {
+    color: #d88909; 
+  }
+  .pro {
+    color: #047c46; 
+  }
 }
 
-ion-item {
-  margin-bottom: 8px;
-  --border-radius: 8px;
+/* --- FORMULARIO Y BOTONES --- */
+ion-card-header {
+  text-align: center;
+  padding-bottom: 20px;
+  
+  p {
+    color: #7f8c8d;
+    margin: 0;
+    font-size: 15px;
+  }
+}
+
+.custom-item {
+  --background: #f9f9f9;
+  --border-radius: 12px;
+  margin-bottom: 15px;
+  --padding-start: 16px;
+  --highlight-color-focused: #2d6a4f;
 }
 
 .login-button {
-  margin-top: 24px;
-  --border-radius: 8px;
+  margin-top: 20px;
+  height: 52px;
+  --border-radius: 12px;
   --background: #2d6a4f;
+  --box-shadow: 0 4px 12px rgba(45, 106, 79, 0.3);
+  font-weight: 700;
+  font-size: 16px;
 }
 
 .error-message {
-  font-size: 14px;
-  margin: 8px 0 0 4px;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 10px;
 }
