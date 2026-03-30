@@ -1,0 +1,55 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  gap: 16px;
+  color: #888;
+}
+
+.empty-icon {
+  font-size: 64px;
+  color: #ccc;
+}
+
+.paciente-item {
+  --border-radius: 12px;
+  margin-bottom: 8px;
+  --background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.paciente-item h2 {
+  font-weight: 600;
+  font-size: 16px;
+  color: #2d6a4f;
+}
+
+.paciente-item p {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+ion-avatar {
+  background: #e8f5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-icon {
+  font-size: 24px;
+  color: #2d6a4f;
+}

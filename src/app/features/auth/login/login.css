@@ -1,5 +1,5 @@
 .login-content {
-  --background: #f0f4f8; 
+  --background: linear-gradient(135deg, #e8f5e9 0%, #f0f4f8 100%);
 }
 
 .login-container {
@@ -7,85 +7,109 @@
   justify-content: center;
   align-items: center;
   min-height: 100%;
-  padding: 20px;
+  padding: 24px;
 }
 
 .login-card {
   width: 100%;
-  max-width: 400px;
-  border-radius: 24px; 
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  max-width: 420px;
   background: #ffffff;
-  overflow: hidden;
-  padding-bottom: 10px;
+  border-radius: 24px;
+  padding: 40px 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
 }
 
-/* --- LOGO MAS GRANDE Y BONITO --- */
 .logo-wrapper {
   display: flex;
-  justify-content: center;
-  padding-top: 40px;
-  
-  .login-logo {
-    width: 140px;      /* Tamaño aumentado */
-    height: 140px;
-    object-fit: contain;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));
-    transition: transform 0.3s ease;
-
-    &:hover {
-      transform: scale(1.05); 
-    }
-  }
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 36px;
 }
 
-/* --- TITULO DUAL NUT (Dorado) PRO (Verde) --- */
+.login-logo {
+  height: 72px;
+  width: auto;
+  margin-bottom: 12px;
+}
+
 .brand-title {
-  font-size: 32px !important;
-  font-weight: 800 !important;
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0;
   letter-spacing: -0.5px;
-  margin-bottom: 4px;
-
-  .nut {
-    color: #d88909; 
-  }
-  .pro {
-    color: #047c46; 
-  }
 }
 
-/* --- FORMULARIO Y BOTONES --- */
-ion-card-header {
-  text-align: center;
-  padding-bottom: 20px;
-  
-  p {
-    color: #7f8c8d;
-    margin: 0;
-    font-size: 15px;
-  }
+.nut {
+  color: #a4752b;
 }
 
-.custom-item {
-  --background: #f9f9f9;
+.pro {
+  color: #738a64;
+}
+
+.brand-subtitle {
+  color: #888;
+  font-size: 14px;
+  margin: 4px 0 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-input {
   --border-radius: 12px;
-  margin-bottom: 15px;
+  --border-color: #e0e0e0;
+  --border-width: 1.5px;
   --padding-start: 16px;
-  --highlight-color-focused: #2d6a4f;
+  --padding-end: 16px;
+  --background: #fafafa;
+  font-size: 15px;
 }
 
-.login-button {
-  margin-top: 20px;
-  height: 52px;
+.error-box {
+  background: #ffeaea;
+  border: 1px solid #ffcdd2;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #c62828;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.btn-primary {
   --border-radius: 12px;
   --background: #2d6a4f;
-  --box-shadow: 0 4px 12px rgba(45, 106, 79, 0.3);
-  font-weight: 700;
+  --background-activated: #1b4332;
+  height: 52px;
   font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
 }
 
-.error-message {
-  font-size: 13px;
+.divider {
   text-align: center;
-  margin-top: 10px;
+  margin-bottom: 16px;
+}
+
+.divider span {
+  font-size: 13px;
+  color: #999;
+}
+
+.btn-secondary {
+  --border-radius: 12px;
+  --color: #2d6a4f;
+  --border-color: #2d6a4f;
+  height: 52px;
+  font-size: 15px;
+  font-weight: 600;
 }

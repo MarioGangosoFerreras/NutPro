@@ -1,0 +1,65 @@
+.header-toolbar {
+  --background: #ffffff;
+  --border-color: #e8f0eb;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.header-logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2d6a4f;
+  white-space: nowrap;
+}
+
+.header-search {
+  --background: #f0f4f2;
+  --border-radius: 10px;
+  --box-shadow: none;
+  max-width: 320px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.action-btn {
+  --color: #2d6a4f;
+  position: relative;
+  font-size: 22px;
+}
+
+ion-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 10px;
+  min-width: 16px;
+  height: 16px;
+}
+
+.avatar-icon {
+  font-size: 32px;
+  color: #2d6a4f;
+}
+
+ion-avatar {
+  width: 34px;
+  height: 34px;
+}

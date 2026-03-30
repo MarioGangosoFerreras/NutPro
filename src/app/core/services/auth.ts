@@ -31,4 +31,53 @@ export class AuthService {
   onAuthStateChange(callback: (event: string, session: any) => void) {
     return this.supabase.auth.onAuthStateChange(callback);
   }
+
+  async getUsuario() {
+    const { data: { session } } = await this.supabase.auth.getSession();
+    if (!session?.user) return null;
+
+    const { data, error } = await this.supabase
+      .from('usuarios')
+      .select('id,nombre, apellidos, rol, avatar_url')
+      .eq('auth_user_id', session.user.id)
+      .single();
+
+    if (error) {
+      console.error('Error obteniendo usuario:', error.message);
+      return null;
+    }
+
+    return data;
+  }
+
+  async getNutricionistaId(): Promise<string | null> {
+    const { data: { session } } = await this.supabase.auth.getSession();
+    if (!session?.user) return null;
+
+    const { data, error } = await this.supabase
+      .from('nutricionistas')
+      .select('id')
+      .eq('usuario_id', (await this.getUsuario())?.id ?? '')
+      .single();
+
+    if (error) return null;
+    return data?.id ?? null;
+  }
+
+  async signUp(email: string, password: string, metadata: {
+    nombre: string;
+    apellidos: string;
+    rol: string;
+    numero_colegiado?: string;
+    especialidad?: string;
+    avatar_url?: string | null;
+  }) {
+    return await this.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata
+      }
+    });
+  }
 }

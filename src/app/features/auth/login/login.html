@@ -1,53 +1,59 @@
 <ion-content class="login-content">
   <div class="login-container">
-    <ion-card class="login-card">
+    <div class="login-card">
+
       <div class="logo-wrapper">
         <img src="img/Logo_app.png" alt="NutPro Logo" class="login-logo">
-      </div>
-      <ion-card-header>
-        <ion-card-title class="brand-title">
+        <h1 class="brand-title">
           <span class="nut">Nut</span><span class="pro">Pro</span>
-        </ion-card-title>
-        <p>Inicia sesión en tu cuenta</p>
-      </ion-card-header>
+        </h1>
+        <p class="brand-subtitle">La plataforma para nutricionistas</p>
+      </div>
 
-      <ion-card-content>
-        <ion-item>
-          <ion-label position="floating">Email</ion-label>
-          <ion-input
-            type="email"
-            [(ngModel)]="email"
-            placeholder="tu@email.com">
-          </ion-input>
-        </ion-item>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <ion-input
+          class="form-input"
+          type="email"
+          [(ngModel)]="email"
+          placeholder="tu@email.com"
+          fill="outline">
+        </ion-input>
+      </div>
 
-        <ion-item>
-          <ion-label position="floating">Contraseña</ion-label>
-          <ion-input
-            type="password"
-            [(ngModel)]="password"
-            placeholder="••••••••">
-          </ion-input>
-        </ion-item>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <ion-input
+          class="form-input"
+          type="password"
+          [(ngModel)]="password"
+          placeholder="••••••••"
+          fill="outline">
+        </ion-input>
+      </div>
 
-        @if (errorMessage) {
-          <ion-text color="danger">
-            <p class="error-message">{{ errorMessage }}</p>
-          </ion-text>
+      @if (errorMessage) {
+        <div class="error-box">
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <ion-button expand="block" class="btn-primary" [disabled]="loading" (click)="onLogin()">
+        @if (loading) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          Entrar
         }
+      </ion-button>
 
-        <ion-button
-          expand="block"
-          class="login-button"
-          [disabled]="loading"
-          (click)="onLogin()">
-          @if (loading) {
-            <ion-spinner name="crescent"></ion-spinner>
-          } @else {
-            <span>Entrar</span>
-          }
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
+      <div class="divider">
+        <span>¿Nuevo en NutPro?</span>
+      </div>
+
+      <ion-button expand="block" fill="outline" class="btn-secondary" routerLink="/register">
+        Crear cuenta de nutricionista
+      </ion-button>
+
+    </div>
   </div>
 </ion-content>

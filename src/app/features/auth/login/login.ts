@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth';
 import {
@@ -22,6 +22,7 @@ import {
     FormsModule,
     IonContent,
     IonCard,
+    RouterLink,
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
@@ -60,4 +61,6 @@ export class Login {
       this.router.navigate(['/dashboard']);
     }
   }
+
+  
 }

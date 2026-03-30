@@ -1,5 +1,7 @@
 export const environment = {
   production: false,
   supabaseUrl: 'https://nzttjhlwrudepimqmxeg.supabase.co',
-  supabaseKey: 'sb_publishable_CzvRgQ_lKnF_QOhVQ6XQTg_-62jsAC8'
+  supabaseKey: 'sb_publishable_CzvRgQ_lKnF_QOhVQ6XQTg_-62jsAC8',
+  cloudinaryCloudName: 'dsvp0hgvd',
+  cloudinaryUploadPreset: 'nutpro_avatars'
 };

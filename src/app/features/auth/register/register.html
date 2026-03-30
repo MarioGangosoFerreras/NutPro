@@ -1,0 +1,96 @@
+<ion-content class="register-content">
+  <div class="register-container">
+    <div class="register-card">
+
+      <div class="register-header">
+        <h1 class="register-title">Crear cuenta</h1>
+        <p class="register-subtitle">Regístrate como nutricionista en NutPro</p>
+      </div>
+
+      <!-- Avatar selector -->
+      <div class="avatar-selector">
+        <div class="avatar-preview" (click)="fileInput.click()">
+          @if (avatarPreview) {
+            <img [src]="avatarPreview" alt="Avatar" class="avatar-img">
+          } @else {
+            <ion-icon name="person-circle-outline" class="avatar-placeholder"></ion-icon>
+          }
+          <div class="avatar-overlay">
+            <ion-icon name="camera-outline"></ion-icon>
+          </div>
+        </div>
+        <p class="avatar-hint">Toca para añadir foto de perfil</p>
+        <input #fileInput type="file" accept="image/*" (change)="onAvatarSelected($event)" hidden>
+      </div>
+
+      <div class="section-block">
+        <p class="section-title">👤 Datos personales</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nombre *</label>
+            <ion-input class="form-input" type="text" [(ngModel)]="nombre" placeholder="Tu nombre" fill="outline"></ion-input>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Apellidos *</label>
+            <ion-input class="form-input" type="text" [(ngModel)]="apellidos" placeholder="Tus apellidos" fill="outline"></ion-input>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <ion-input class="form-input" type="email" [(ngModel)]="email" placeholder="tu@email.com" fill="outline"></ion-input>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Contraseña *</label>
+            <ion-input class="form-input" type="password" [(ngModel)]="password" placeholder="Mínimo 6 caracteres" fill="outline"></ion-input>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar contraseña *</label>
+            <ion-input class="form-input" type="password" [(ngModel)]="confirmPassword" placeholder="Repite la contraseña" fill="outline"></ion-input>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <p class="section-title">🩺 Datos profesionales</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Número de colegiado</label>
+            <ion-input class="form-input" type="text" [(ngModel)]="numeroColegiado" placeholder="Ej: AND-1234" fill="outline"></ion-input>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Especialidad</label>
+            <ion-input class="form-input" type="text" [(ngModel)]="especialidad" placeholder="Ej: Nutrición deportiva" fill="outline"></ion-input>
+          </div>
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-box">
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <ion-button expand="block" class="btn-primary" [disabled]="loading" (click)="onRegister()">
+        @if (loading) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          Crear cuenta
+        }
+      </ion-button>
+
+      <div class="divider">
+        <span>¿Ya tienes cuenta?</span>
+      </div>
+
+      <ion-button expand="block" fill="outline" class="btn-secondary" routerLink="/login">
+        Iniciar sesión
+      </ion-button>
+
+    </div>
+  </div>
+</ion-content>
