@@ -1,0 +1,150 @@
+<app-header></app-header>
+
+<ion-content class="ion-padding">
+
+  @if (loading) {
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  }
+
+  @if (!loading && paciente) {
+    <div class="ficha-container">
+
+      <!-- Cabecera del paciente -->
+      <div class="ficha-header">
+        <ion-button fill="clear" class="btn-back" (click)="volver()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+          Volver
+        </ion-button>
+
+        <div class="paciente-hero">
+          <ion-avatar class="paciente-avatar">
+            @if (paciente.usuario?.avatar_url) {
+              <img [src]="paciente.usuario.avatar_url" alt="Avatar">
+            } @else {
+              <ion-icon name="person-circle-outline"></ion-icon>
+            }
+          </ion-avatar>
+          <div class="paciente-info">
+            <h1>{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</h1>
+            <p>{{ calcularEdad(paciente.fecha_nacimiento) }} años · {{ paciente.sexo }}</p>
+            <ion-badge color="primary">{{ paciente.motivo_consulta }}</ion-badge>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos personales -->
+      <div class="section-block">
+        <p class="section-title">👤 Datos personales</p>
+        <div class="info-grid">
+          <div class="info-item">
+            <ion-icon name="mail-outline"></ion-icon>
+            <div>
+              <span class="info-label">Email</span>
+              <span class="info-value">{{ paciente.email }}</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <ion-icon name="call-outline"></ion-icon>
+            <div>
+              <span class="info-label">Teléfono</span>
+              <span class="info-value">{{ paciente.telefono }}</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <ion-icon name="location-outline"></ion-icon>
+            <div>
+              <span class="info-label">Dirección</span>
+              <span class="info-value">{{ paciente.direccion }}</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <div>
+              <span class="info-label">Fecha de nacimiento</span>
+              <span class="info-value">{{ paciente.fecha_nacimiento }}</span>
+            </div>
+          </div>
+          @if (paciente.dni) {
+            <div class="info-item">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <div>
+                <span class="info-label">DNI</span>
+                <span class="info-value">{{ paciente.dni }}</span>
+              </div>
+            </div>
+          }
+          @if (paciente.ocupacion) {
+            <div class="info-item">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <div>
+                <span class="info-label">Ocupación</span>
+                <span class="info-value">{{ paciente.ocupacion }}</span>
+              </div>
+            </div>
+          }
+          @if (paciente.estado_civil) {
+            <div class="info-item">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <div>
+                <span class="info-label">Estado civil</span>
+                <span class="info-value">{{ paciente.estado_civil }}</span>
+              </div>
+            </div>
+          }
+          @if (paciente.nacionalidad) {
+            <div class="info-item">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <div>
+                <span class="info-label">Nacionalidad</span>
+                <span class="info-value">{{ paciente.nacionalidad }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Alergias e intolerancias -->
+      @if (paciente.alergias?.length > 0 || paciente.intolerancias?.length > 0) {
+        <div class="section-block">
+          <p class="section-title">⚠️ Alergias e intolerancias</p>
+          @if (paciente.alergias?.length > 0) {
+            <div class="tags-group">
+              <span class="tags-label">Alergias:</span>
+              <div class="tags">
+                @for (alergia of paciente.alergias; track alergia) {
+                  <ion-badge color="danger">{{ alergia }}</ion-badge>
+                }
+              </div>
+            </div>
+          }
+          @if (paciente.intolerancias?.length > 0) {
+            <div class="tags-group">
+              <span class="tags-label">Intolerancias:</span>
+              <div class="tags">
+                @for (intolerancia of paciente.intolerancias; track intolerancia) {
+                  <ion-badge color="warning">{{ intolerancia }}</ion-badge>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Acciones -->
+      <div class="acciones-grid">
+        <ion-button expand="block" fill="outline" class="accion-btn">
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          Citas
+        </ion-button>
+        <ion-button expand="block" fill="outline" class="accion-btn">
+          <ion-icon name="mail-outline" slot="start"></ion-icon>
+          Mensajes
+        </ion-button>
+      </div>
+
+    </div>
+  }
+
+</ion-content>

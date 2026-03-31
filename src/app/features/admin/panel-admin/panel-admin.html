@@ -1,0 +1,87 @@
+<app-header></app-header>
+
+<ion-content class="ion-padding">
+
+  <h2 class="section-header">Panel de administración</h2>
+
+  @if (loading) {
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  }
+
+  @if (!loading) {
+    <div class="section-block">
+      <p class="section-title">⏳ Pendientes de verificación ({{ nutricionistasPendientes.length }})</p>
+
+      @if (nutricionistasPendientes.length === 0) {
+        <p class="empty-text">No hay solicitudes pendientes</p>
+      }
+
+      <ion-list>
+        @for (n of nutricionistasPendientes; track n.id) {
+          <ion-item class="nutricionista-item">
+            <ion-avatar slot="start">
+              @if (n.usuario?.avatar_url) {
+                <img [src]="n.usuario.avatar_url" alt="Avatar">
+              } @else {
+                <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
+              }
+            </ion-avatar>
+            <ion-label>
+              <h2>{{ n.usuario?.nombre }} {{ n.usuario?.apellidos }}</h2>
+              <p>{{ n.usuario?.email }}</p>
+              <p>{{ n.numero_colegiado || 'Sin nº colegiado' }} · {{ n.especialidad || 'Sin especialidad' }}</p>
+            </ion-label>
+            <div slot="end" class="action-buttons">
+              <ion-button color="success" fill="clear" (click)="aprobar(n.id)">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+              </ion-button>
+              <ion-button color="danger" fill="clear" (click)="rechazar(n.id)">
+                <ion-icon name="close-circle-outline"></ion-icon>
+              </ion-button>
+              <ion-button color="danger" fill="clear" (click)="eliminar(n.id)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+
+    <div class="section-block">
+      <p class="section-title">✅ Nutricionistas activos ({{ nutricionistasActivos.length }})</p>
+
+      @if (nutricionistasActivos.length === 0) {
+        <p class="empty-text">No hay nutricionistas activos</p>
+      }
+
+      <ion-list>
+        @for (n of nutricionistasActivos; track n.id) {
+          <ion-item class="nutricionista-item">
+            <ion-avatar slot="start">
+              @if (n.usuario?.avatar_url) {
+                <img [src]="n.usuario.avatar_url" alt="Avatar">
+              } @else {
+                <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
+              }
+            </ion-avatar>
+            <ion-label>
+              <h2>{{ n.usuario?.nombre }} {{ n.usuario?.apellidos }}</h2>
+              <p>{{ n.usuario?.email }}</p>
+              <p>{{ n.numero_colegiado || 'Sin nº colegiado' }} · {{ n.especialidad || 'Sin especialidad' }}</p>
+            </ion-label>
+            <div slot="end" class="action-buttons">
+              <ion-badge color="success">Activo</ion-badge>
+              <ion-button color="danger" fill="clear" (click)="eliminar(n.id)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+
+  }
+
+</ion-content>

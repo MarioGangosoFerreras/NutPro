@@ -16,7 +16,7 @@ import { addOutline, personOutline, callOutline, mailOutline } from 'ionicons/ic
   imports: [
     Header,
     IonContent, IonList, IonItem, IonLabel, IonButton,
-    IonIcon, IonSpinner, IonText, IonAvatar, IonBadge,
+    IonIcon, IonSpinner, IonAvatar, IonBadge,
     IonFab, IonFabButton
   ],
   templateUrl: './lista-pacientes.html',

@@ -80,4 +80,18 @@ export class AuthService {
       }
     });
   }
+  
+  async getNutricionistaEstado() {
+  const usuario = await this.getUsuario();
+  if (!usuario) return null;
+
+  const { data, error } = await this.supabase
+    .from('nutricionistas')
+    .select('id, estado')
+    .eq('usuario_id', usuario.id)
+    .single();
+
+  if (error) return null;
+  return data;
+}
 }

@@ -39,25 +39,76 @@ export class PacientesService {
     return data;
   }
 
-  async crearPaciente(paciente: any) {
-    const { data, error } = await this.supabase
-      .from('pacientes')
-      .insert(paciente)
+  async crearPaciente(datos: any) {
+    // Paso 1: Crear usuario sin auth_user_id
+    const { data: usuario, error: errorUsuario } = await this.supabase
+      .from('usuarios')
+      .insert({
+        email: datos.email,
+        nombre: datos.nombre,
+        apellidos: datos.apellidos,
+        rol: 'paciente'
+      })
       .select()
       .single();
 
-    if (error) {
-      console.error('Error creando paciente:', error.message);
-      return { data: null, error };
+    if (errorUsuario) {
+      console.error('Error creando usuario:', errorUsuario.message);
+      return { data: null, error: errorUsuario };
     }
 
-    return { data, error: null };
+    // Paso 2: Crear paciente vinculado al usuario
+    const { data: paciente, error: errorPaciente } = await this.supabase
+      .from('pacientes')
+      .insert({
+        usuario_id: usuario.id,
+        nutricionista_id: datos.nutricionista_id,
+        dni: datos.dni,
+        fecha_nacimiento: datos.fecha_nacimiento,
+        sexo: datos.sexo,
+        estado_civil: datos.estado_civil || null,
+        telefono: datos.telefono,
+        email: datos.email,
+        direccion: datos.direccion,
+        ocupacion: datos.ocupacion || null,
+        nacionalidad: datos.nacionalidad || null,
+        motivo_consulta: datos.motivo_consulta,
+        alergias: datos.alergias,
+        intolerancias: datos.intolerancias
+      })
+      .select()
+      .single();
+
+    if (errorPaciente) {
+      console.error('Error creando paciente:', errorPaciente.message);
+      // Si falla el paciente, borramos el usuario creado
+      await this.supabase.from('usuarios').delete().eq('id', usuario.id);
+      return { data: null, error: errorPaciente };
+    }
+
+    return { data: paciente, error: null };
   }
 
   async getPacienteById(id: string) {
     const { data, error } = await this.supabase
       .from('pacientes')
-      .select('*')
+      .select(`
+      *,
+      usuario:usuario_id (
+        nombre,
+        apellidos,
+        email,
+        avatar_url
+      ),
+      nutricionista:nutricionista_id (
+        id,
+        especialidad,
+        usuario:usuario_id (
+          nombre,
+          apellidos
+        )
+      )
+    `)
       .eq('id', id)
       .single();
 

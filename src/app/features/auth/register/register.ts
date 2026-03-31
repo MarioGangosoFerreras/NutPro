@@ -15,8 +15,8 @@ import { CloudinaryService } from '../../../core/services/cloudinary';
   selector: 'app-register',
   imports: [
     FormsModule, RouterLink,
-    IonContent, IonItem, IonLabel, IonInput,
-    IonButton, IonSpinner, IonText, IonAvatar, IonIcon
+    IonContent, IonInput,
+    IonButton, IonSpinner, IonIcon
   ],
   templateUrl: './register.html',
   styleUrl: './register.css'

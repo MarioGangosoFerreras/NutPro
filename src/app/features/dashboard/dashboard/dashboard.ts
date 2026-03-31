@@ -7,7 +7,7 @@ import { Header } from "../../../shared/components/header/header";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, IonContent, IonHeader, IonToolbar, IonTitle, IonButton, Header, RouterLink],
+  imports: [CommonModule, IonContent, IonButton, Header, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

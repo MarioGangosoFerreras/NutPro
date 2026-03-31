@@ -21,17 +21,10 @@ import {
   imports: [
     FormsModule,
     IonContent,
-    IonCard,
     RouterLink,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonItem,
-    IonLabel,
     IonInput,
     IonButton,
     IonSpinner,
-    IonText
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',

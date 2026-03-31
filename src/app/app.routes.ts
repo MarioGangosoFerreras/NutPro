@@ -30,6 +30,24 @@ export const routes: Routes = [
 {
   path: 'pacientes/nuevo',
   canActivate: [authGuard],
-  loadComponent: () => import('./features/pacientes/nuevo-paciente/nuevo-paciente').then(m => m.NuevoPaciente)
+  loadComponent: () => import('./features/pacientes/nuevo-paciente/nuevo-paciente')
+    .then(m => m.NuevoPaciente)
+},
+{
+  path: 'pendiente-verificacion',
+  loadComponent: () => import('./features/auth/pendiente-verificacion/pendiente-verificacion')
+    .then(m => m.PendienteVerificacion)
+},
+{
+  path: 'admin',
+  canActivate: [authGuard],
+  loadComponent: () => import('./features/admin/panel-admin/panel-admin')
+    .then(m => m.PanelAdmin)
+},
+{
+  path: 'pacientes/:id',
+  canActivate: [authGuard],
+  loadComponent: () => import('./features/pacientes/ficha-paciente/ficha-paciente')
+    .then(m => m.FichaPaciente)
 }
 ];

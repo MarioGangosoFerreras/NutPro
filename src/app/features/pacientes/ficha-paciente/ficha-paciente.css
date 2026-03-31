@@ -1,0 +1,161 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+
+.ficha-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.btn-back {
+  --color: #2d6a4f;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.paciente-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}
+
+.paciente-avatar {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  background: #e8f5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.paciente-avatar ion-icon {
+  font-size: 48px;
+  color: #2d6a4f;
+}
+
+.paciente-info h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #2d6a4f;
+  margin: 0 0 4px;
+}
+
+.paciente-info p {
+  color: #888;
+  font-size: 14px;
+  margin: 0 0 8px;
+  text-transform: capitalize;
+}
+
+.section-block {
+  background: #f9fafb;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #eee;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d6a4f;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.info-item ion-icon {
+  font-size: 20px;
+  color: #2d6a4f;
+  margin-top: 2px;
+  min-width: 20px;
+}
+
+.info-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.tags-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.tags-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+.tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.acciones-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.accion-btn {
+  --border-radius: 12px;
+  --color: #2d6a4f;
+  --border-color: #2d6a4f;
+  height: 52px;
+}
+
+@media (max-width: 480px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .paciente-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+}
