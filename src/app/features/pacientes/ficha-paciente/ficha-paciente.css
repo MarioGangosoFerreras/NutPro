@@ -159,3 +159,158 @@
     text-align: center;
   }
 }
+
+/* Avatar editable */
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-edit-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--ion-color-primary);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Botones edición/cancelar/guardar */
+.acciones-edicion {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Nombre en modo edición (en la cabecera) */
+.nombre-edicion {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 220px;
+}
+
+/* Grid de campos editables */
+.edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.edit-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+ion-item {
+  --border-radius: 12px;
+  --background: #f8fffe;
+}
+
+@media (max-width: 480px) {
+  .edit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.tags-edit-group {
+  margin-bottom: 16px;
+}
+
+.tags-edit-group .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+  min-height: 32px;
+}
+
+.tag-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tag-danger {
+  background: #fde8e8;
+  color: #c0392b;
+}
+
+.tag-warning {
+  background: #fef3cd;
+  color: #856404;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  color: inherit;
+  opacity: 0.6;
+}
+
+.tag-remove:hover {
+  opacity: 1;
+}
+
+.tag-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-input {
+  flex: 1;
+  --border-radius: 12px;
+}
+
+/* --- CAMBIO DE COLOR DE BOTONES --- */
+
+/* 1. Estilo para el botón de GUARDAR (Sólido y Verde) */
+.btn-guardar {
+  /* Fondo verde (usando el color que ya tienes en tus títulos) */
+  --background: #2d6a4f;
+  /* Texto en blanco para contraste */
+  --color: #ffffff;
+  /* Peso de fuente negrita */
+  font-weight: 700;
+  /* Borde redondeado sutil */
+  --border-radius: 8px;
+}
+
+/* Estado activo/pulsado para el botón guardar */
+.btn-guardar::part(native):active {
+  --background: #1b4332; /* Un verde más oscuro al pulsar */
+}
+
+/* 2. Estilo para el botón de EDITAR (Outline y Verde) */
+.btn-editar {
+  /* Color del texto y del borde */
+  --color: #2d6a4f !important;
+  --border-color: #2d6a4f !important;
+  /* Peso de fuente negrita */
+  font-weight: 700;
+  /* Borde redondeado sutil */
+  --border-radius: 8px;
+}
+
+/* Estado activo/pulsado para el botón editar */
+.btn-editar::part(native):active {
+  --background: rgba(45, 106, 79, 0.1); /* Fondo verde muy suave al pulsar */
+}
+
+/* --- FIN DEL CAMBIO DE COLOR --- */

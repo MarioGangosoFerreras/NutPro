@@ -1,7 +1,6 @@
 <app-header></app-header>
 
 <ion-content class="ion-padding">
-
   @if (loading) {
     <div class="loading-container">
       <ion-spinner name="crescent"></ion-spinner>
@@ -10,8 +9,7 @@
 
   @if (!loading && paciente) {
     <div class="ficha-container">
-
-      <!-- Cabecera del paciente -->
+      <!-- Cabecera -->
       <div class="ficha-header">
         <ion-button fill="clear" class="btn-back" (click)="volver()">
           <ion-icon name="arrow-back-outline"></ion-icon>
@@ -19,94 +17,206 @@
         </ion-button>
 
         <div class="paciente-hero">
-          <ion-avatar class="paciente-avatar">
-            @if (paciente.usuario?.avatar_url) {
-              <img [src]="paciente.usuario.avatar_url" alt="Avatar">
-            } @else {
-              <ion-icon name="person-circle-outline"></ion-icon>
+          <!-- Avatar con overlay de edición -->
+          <div class="avatar-wrapper">
+            <ion-avatar class="paciente-avatar">
+              @if (editando && avatarPreview) {
+                <img [src]="avatarPreview" alt="Avatar preview" />
+              } @else if (paciente.usuario?.avatar_url) {
+                <img [src]="paciente.usuario.avatar_url" alt="Avatar" />
+              } @else {
+                <ion-icon name="person-circle-outline"></ion-icon>
+              }
+            </ion-avatar>
+            @if (editando) {
+              <label class="avatar-edit-btn" for="avatarInput">
+                <ion-icon name="camera-outline"></ion-icon>
+              </label>
+              <input
+                id="avatarInput"
+                type="file"
+                accept="image/*"
+                (change)="onAvatarChange($event)"
+                hidden
+              />
             }
-          </ion-avatar>
-          <div class="paciente-info">
-            <h1>{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</h1>
-            <p>{{ calcularEdad(paciente.fecha_nacimiento) }} años · {{ paciente.sexo }}</p>
-            <ion-badge color="primary">{{ paciente.motivo_consulta }}</ion-badge>
           </div>
+
+          <div class="paciente-info">
+            @if (!editando) {
+              <h1>{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</h1>
+              <p>{{ calcularEdad(paciente.fecha_nacimiento) }} años · {{ paciente.sexo }}</p>
+              <ion-badge color="primary">{{ paciente.motivo_consulta }}</ion-badge>
+            } @else {
+              <div class="nombre-edicion">
+                <ion-item>
+                  <ion-label position="stacked">Nombre</ion-label>
+                  <ion-input [(ngModel)]="form.nombre"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Apellidos</ion-label>
+                  <ion-input [(ngModel)]="form.apellidos"></ion-input>
+                </ion-item>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Botones modo vista / modo edición -->
+        <div class="acciones-edicion">
+          @if (!editando) {
+            <ion-button fill="outline" class="btn-editar" (click)="iniciarEdicion()">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar
+            </ion-button>
+          } @else {
+            <ion-button fill="clear" color="medium" (click)="cancelarEdicion()">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Cancelar
+            </ion-button>
+
+            <ion-button class="btn-guardar" (click)="guardar()" [disabled]="guardando">
+              @if (guardando) {
+                <ion-spinner name="crescent"></ion-spinner>
+              } @else {
+                <ion-icon name="save-outline" slot="start"></ion-icon>
+                Guardar
+              }
+            </ion-button>
+          }
         </div>
       </div>
 
       <!-- Datos personales -->
       <div class="section-block">
         <p class="section-title">👤 Datos personales</p>
-        <div class="info-grid">
-          <div class="info-item">
-            <ion-icon name="mail-outline"></ion-icon>
-            <div>
-              <span class="info-label">Email</span>
-              <span class="info-value">{{ paciente.email }}</span>
+
+        @if (!editando) {
+          <div class="info-grid">
+            <div class="info-item">
+              <ion-icon name="mail-outline"></ion-icon>
+              <div>
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ paciente.email }}</span>
+              </div>
             </div>
-          </div>
-          <div class="info-item">
-            <ion-icon name="call-outline"></ion-icon>
-            <div>
-              <span class="info-label">Teléfono</span>
-              <span class="info-value">{{ paciente.telefono }}</span>
+            <div class="info-item">
+              <ion-icon name="call-outline"></ion-icon>
+              <div>
+                <span class="info-label">Teléfono</span>
+                <span class="info-value">{{ paciente.telefono }}</span>
+              </div>
             </div>
-          </div>
-          <div class="info-item">
-            <ion-icon name="location-outline"></ion-icon>
-            <div>
-              <span class="info-label">Dirección</span>
-              <span class="info-value">{{ paciente.direccion }}</span>
+            <div class="info-item">
+              <ion-icon name="location-outline"></ion-icon>
+              <div>
+                <span class="info-label">Dirección</span>
+                <span class="info-value">{{ paciente.direccion }}</span>
+              </div>
             </div>
-          </div>
-          <div class="info-item">
-            <ion-icon name="calendar-outline"></ion-icon>
-            <div>
-              <span class="info-label">Fecha de nacimiento</span>
-              <span class="info-value">{{ paciente.fecha_nacimiento }}</span>
-            </div>
-          </div>
-          @if (paciente.dni) {
             <div class="info-item">
               <ion-icon name="calendar-outline"></ion-icon>
               <div>
-                <span class="info-label">DNI</span>
-                <span class="info-value">{{ paciente.dni }}</span>
+                <span class="info-label">Fecha de nacimiento</span>
+                <span class="info-value">{{ paciente.fecha_nacimiento }}</span>
               </div>
             </div>
-          }
-          @if (paciente.ocupacion) {
-            <div class="info-item">
-              <ion-icon name="calendar-outline"></ion-icon>
-              <div>
-                <span class="info-label">Ocupación</span>
-                <span class="info-value">{{ paciente.ocupacion }}</span>
+            @if (paciente.dni) {
+              <div class="info-item">
+                <ion-icon name="card-outline"></ion-icon>
+                <div>
+                  <span class="info-label">DNI</span>
+                  <span class="info-value">{{ paciente.dni }}</span>
+                </div>
               </div>
-            </div>
-          }
-          @if (paciente.estado_civil) {
-            <div class="info-item">
-              <ion-icon name="calendar-outline"></ion-icon>
-              <div>
-                <span class="info-label">Estado civil</span>
-                <span class="info-value">{{ paciente.estado_civil }}</span>
+            }
+            @if (paciente.ocupacion) {
+              <div class="info-item">
+                <ion-icon name="briefcase-outline"></ion-icon>
+                <div>
+                  <span class="info-label">Ocupación</span>
+                  <span class="info-value">{{ paciente.ocupacion }}</span>
+                </div>
               </div>
-            </div>
-          }
-          @if (paciente.nacionalidad) {
-            <div class="info-item">
-              <ion-icon name="calendar-outline"></ion-icon>
-              <div>
-                <span class="info-label">Nacionalidad</span>
-                <span class="info-value">{{ paciente.nacionalidad }}</span>
+            }
+            @if (paciente.estado_civil) {
+              <div class="info-item">
+                <ion-icon name="heart-outline"></ion-icon>
+                <div>
+                  <span class="info-label">Estado civil</span>
+                  <span class="info-value">{{ paciente.estado_civil }}</span>
+                </div>
               </div>
-            </div>
-          }
-        </div>
+            }
+            @if (paciente.nacionalidad) {
+              <div class="info-item">
+                <ion-icon name="flag-outline"></ion-icon>
+                <div>
+                  <span class="info-label">Nacionalidad</span>
+                  <span class="info-value">{{ paciente.nacionalidad }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- MODO EDICIÓN -->
+          <div class="edit-grid">
+            <ion-item>
+              <ion-label position="stacked">Email</ion-label>
+              <ion-input type="email" [(ngModel)]="form.email"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Teléfono</ion-label>
+              <ion-input type="tel" [(ngModel)]="form.telefono"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Dirección</ion-label>
+              <ion-input [(ngModel)]="form.direccion"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Fecha de nacimiento</ion-label>
+              <ion-input type="date" [(ngModel)]="form.fecha_nacimiento"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Sexo</ion-label>
+              <ion-select [(ngModel)]="form.sexo" placeholder="Selecciona">
+                <ion-select-option value="masculino">Masculino</ion-select-option>
+                <ion-select-option value="femenino">Femenino</ion-select-option>
+                <ion-select-option value="otro">Otro</ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">DNI</ion-label>
+              <ion-input [(ngModel)]="form.dni"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Ocupación</ion-label>
+              <ion-input [(ngModel)]="form.ocupacion"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Estado civil</ion-label>
+              <ion-select [(ngModel)]="form.estado_civil" placeholder="Selecciona">
+                <ion-select-option value="soltero">Soltero/a</ion-select-option>
+                <ion-select-option value="casado">Casado/a</ion-select-option>
+                <ion-select-option value="divorciado">Divorciado/a</ion-select-option>
+                <ion-select-option value="viudo">Viudo/a</ion-select-option>
+                <ion-select-option value="pareja_de_hecho">Pareja de hecho</ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Nacionalidad</ion-label>
+              <ion-input [(ngModel)]="form.nacionalidad"></ion-input>
+            </ion-item>
+            <ion-item class="full-width">
+              <ion-label position="stacked">Motivo de consulta</ion-label>
+              <ion-textarea [(ngModel)]="form.motivo_consulta" rows="3"></ion-textarea>
+            </ion-item>
+          </div>
+        }
       </div>
 
       <!-- Alergias e intolerancias -->
-      @if (paciente.alergias?.length > 0 || paciente.intolerancias?.length > 0) {
+      @if (!editando && (paciente.alergias?.length > 0 || paciente.intolerancias?.length > 0)) {
         <div class="section-block">
           <p class="section-title">⚠️ Alergias e intolerancias</p>
           @if (paciente.alergias?.length > 0) {
@@ -132,19 +242,81 @@
         </div>
       }
 
-      <!-- Acciones -->
-      <div class="acciones-grid">
-        <ion-button expand="block" fill="outline" class="accion-btn">
-          <ion-icon name="calendar-outline" slot="start"></ion-icon>
-          Citas
-        </ion-button>
-        <ion-button expand="block" fill="outline" class="accion-btn">
-          <ion-icon name="mail-outline" slot="start"></ion-icon>
-          Mensajes
-        </ion-button>
-      </div>
+      @if (editando) {
+        <div class="section-block">
+          <p class="section-title">⚠️ Alergias e intolerancias</p>
 
+          <!-- Alergias -->
+          <div class="tags-edit-group">
+            <span class="tags-label">Alergias</span>
+            <div class="tags">
+              @for (alergia of form.alergias; track alergia; let i = $index) {
+                <div class="tag-chip tag-danger">
+                  {{ alergia }}
+                  <button class="tag-remove" (click)="eliminarTag('alergias', i)">×</button>
+                </div>
+              }
+            </div>
+            <div class="tag-input-row">
+              <ion-item class="tag-input">
+                <ion-input
+                  placeholder="Añadir alergia..."
+                  [(ngModel)]="nuevaAlergia"
+                  (keydown)="onTagKeydown($event, 'alergias', nuevaAlergia)"
+                >
+                </ion-input>
+              </ion-item>
+              <ion-button size="small" (click)="agregarTag('alergias', nuevaAlergia)">
+                Añadir
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- Intolerancias -->
+          <div class="tags-edit-group">
+            <span class="tags-label">Intolerancias</span>
+            <div class="tags">
+              @for (intolerancia of form.intolerancias; track intolerancia; let i = $index) {
+                <div class="tag-chip tag-warning">
+                  {{ intolerancia }}
+                  <button class="tag-remove" (click)="eliminarTag('intolerancias', i)">×</button>
+                </div>
+              }
+            </div>
+            <div class="tag-input-row">
+              <ion-item class="tag-input">
+                <ion-input
+                  placeholder="Añadir intolerancia..."
+                  [(ngModel)]="nuevaIntolerancia"
+                  (keydown)="onTagKeydown($event, 'intolerancias', nuevaIntolerancia)"
+                >
+                </ion-input>
+              </ion-item>
+              <ion-button
+                size="small"
+                color="warning"
+                (click)="agregarTag('intolerancias', nuevaIntolerancia)"
+              >
+                Añadir
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Acciones (solo en modo vista) -->
+      @if (!editando) {
+        <div class="acciones-grid">
+          <ion-button expand="block" fill="outline" class="accion-btn">
+            <ion-icon name="calendar-outline" slot="start"></ion-icon>
+            Citas
+          </ion-button>
+          <ion-button expand="block" fill="outline" class="accion-btn">
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
+            Mensajes
+          </ion-button>
+        </div>
+      }
     </div>
   }
-
 </ion-content>

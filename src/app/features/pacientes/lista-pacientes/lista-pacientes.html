@@ -1,52 +1,57 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-
-  @if (loading) {
+<ion-content class="ion-padding" color="light">
+  @if (loading()) {
     <div class="loading-container">
       <ion-spinner name="crescent" color="primary"></ion-spinner>
     </div>
+  } @else {
+    
+    @if (pacientes().length === 0) {
+      <div class="empty-container">
+        <ion-icon name="person-outline" class="empty-icon"></ion-icon>
+        <p>No tienes pacientes todavía</p>
+        <ion-button shape="round" (click)="nuevoPaciente()">Añadir primer paciente</ion-button>
+      </div>
+    }
+
+    @if (pacientes().length > 0) {
+      <ion-list lines="none">
+        @for (paciente of pacientes(); track paciente.id) {
+          <ion-item button (click)="verPaciente(paciente.id)" class="paciente-item" detail="false">
+            <ion-avatar slot="start">
+              @if (paciente.usuario?.avatar_url) {
+                <img [src]="paciente.usuario.avatar_url + '?v=' + version" alt="Foto" />
+              } @else {
+                <div class="avatar-placeholder">
+                  <ion-icon name="person-outline" class="avatar-icon"></ion-icon>
+                </div>
+              }
+            </ion-avatar>
+
+            <ion-label>
+              <h2>{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</h2>
+              <p>
+                <ion-icon name="mail-outline"></ion-icon>
+                {{ paciente.email }}
+              </p>
+              <p>
+                <ion-icon name="call-outline"></ion-icon>
+                {{ paciente.telefono }}
+              </p>
+            </ion-label>
+
+            <ion-badge slot="end"> {{ calcularEdad(paciente.fecha_nacimiento) }} años </ion-badge>
+          </ion-item>
+        }
+      </ion-list>
+    }
+
   }
 
-  @if (!loading && pacientes.length === 0) {
-    <div class="empty-container">
-      <ion-icon name="person-outline" class="empty-icon"></ion-icon>
-      <p>No tienes pacientes todavía</p>
-      <ion-button (click)="nuevoPaciente()">Añadir primer paciente</ion-button>
-    </div>
-  }
-
-  @if (!loading && pacientes.length > 0) {
-    <ion-list>
-      @for (paciente of pacientes; track paciente.id) {
-        <ion-item button (click)="verPaciente(paciente.id)" class="paciente-item">
-          <ion-avatar slot="start">
-            <ion-icon name="person-outline" class="avatar-icon"></ion-icon>
-          </ion-avatar>
-          <ion-label>
-            <h2>{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</h2>
-            <p>
-              <ion-icon name="mail-outline"></ion-icon>
-              {{ paciente.email }}
-            </p>
-            <p>
-              <ion-icon name="call-outline"></ion-icon>
-              {{ paciente.telefono }}
-            </p>
-          </ion-label>
-          <ion-badge slot="end" color="medium">
-            {{ calcularEdad(paciente.fecha_nacimiento) }} años
-          </ion-badge>
-        </ion-item>
-      }
-    </ion-list>
-  }
-
-  <!-- Botón flotante para añadir paciente -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="nuevoPaciente()" color="primary">
+    <ion-fab-button (click)="nuevoPaciente()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-
 </ion-content>

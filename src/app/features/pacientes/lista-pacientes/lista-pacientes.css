@@ -1,55 +1,84 @@
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50vh;
+/* Contenedor para centrar la lista en pantallas grandes */
+ion-list {
+  background: transparent;
+  max-width: 1000px;
+  margin: 0 auto !important;
 }
 
-.empty-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 50vh;
-  gap: 16px;
-  color: #888;
-}
-
-.empty-icon {
-  font-size: 64px;
-  color: #ccc;
-}
-
+/* La Tarjeta (Item) */
 .paciente-item {
-  --border-radius: 12px;
-  margin-bottom: 8px;
-  --background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --background: #ffffff;
+  --border-radius: 16px;
+  --padding-start: 12px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  margin-bottom: 12px;
+  /* Sombra más suave y moderna */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
 }
 
-.paciente-item h2 {
-  font-weight: 600;
-  font-size: 16px;
+/* Avatar corregido y centrado */
+ion-avatar {
+  width: 64px;
+  height: 64px;
+  margin-right: 16px;
+  border: 2px solid #e8f5e9;
+  background: #f0fdf4; /* Un fondo verde muy suave para cuando no hay foto */
+  
+  /* Estas 3 líneas centran el icono perfectamente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Regla para el icono de persona */
+.avatar-icon {
+  margin: 0;
+  padding: 0;
+  font-size: 32px; /* Tamaño del icono dentro del círculo */
   color: #2d6a4f;
+  /* Evita que el line-height del texto lo empuje hacia abajo */
+  display: block; 
+}
+/* Tipografía */
+.paciente-item h2 {
+  font-weight: 700;
+  font-size: 18px;
+  color: #1b4332; /* Verde oscuro saludable */
+  margin-bottom: 4px;
 }
 
 .paciente-item p {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 14px;
   color: #666;
-  margin-top: 2px;
+  margin: 2px 0;
 }
 
-ion-avatar {
-  background: #e8f5e9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.paciente-item p ion-icon {
+  color: #40916c; /* Iconos en verde */
+  font-size: 16px;
 }
 
-.avatar-icon {
-  font-size: 24px;
-  color: #2d6a4f;
+/* Badge (Edad) */
+ion-badge {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  /* Color secundario suave */
+  --background: #d8f3dc;
+  color: #1b4332;
+}
+
+/* Efecto al pulsar */
+.paciente-item::part(native):active {
+  background: #f8f9fa;
 }

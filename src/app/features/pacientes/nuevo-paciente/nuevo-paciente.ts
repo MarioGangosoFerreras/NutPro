@@ -4,20 +4,24 @@ import { FormsModule } from '@angular/forms';
 import { PacientesService } from '../../../core/services/pacientes';
 import { AuthService } from '../../../core/services/auth';
 import { Header } from '../../../shared/components/header/header';
-import { IonButton, IonContent, IonInput, IonSpinner } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonInput, IonSpinner, IonIcon } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-nuevo-paciente',
   imports: [
     FormsModule, RouterLink,
-    Header, IonContent, IonInput, IonButton, IonSpinner
-  ],
+    Header, IonContent, IonInput, IonButton, IonSpinner,
+    IonIcon
+],
   templateUrl: './nuevo-paciente.html',
   styleUrl: './nuevo-paciente.css'
 })
 export class NuevoPaciente {
   nombre = '';
   apellidos = '';
+
+  avatarFile: File | null = null;
+  avatarPreview: string | null = null;
 
   paciente = {
     dni: '',
@@ -44,6 +48,18 @@ export class NuevoPaciente {
     private authService: AuthService,
     private router: Router
   ) {}
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.avatarFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.avatarPreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   async guardar() {
     if (!this.nombre || !this.apellidos || !this.paciente.dni ||
@@ -76,7 +92,7 @@ export class NuevoPaciente {
       nombre: this.nombre,
       apellidos: this.apellidos,
       nutricionista_id: nutricionistaId
-    });
+    }, this.avatarFile);
 
     this.loading = false;
 
