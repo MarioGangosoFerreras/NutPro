@@ -1,316 +1,226 @@
+/* --- Variables y Reset General --- */
+:host {
+  --primary-medical: #2d6a4f;
+  --primary-soft: #e8f5e9;
+  --danger-medical: #c0392b;
+  --warning-medical: #f39c12;
+  --bg-subtle: #f8fafc;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
 .loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 50vh;
+  height: 60vh;
 }
 
 .ficha-container {
-  max-width: 700px;
+  max-width: 800px; /* Un poco más ancho para legibilidad */
   margin: 0 auto;
+  padding-bottom: 40px;
 }
 
+/* --- Botón Volver --- */
 .btn-back {
-  --color: #2d6a4f;
-  margin-bottom: 16px;
-  font-size: 14px;
+  --color: var(--primary-medical);
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: transform 0.2s;
 }
+.btn-back:hover { transform: translateX(-5px); }
 
+/* --- Hero Section (Cabecera Paciente) --- */
 .paciente-hero {
   display: flex;
   align-items: center;
-  gap: 20px;
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  margin-bottom: 20px;
+  gap: 24px;
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 24px;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+.avatar-wrapper {
+  position: relative;
 }
 
 .paciente-avatar {
-  width: 80px;
-  height: 80px;
-  min-width: 80px;
-  background: #e8f5e9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.paciente-avatar ion-icon {
-  font-size: 48px;
-  color: #2d6a4f;
+  width: 100px;
+  height: 100px;
+  border: 3px solid var(--primary-soft);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .paciente-info h1 {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 800;
-  color: #2d6a4f;
-  margin: 0 0 4px;
+  color: #1a3c2e;
+  margin: 0 0 6px;
 }
 
 .paciente-info p {
-  color: #888;
-  font-size: 14px;
-  margin: 0 0 8px;
-  text-transform: capitalize;
+  color: #64748b;
+  font-size: 15px;
+  margin-bottom: 10px;
 }
 
+/* --- Segmentos (Tabs) --- */
+.ficha-tabs {
+  background: #f1f5f9;
+  border-radius: 14px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+ion-segment-button {
+  --color: #64748b;
+  --color-checked: var(--primary-medical);
+  --indicator-color: white;
+  --indicator-box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  font-weight: 600;
+  min-height: 45px;
+}
+
+/* --- Bloques de Sección --- */
 .section-block {
-  background: #f9fafb;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  border: 1px solid #eee;
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid #f1f5f9;
 }
 
 .section-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #2d6a4f;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--primary-medical);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 16px;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--primary-medical);
+  padding-left: 12px;
 }
 
+/* --- Grid de Información --- */
 .info-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
 
 .info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  background: var(--bg-subtle);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
 }
 
-.info-item ion-icon {
-  font-size: 20px;
-  color: #2d6a4f;
-  margin-top: 2px;
-  min-width: 20px;
-}
-
-.info-item div {
-  display: flex;
-  flex-direction: column;
+.info-item:hover {
+  background: #f0fdf4;
+  border-color: var(--primary-soft);
 }
 
 .info-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #999;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 700;
 }
 
 .info-value {
   font-size: 14px;
-  color: #333;
-  font-weight: 500;
-}
-
-.tags-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-
-.tags-label {
-  font-size: 13px;
+  color: #334155;
   font-weight: 600;
-  color: #555;
 }
 
-.tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.acciones-grid {
+/* --- Toggles y Edición --- */
+.toggle-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
 }
 
-.accion-btn {
-  --border-radius: 12px;
-  --color: #2d6a4f;
-  --border-color: #2d6a4f;
-  height: 52px;
-}
-
-@media (max-width: 480px) {
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .acciones-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .paciente-hero {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-/* Avatar editable */
-.avatar-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.avatar-edit-btn {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: var(--ion-color-primary);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
+.toggle-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: white;
+  background: var(--bg-subtle);
+  padding: 10px 14px;
+  border-radius: 12px;
   font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  color: #475569;
 }
 
-/* Botones edición/cancelar/guardar */
-.acciones-edicion {
+/* --- Mediciones --- */
+.medicion-card {
+  border-radius: 18px;
+  margin-bottom: 16px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.medicion-card-header {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 12px;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
-/* Nombre en modo edición (en la cabecera) */
-.nombre-edicion {
+.medicion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  background: var(--bg-subtle);
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.medicion-dato {
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 220px;
 }
 
-/* Grid de campos editables */
-.edit-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
+.dato-label { font-size: 10px; color: #94a3b8; font-weight: 700; }
+.dato-valor { font-size: 15px; color: var(--primary-medical); font-weight: 700; }
 
-.edit-grid .full-width {
-  grid-column: 1 / -1;
-}
-
-ion-item {
+/* --- Botones --- */
+.btn-guardar {
+  --background: var(--primary-medical);
+  --background-activated: #1b4332;
   --border-radius: 12px;
-  --background: #f8fffe;
-}
-
-@media (max-width: 480px) {
-  .edit-grid {
-    grid-template-columns: 1fr;
-  }
-}
-.tags-edit-group {
-  margin-bottom: 16px;
-}
-
-.tags-edit-group .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 8px 0;
-  min-height: 32px;
+  height: 50px;
+  margin-top: 10px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.2);
 }
 
 .tag-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px 4px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 12px;
 }
 
-.tag-danger {
-  background: #fde8e8;
-  color: #c0392b;
+/* --- Ajustes Responsive --- */
+@media (max-width: 600px) {
+  .paciente-hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .acciones-edicion {
+    flex-direction: column;
+  }
 }
-
-.tag-warning {
-  background: #fef3cd;
-  color: #856404;
-}
-
-.tag-remove {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
-  padding: 0;
-  color: inherit;
-  opacity: 0.6;
-}
-
-.tag-remove:hover {
-  opacity: 1;
-}
-
-.tag-input-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tag-input {
-  flex: 1;
-  --border-radius: 12px;
-}
-
-/* --- CAMBIO DE COLOR DE BOTONES --- */
-
-/* 1. Estilo para el botón de GUARDAR (Sólido y Verde) */
-.btn-guardar {
-  /* Fondo verde (usando el color que ya tienes en tus títulos) */
-  --background: #2d6a4f;
-  /* Texto en blanco para contraste */
-  --color: #ffffff;
-  /* Peso de fuente negrita */
-  font-weight: 700;
-  /* Borde redondeado sutil */
-  --border-radius: 8px;
-}
-
-/* Estado activo/pulsado para el botón guardar */
-.btn-guardar::part(native):active {
-  --background: #1b4332; /* Un verde más oscuro al pulsar */
-}
-
-/* 2. Estilo para el botón de EDITAR (Outline y Verde) */
-.btn-editar {
-  /* Color del texto y del borde */
-  --color: #2d6a4f !important;
-  --border-color: #2d6a4f !important;
-  /* Peso de fuente negrita */
-  font-weight: 700;
-  /* Borde redondeado sutil */
-  --border-radius: 8px;
-}
-
-/* Estado activo/pulsado para el botón editar */
-.btn-editar::part(native):active {
-  --background: rgba(45, 106, 79, 0.1); /* Fondo verde muy suave al pulsar */
-}
-
-/* --- FIN DEL CAMBIO DE COLOR --- */
