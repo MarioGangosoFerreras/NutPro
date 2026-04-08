@@ -204,4 +204,14 @@ export class PacientesService {
 
     if (errorPaciente) throw errorPaciente;
   }
+
+  async eliminarPaciente(id: string, usuarioId: string) {
+  // Al borrar usuario, paciente se borra en cascada
+  const { error } = await this.supabase
+    .from('usuarios')
+    .delete()
+    .eq('id', usuarioId);
+
+  if (error) throw error;
+}
 }

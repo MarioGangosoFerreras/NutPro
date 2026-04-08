@@ -18,6 +18,7 @@ import {
   IonSelectOption,
   IonTextarea,
   ToastController,
+  AlertController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -77,6 +78,7 @@ export class FichaPaciente implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private toastCtrl: ToastController,
+    private alertCtrl: AlertController,
   ) {
     addIcons({
       arrowBackOutline,
@@ -248,5 +250,36 @@ export class FichaPaciente implements OnInit {
       position: 'bottom',
     });
     await toast.present();
+  }
+
+  async confirmarEliminar() {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar paciente',
+      message: `¿Seguro que quieres eliminar a ${this.paciente.usuario?.nombre} ${this.paciente.usuario?.apellidos}? Esta acción no se puede deshacer.`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          cssClass: 'alert-btn-danger',
+          handler: () => this.eliminar(),
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  private async eliminar() {
+    try {
+      await this.pacientesService.eliminarPaciente(this.paciente.id, this.paciente.usuario_id);
+      await this.mostrarToast('Paciente eliminado correctamente', 'success');
+      this.router.navigate(['/pacientes']);
+    } catch (error) {
+      console.error('Error al eliminar:', error);
+      await this.mostrarToast('Error al eliminar el paciente', 'danger');
+    }
   }
 }

@@ -65,7 +65,11 @@
         <!-- Botones modo vista / modo edición -->
         <div class="acciones-edicion">
           @if (!editando) {
-            <ion-button fill="outline" class="btn-editar" (click)="iniciarEdicion()">
+            <ion-button fill="outline" color="danger" (click)="confirmarEliminar()">
+              <ion-icon name="trash-outline" slot="start"></ion-icon>
+              Eliminar
+            </ion-button>
+            <ion-button fill="outline" (click)="iniciarEdicion()">
               <ion-icon name="create-outline" slot="start"></ion-icon>
               Editar
             </ion-button>
@@ -74,8 +78,7 @@
               <ion-icon name="close-outline" slot="start"></ion-icon>
               Cancelar
             </ion-button>
-
-            <ion-button class="btn-guardar" (click)="guardar()" [disabled]="guardando">
+            <ion-button (click)="guardar()" [disabled]="guardando">
               @if (guardando) {
                 <ion-spinner name="crescent"></ion-spinner>
               } @else {
