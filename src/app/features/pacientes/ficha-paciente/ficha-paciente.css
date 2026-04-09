@@ -32,8 +32,9 @@
 
 /* --- Hero Section (Cabecera Paciente) --- */
 .paciente-hero {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 24px;
   background: white;
   border-radius: 24px;
@@ -115,8 +116,11 @@ ion-segment-button {
 }
 
 .info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   background: var(--bg-subtle);
-  padding: 12px;
+  padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid transparent;
   transition: all 0.2s;
@@ -127,16 +131,29 @@ ion-segment-button {
   border-color: var(--primary-soft);
 }
 
+/* NUEVO: contenedor interno que apila label + valor */
+.info-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .info-label {
-  font-size: 10px;
+  display: block;          /* ← esto era el problema */
+  font-size: 11px;
   color: #94a3b8;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .info-value {
+  display: block;          /* ← y esto */
   font-size: 14px;
   color: #334155;
   font-weight: 600;
+  word-break: break-word;
 }
 
 /* --- Toggles y Edición --- */
@@ -208,19 +225,92 @@ ion-segment-button {
   font-size: 12px;
 }
 
+.fab-guardar {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  --border-radius: 16px;
+  --box-shadow: 0 4px 16px rgba(45, 106, 79, 0.35);
+  height: 52px;
+  padding: 0 24px;
+  font-weight: 700;
+}
+
 /* --- Ajustes Responsive --- */
+.acciones-edicion {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
 @media (max-width: 600px) {
   .paciente-hero {
     flex-direction: column;
     text-align: center;
     padding: 20px;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
   }
-  
-  .acciones-edicion {
-    flex-direction: column;
-  }
+}
+
+.menu-acciones {
+  position: relative;
+}
+
+.btn-dots {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  line-height: 1;
+}
+
+.btn-dots:hover {
+  background: #f1f5f9;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 42px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 170px;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.dropdown-item {
+  padding: 11px 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #334155;
+  font-weight: 500;
+}
+
+.dropdown-item:hover {
+  background: #f8fafc;
+}
+
+.dropdown-item.danger {
+  color: #c0392b;
+}
+
+.dropdown-item.danger:hover {
+  background: #fef2f2;
 }

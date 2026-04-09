@@ -1,7 +1,6 @@
 <app-header></app-header>
 
 <ion-content class="ion-padding">
-
   @if (loading) {
     <div class="loading-container">
       <ion-spinner name="crescent"></ion-spinner>
@@ -10,7 +9,6 @@
 
   @if (!loading && paciente) {
     <div class="ficha-container">
-
       <!-- Cabecera siempre visible -->
       <div class="ficha-header">
         <ion-button fill="clear" class="btn-back" (click)="volver()">
@@ -22,9 +20,9 @@
           <div class="avatar-wrapper">
             <ion-avatar class="paciente-avatar">
               @if (editando && avatarPreview) {
-                <img [src]="avatarPreview" alt="preview">
+                <img [src]="avatarPreview" alt="preview" />
               } @else if (paciente.usuario?.avatar_url) {
-                <img [src]="paciente.usuario.avatar_url" alt="avatar">
+                <img [src]="paciente.usuario.avatar_url" alt="avatar" />
               } @else {
                 <ion-icon name="person-circle-outline"></ion-icon>
               }
@@ -33,7 +31,13 @@
               <label class="avatar-edit-btn" for="avatarInput">
                 <ion-icon name="camera-outline"></ion-icon>
               </label>
-              <input id="avatarInput" type="file" accept="image/*" (change)="onAvatarChange($event)" hidden>
+              <input
+                id="avatarInput"
+                type="file"
+                accept="image/*"
+                (change)="onAvatarChange($event)"
+                hidden
+              />
             }
           </div>
           <div class="paciente-info">
@@ -54,28 +58,37 @@
               </div>
             }
           </div>
-        </div>
-
-        <div class="acciones-edicion">
-          @if (!editando) {
-            <ion-button fill="outline" color="danger" (click)="confirmarEliminar()">
-              <ion-icon name="trash-outline" slot="start"></ion-icon>
-              Eliminar
-            </ion-button>
-            <ion-button fill="outline" (click)="iniciarEdicion()">
-              <ion-icon name="create-outline" slot="start"></ion-icon>
-              Editar
-            </ion-button>
-          } @else {
-            <ion-button fill="clear" color="medium" (click)="cancelarEdicion()">
-              <ion-icon name="close-outline" slot="start"></ion-icon>
-              Cancelar
-            </ion-button>
-            <ion-button (click)="guardar()" [disabled]="guardando">
-              @if (guardando) { <ion-spinner name="crescent"></ion-spinner> }
-              @else { <ion-icon name="save-outline" slot="start"></ion-icon> Guardar }
-            </ion-button>
-          }
+          <div class="acciones-edicion">
+            @if (!editando) {
+              <div class="menu-acciones">
+                <button class="btn-dots" (click)="toggleMenu()">⋯</button>
+                @if (menuAbierto) {
+                  <div class="dropdown">
+                    <div class="dropdown-item" (click)="iniciarEdicion(); toggleMenu()">
+                      <ion-icon name="create-outline"></ion-icon>
+                      Editar paciente
+                    </div>
+                    <div class="dropdown-item danger" (click)="confirmarEliminar(); toggleMenu()">
+                      <ion-icon name="trash-outline"></ion-icon>
+                      Eliminar paciente
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <ion-button fill="clear" color="medium" (click)="cancelarEdicion()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Cancelar
+              </ion-button>
+              <ion-button (click)="guardar()" [disabled]="guardando">
+                @if (guardando) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="save-outline" slot="start"></ion-icon> Guardar
+                }
+              </ion-button>
+            }
+          </div>
         </div>
       </div>
 
@@ -107,51 +120,87 @@
             <div class="info-grid">
               <div class="info-item">
                 <ion-icon name="mail-outline"></ion-icon>
-                <div><span class="info-label">Email</span><span class="info-value">{{ paciente.email }}</span></div>
+                <div>
+                  <span class="info-label">Email</span
+                  ><span class="info-value">{{ paciente.email }}</span>
+                </div>
               </div>
               <div class="info-item">
                 <ion-icon name="call-outline"></ion-icon>
-                <div><span class="info-label">Teléfono</span><span class="info-value">{{ paciente.telefono }}</span></div>
+                <div>
+                  <span class="info-label">Teléfono</span
+                  ><span class="info-value">{{ paciente.telefono }}</span>
+                </div>
               </div>
               <div class="info-item">
                 <ion-icon name="location-outline"></ion-icon>
-                <div><span class="info-label">Dirección</span><span class="info-value">{{ paciente.direccion }}</span></div>
+                <div>
+                  <span class="info-label">Dirección</span
+                  ><span class="info-value">{{ paciente.direccion }}</span>
+                </div>
               </div>
               <div class="info-item">
                 <ion-icon name="calendar-outline"></ion-icon>
-                <div><span class="info-label">F. nacimiento</span><span class="info-value">{{ paciente.fecha_nacimiento }}</span></div>
+                <div>
+                  <span class="info-label">F. nacimiento</span
+                  ><span class="info-value">{{ paciente.fecha_nacimiento }}</span>
+                </div>
               </div>
               @if (paciente.dni) {
                 <div class="info-item">
                   <ion-icon name="card-outline"></ion-icon>
-                  <div><span class="info-label">DNI</span><span class="info-value">{{ paciente.dni }}</span></div>
+                  <div>
+                    <span class="info-label">DNI</span
+                    ><span class="info-value">{{ paciente.dni }}</span>
+                  </div>
                 </div>
               }
               @if (paciente.ocupacion) {
                 <div class="info-item">
                   <ion-icon name="briefcase-outline"></ion-icon>
-                  <div><span class="info-label">Ocupación</span><span class="info-value">{{ paciente.ocupacion }}</span></div>
+                  <div>
+                    <span class="info-label">Ocupación</span
+                    ><span class="info-value">{{ paciente.ocupacion }}</span>
+                  </div>
                 </div>
               }
               @if (paciente.estado_civil) {
                 <div class="info-item">
                   <ion-icon name="heart-outline"></ion-icon>
-                  <div><span class="info-label">Estado civil</span><span class="info-value">{{ paciente.estado_civil }}</span></div>
+                  <div>
+                    <span class="info-label">Estado civil</span
+                    ><span class="info-value">{{ paciente.estado_civil }}</span>
+                  </div>
                 </div>
               }
               @if (paciente.nacionalidad) {
                 <div class="info-item">
                   <ion-icon name="flag-outline"></ion-icon>
-                  <div><span class="info-label">Nacionalidad</span><span class="info-value">{{ paciente.nacionalidad }}</span></div>
+                  <div>
+                    <span class="info-label">Nacionalidad</span
+                    ><span class="info-value">{{ paciente.nacionalidad }}</span>
+                  </div>
                 </div>
               }
             </div>
           } @else {
             <div class="edit-grid">
-              <ion-item><ion-label position="stacked">Email</ion-label><ion-input type="email" [(ngModel)]="form.email"></ion-input></ion-item>
-              <ion-item><ion-label position="stacked">Teléfono</ion-label><ion-input type="tel" [(ngModel)]="form.telefono"></ion-input></ion-item>
-              <ion-item><ion-label position="stacked">Dirección</ion-label><ion-input [(ngModel)]="form.direccion"></ion-input></ion-item>
-              <ion-item><ion-label position="stacked">F. nacimiento</ion-label><ion-input type="date" [(ngModel)]="form.fecha_nacimiento"></ion-input></ion-item>
+              <ion-item
+                ><ion-label position="stacked">Email</ion-label
+                ><ion-input type="email" [(ngModel)]="form.email"></ion-input
+              ></ion-item>
+              <ion-item
+                ><ion-label position="stacked">Teléfono</ion-label
+                ><ion-input type="tel" [(ngModel)]="form.telefono"></ion-input
+              ></ion-item>
+              <ion-item
+                ><ion-label position="stacked">Dirección</ion-label
+                ><ion-input [(ngModel)]="form.direccion"></ion-input
+              ></ion-item>
+              <ion-item
+                ><ion-label position="stacked">F. nacimiento</ion-label
+                ><ion-input type="date" [(ngModel)]="form.fecha_nacimiento"></ion-input
+              ></ion-item>
               <ion-item>
                 <ion-label position="stacked">Sexo</ion-label>
                 <ion-select [(ngModel)]="form.sexo" placeholder="Selecciona">
@@ -160,8 +209,14 @@
                   <ion-select-option value="otro">Otro</ion-select-option>
                 </ion-select>
               </ion-item>
-              <ion-item><ion-label position="stacked">DNI</ion-label><ion-input [(ngModel)]="form.dni"></ion-input></ion-item>
-              <ion-item><ion-label position="stacked">Ocupación</ion-label><ion-input [(ngModel)]="form.ocupacion"></ion-input></ion-item>
+              <ion-item
+                ><ion-label position="stacked">DNI</ion-label
+                ><ion-input [(ngModel)]="form.dni"></ion-input
+              ></ion-item>
+              <ion-item
+                ><ion-label position="stacked">Ocupación</ion-label
+                ><ion-input [(ngModel)]="form.ocupacion"></ion-input
+              ></ion-item>
               <ion-item>
                 <ion-label position="stacked">Estado civil</ion-label>
                 <ion-select [(ngModel)]="form.estado_civil" placeholder="Selecciona">
@@ -172,8 +227,14 @@
                   <ion-select-option value="pareja_de_hecho">Pareja de hecho</ion-select-option>
                 </ion-select>
               </ion-item>
-              <ion-item><ion-label position="stacked">Nacionalidad</ion-label><ion-input [(ngModel)]="form.nacionalidad"></ion-input></ion-item>
-              <ion-item class="full-width"><ion-label position="stacked">Motivo de consulta</ion-label><ion-textarea [(ngModel)]="form.motivo_consulta" rows="3"></ion-textarea></ion-item>
+              <ion-item
+                ><ion-label position="stacked">Nacionalidad</ion-label
+                ><ion-input [(ngModel)]="form.nacionalidad"></ion-input
+              ></ion-item>
+              <ion-item class="full-width"
+                ><ion-label position="stacked">Motivo de consulta</ion-label
+                ><ion-textarea [(ngModel)]="form.motivo_consulta" rows="3"></ion-textarea
+              ></ion-item>
             </div>
           }
         </div>
@@ -186,7 +247,9 @@
               <div class="tags-group">
                 <span class="tags-label">Alergias:</span>
                 <div class="tags">
-                  @for (a of paciente.alergias; track a) { <ion-badge color="danger">{{ a }}</ion-badge> }
+                  @for (a of paciente.alergias; track a) {
+                    <ion-badge color="danger">{{ a }}</ion-badge>
+                  }
                 </div>
               </div>
             }
@@ -194,7 +257,9 @@
               <div class="tags-group">
                 <span class="tags-label">Intolerancias:</span>
                 <div class="tags">
-                  @for (i of paciente.intolerancias; track i) { <ion-badge color="warning">{{ i }}</ion-badge> }
+                  @for (i of paciente.intolerancias; track i) {
+                    <ion-badge color="warning">{{ i }}</ion-badge>
+                  }
                 </div>
               </div>
             }
@@ -208,24 +273,51 @@
               <span class="tags-label">Alergias</span>
               <div class="tags">
                 @for (a of form.alergias; track a; let i = $index) {
-                  <div class="tag-chip tag-danger">{{ a }}<button class="tag-remove" (click)="eliminarTag('alergias', i)">×</button></div>
+                  <div class="tag-chip tag-danger">
+                    {{ a
+                    }}<button class="tag-remove" (click)="eliminarTag('alergias', i)">×</button>
+                  </div>
                 }
               </div>
               <div class="tag-input-row">
-                <ion-item class="tag-input"><ion-input placeholder="Añadir alergia..." [(ngModel)]="nuevaAlergia" (keydown)="onTagKeydown($event, 'alergias', nuevaAlergia)"></ion-input></ion-item>
-                <ion-button size="small" (click)="agregarTag('alergias', nuevaAlergia)">Añadir</ion-button>
+                <ion-item class="tag-input"
+                  ><ion-input
+                    placeholder="Añadir alergia..."
+                    [(ngModel)]="nuevaAlergia"
+                    (keydown)="onTagKeydown($event, 'alergias', nuevaAlergia)"
+                  ></ion-input
+                ></ion-item>
+                <ion-button size="small" (click)="agregarTag('alergias', nuevaAlergia)"
+                  >Añadir</ion-button
+                >
               </div>
             </div>
             <div class="tags-edit-group">
               <span class="tags-label">Intolerancias</span>
               <div class="tags">
                 @for (it of form.intolerancias; track it; let i = $index) {
-                  <div class="tag-chip tag-warning">{{ it }}<button class="tag-remove" (click)="eliminarTag('intolerancias', i)">×</button></div>
+                  <div class="tag-chip tag-warning">
+                    {{ it
+                    }}<button class="tag-remove" (click)="eliminarTag('intolerancias', i)">
+                      ×
+                    </button>
+                  </div>
                 }
               </div>
               <div class="tag-input-row">
-                <ion-item class="tag-input"><ion-input placeholder="Añadir intolerancia..." [(ngModel)]="nuevaIntolerancia" (keydown)="onTagKeydown($event, 'intolerancias', nuevaIntolerancia)"></ion-input></ion-item>
-                <ion-button size="small" color="warning" (click)="agregarTag('intolerancias', nuevaIntolerancia)">Añadir</ion-button>
+                <ion-item class="tag-input"
+                  ><ion-input
+                    placeholder="Añadir intolerancia..."
+                    [(ngModel)]="nuevaIntolerancia"
+                    (keydown)="onTagKeydown($event, 'intolerancias', nuevaIntolerancia)"
+                  ></ion-input
+                ></ion-item>
+                <ion-button
+                  size="small"
+                  color="warning"
+                  (click)="agregarTag('intolerancias', nuevaIntolerancia)"
+                  >Añadir</ion-button
+                >
               </div>
             </div>
           </div>
@@ -243,36 +335,62 @@
             <div class="toggle-grid">
               <div class="toggle-item">
                 <span>Hipertensión</span>
-                <ion-toggle [(ngModel)]="formAntFam.hta"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntFam.hta"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Enf. cardiovascular</span>
-                <ion-toggle [(ngModel)]="formAntFam.ecv"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntFam.ecv"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Diabetes</span>
-                <ion-toggle [(ngModel)]="formAntFam.diabetes"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntFam.diabetes"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Enf. autoinmune</span>
-                <ion-toggle [(ngModel)]="formAntFam.enfermedad_autoinmune"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntFam.enfermedad_autoinmune"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Alergias</span>
-                <ion-toggle [(ngModel)]="formAntFam.alergias"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntFam.alergias"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Obesidad</span>
-                <ion-toggle [(ngModel)]="formAntFam.obesidad"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntFam.obesidad"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Cáncer</span>
-                <ion-toggle [(ngModel)]="formAntFam.cancer"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntFam.cancer"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
             </div>
             <ion-item>
               <ion-label position="stacked">Otras enfermedades familiares</ion-label>
-              <ion-textarea [(ngModel)]="formAntFam.otra" rows="2" placeholder="Describe otras..."></ion-textarea>
+              <ion-textarea
+                [(ngModel)]="formAntFam.otra"
+                rows="2"
+                placeholder="Describe otras..."
+                (ngModelChange)="marcarCambiosClinica()"
+              ></ion-textarea>
             </ion-item>
           </div>
 
@@ -282,49 +400,85 @@
             <div class="toggle-grid">
               <div class="toggle-item">
                 <span>Alcohol</span>
-                <ion-toggle [(ngModel)]="formAntPer.alcohol"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntPer.alcohol"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Tabaco</span>
-                <ion-toggle [(ngModel)]="formAntPer.tabaco"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntPer.tabaco"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Cirugías previas</span>
-                <ion-toggle [(ngModel)]="formAntPer.cirugias"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntPer.cirugias"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Alergias</span>
-                <ion-toggle [(ngModel)]="formAntPer.alergias"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntPer.alergias"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
               <div class="toggle-item">
                 <span>Descansa bien</span>
-                <ion-toggle [(ngModel)]="formAntPer.descansa_bien"></ion-toggle>
+                <ion-toggle
+                  [(ngModel)]="formAntPer.descansa_bien"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-toggle>
               </div>
             </div>
             <div class="edit-grid" style="margin-top: 12px">
               <ion-item class="full-width">
                 <ion-label position="stacked">Enfermedades / Patologías</ion-label>
-                <ion-textarea [(ngModel)]="formAntPer.enfermedad_patologia" rows="2"></ion-textarea>
+                <ion-textarea
+                  [(ngModel)]="formAntPer.enfermedad_patologia"
+                  rows="2"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-textarea>
               </ion-item>
               <ion-item class="full-width">
                 <ion-label position="stacked">Medicación actual</ion-label>
-                <ion-textarea [(ngModel)]="formAntPer.medicacion" rows="2"></ion-textarea>
+                <ion-textarea
+                  [(ngModel)]="formAntPer.medicacion"
+                  rows="2"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-textarea>
               </ion-item>
               <ion-item>
                 <ion-label position="stacked">Digestiones</ion-label>
-                <ion-input [(ngModel)]="formAntPer.digestiones"></ion-input>
+                <ion-input
+                  [(ngModel)]="formAntPer.digestiones"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-input>
               </ion-item>
               <ion-item>
                 <ion-label position="stacked">Menstruación</ion-label>
-                <ion-input [(ngModel)]="formAntPer.menstruacion"></ion-input>
+                <ion-input
+                  [(ngModel)]="formAntPer.menstruacion"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-input>
               </ion-item>
               <ion-item class="full-width">
                 <ion-label position="stacked">Suplementos nutricionales</ion-label>
-                <ion-input [(ngModel)]="formAntPer.suplementos_nutricionales"></ion-input>
+                <ion-input
+                  [(ngModel)]="formAntPer.suplementos_nutricionales"
+                  (ngModelChange)="marcarCambiosClinica()"
+                ></ion-input>
               </ion-item>
               <ion-item>
                 <ion-label position="stacked">Actividad física</ion-label>
-                <ion-select [(ngModel)]="formAntPer.actividad_fisica" placeholder="Selecciona">
+                <ion-select
+                  [(ngModel)]="formAntPer.actividad_fisica"
+                  (ngModelChange)="marcarCambiosClinica()"
+                  placeholder="Selecciona"
+                >
                   <ion-select-option value="sedentario">Sedentario</ion-select-option>
                   <ion-select-option value="ligero">Ligero</ion-select-option>
                   <ion-select-option value="moderado">Moderado</ion-select-option>
@@ -335,9 +489,17 @@
             </div>
           </div>
 
-          <ion-button expand="block" (click)="guardarClinica()" [disabled]="guardandoClinica" class="btn-guardar">
-            @if (guardandoClinica) { <ion-spinner name="crescent"></ion-spinner> }
-            @else { <ion-icon name="save-outline" slot="start"></ion-icon> Guardar antecedentes }
+          <ion-button
+            expand="block"
+            (click)="guardarClinica()"
+            [disabled]="guardandoClinica"
+            class="btn-guardar"
+          >
+            @if (guardandoClinica) {
+              <ion-spinner name="crescent"></ion-spinner>
+            } @else {
+              <ion-icon name="save-outline" slot="start"></ion-icon> Guardar antecedentes
+            }
           </ion-button>
         }
       }
@@ -350,51 +512,120 @@
           <div class="section-block">
             <p class="section-title">🍽️ Hábitos alimentarios</p>
             <div class="toggle-grid">
-              <div class="toggle-item"><span>Come en casa</span><ion-toggle [(ngModel)]="formEncuesta.come_en_casa"></ion-toggle></div>
-              <div class="toggle-item"><span>Hace la comida</span><ion-toggle [(ngModel)]="formEncuesta.hace_la_comida"></ion-toggle></div>
-              <div class="toggle-item"><span>Le gusta cocinar</span><ion-toggle [(ngModel)]="formEncuesta.le_gusta_cocinar"></ion-toggle></div>
-              <div class="toggle-item"><span>Come tranquilo</span><ion-toggle [(ngModel)]="formEncuesta.come_tranquilo"></ion-toggle></div>
-              <div class="toggle-item"><span>Picotea</span><ion-toggle [(ngModel)]="formEncuesta.picotea"></ion-toggle></div>
+              <div class="toggle-item">
+                <span>Come en casa</span
+                ><ion-toggle
+                  [(ngModel)]="formEncuesta.come_en_casa"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                ></ion-toggle>
+              </div>
+              <div class="toggle-item">
+                <span>Hace la comida</span
+                ><ion-toggle
+                  [(ngModel)]="formEncuesta.hace_la_comida"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                ></ion-toggle>
+              </div>
+              <div class="toggle-item">
+                <span>Le gusta cocinar</span
+                ><ion-toggle
+                  [(ngModel)]="formEncuesta.le_gusta_cocinar"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                ></ion-toggle>
+              </div>
+              <div class="toggle-item">
+                <span>Come tranquilo</span
+                ><ion-toggle
+                  [(ngModel)]="formEncuesta.come_tranquilo"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                ></ion-toggle>
+              </div>
+              <div class="toggle-item">
+                <span>Picotea</span
+                ><ion-toggle
+                  [(ngModel)]="formEncuesta.picotea"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                ></ion-toggle>
+              </div>
             </div>
-            <div class="edit-grid" style="margin-top:12px">
+            <div class="edit-grid" style="margin-top: 12px">
               <ion-item>
                 <ion-label position="stacked">Comidas al día</ion-label>
-                <ion-input type="number" [(ngModel)]="formEncuesta.num_comidas_dia" min="1" max="10"></ion-input>
+                <ion-input
+                  type="number"
+                  [(ngModel)]="formEncuesta.num_comidas_dia"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                  min="1"
+                  max="10"
+                ></ion-input>
               </ion-item>
               <ion-item>
                 <ion-label position="stacked">Agua (litros/día)</ion-label>
-                <ion-input type="number" [(ngModel)]="formEncuesta.consumo_agua_litros" step="0.1"></ion-input>
+                <ion-input
+                  type="number"
+                  [(ngModel)]="formEncuesta.consumo_agua_litros"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                  step="0.1"
+                ></ion-input>
               </ion-item>
               <ion-item>
                 <ion-label position="stacked">Come solo / con TV</ion-label>
-                <ion-input [(ngModel)]="formEncuesta.come_solo_tv"></ion-input>
+                <ion-input
+                  [(ngModel)]="formEncuesta.come_solo_tv"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                ></ion-input>
               </ion-item>
               <ion-item>
                 <ion-label position="stacked">Otras bebidas</ion-label>
-                <ion-input [(ngModel)]="formEncuesta.otras_bebidas"></ion-input>
+                <ion-input
+                  [(ngModel)]="formEncuesta.otras_bebidas"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                ></ion-input>
               </ion-item>
               <ion-item>
                 <ion-label position="stacked">Apetito</ion-label>
-                <ion-input [(ngModel)]="formEncuesta.apetito"></ion-input>
+                <ion-input
+                  [(ngModel)]="formEncuesta.apetito"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                ></ion-input>
               </ion-item>
               <ion-item>
                 <ion-label position="stacked">Ansiedad con la comida</ion-label>
-                <ion-input [(ngModel)]="formEncuesta.ansiedad_comida"></ion-input>
+                <ion-input
+                  [(ngModel)]="formEncuesta.ansiedad_comida"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                ></ion-input>
               </ion-item>
               <ion-item class="full-width">
                 <ion-label position="stacked">Preferencias alimentarias</ion-label>
-                <ion-textarea [(ngModel)]="formEncuesta.preferencias_alimentarias" rows="2"></ion-textarea>
+                <ion-textarea
+                  [(ngModel)]="formEncuesta.preferencias_alimentarias"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                  rows="2"
+                ></ion-textarea>
               </ion-item>
               <ion-item class="full-width">
                 <ion-label position="stacked">Aversiones alimentarias</ion-label>
-                <ion-textarea [(ngModel)]="formEncuesta.aversiones_alimentarias" rows="2"></ion-textarea>
+                <ion-textarea
+                  [(ngModel)]="formEncuesta.aversiones_alimentarias"
+                  (ngModelChange)="marcarCambiosAlimentacion()"
+                  rows="2"
+                ></ion-textarea>
               </ion-item>
             </div>
           </div>
 
-          <ion-button expand="block" (click)="guardarEncuesta()" [disabled]="guardandoClinica" class="btn-guardar">
-            @if (guardandoClinica) { <ion-spinner name="crescent"></ion-spinner> }
-            @else { <ion-icon name="save-outline" slot="start"></ion-icon> Guardar encuesta }
+          <ion-button
+            expand="block"
+            (click)="guardarEncuesta()"
+            [disabled]="guardandoClinica"
+            class="btn-guardar"
+          >
+            @if (guardandoClinica) {
+              <ion-spinner name="crescent"></ion-spinner>
+            } @else {
+              <ion-icon name="save-outline" slot="start"></ion-icon> Guardar encuesta
+            }
           </ion-button>
         }
       }
@@ -429,7 +660,12 @@
                       IMC {{ m.imc }} · {{ imcCategoria(m.imc).label }}
                     </ion-badge>
                   }
-                  <ion-button fill="clear" color="danger" size="small" (click)="confirmarEliminarMedicion(m.id)">
+                  <ion-button
+                    fill="clear"
+                    color="danger"
+                    size="small"
+                    (click)="confirmarEliminarMedicion(m.id)"
+                  >
                     <ion-icon name="trash-outline"></ion-icon>
                   </ion-button>
                 </div>
@@ -437,19 +673,34 @@
               <ion-card-content>
                 <div class="medicion-grid">
                   @if (m.peso_kg) {
-                    <div class="medicion-dato"><span class="dato-label">Peso</span><span class="dato-valor">{{ m.peso_kg }} kg</span></div>
+                    <div class="medicion-dato">
+                      <span class="dato-label">Peso</span
+                      ><span class="dato-valor">{{ m.peso_kg }} kg</span>
+                    </div>
                   }
                   @if (m.altura_cm) {
-                    <div class="medicion-dato"><span class="dato-label">Altura</span><span class="dato-valor">{{ m.altura_cm }} cm</span></div>
+                    <div class="medicion-dato">
+                      <span class="dato-label">Altura</span
+                      ><span class="dato-valor">{{ m.altura_cm }} cm</span>
+                    </div>
                   }
                   @if (m.grasa_corporal_pct) {
-                    <div class="medicion-dato"><span class="dato-label">Grasa</span><span class="dato-valor">{{ m.grasa_corporal_pct }}%</span></div>
+                    <div class="medicion-dato">
+                      <span class="dato-label">Grasa</span
+                      ><span class="dato-valor">{{ m.grasa_corporal_pct }}%</span>
+                    </div>
                   }
                   @if (m.masa_muscular_kg) {
-                    <div class="medicion-dato"><span class="dato-label">Músculo</span><span class="dato-valor">{{ m.masa_muscular_kg }} kg</span></div>
+                    <div class="medicion-dato">
+                      <span class="dato-label">Músculo</span
+                      ><span class="dato-valor">{{ m.masa_muscular_kg }} kg</span>
+                    </div>
                   }
                   @if (m.perimetro_cintura_cm) {
-                    <div class="medicion-dato"><span class="dato-label">Cintura</span><span class="dato-valor">{{ m.perimetro_cintura_cm }} cm</span></div>
+                    <div class="medicion-dato">
+                      <span class="dato-label">Cintura</span
+                      ><span class="dato-valor">{{ m.perimetro_cintura_cm }} cm</span>
+                    </div>
                   }
                 </div>
                 @if (m.notas) {
@@ -460,11 +711,20 @@
           }
         }
       }
-
     </div>
   }
-
 </ion-content>
+
+@if ((tabActiva === 'clinica' || tabActiva === 'alimentacion') && hayCambiosSinGuardar) {
+  <ion-button class="fab-guardar" (click)="guardarTabActual()" [disabled]="guardandoClinica">
+    @if (guardandoClinica) {
+      <ion-spinner name="crescent"></ion-spinner>
+    } @else {
+      <ion-icon name="save-outline" slot="start"></ion-icon>
+      Guardar cambios
+    }
+  </ion-button>
+}
 
 <!-- Modal nueva medición -->
 <ion-modal [isOpen]="modalMedicion" (didDismiss)="modalMedicion = false">
@@ -491,25 +751,52 @@
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Grasa corporal (%)</ion-label>
-          <ion-input type="number" [(ngModel)]="nuevaMedicion.grasa_corporal_pct" step="0.1"></ion-input>
+          <ion-input
+            type="number"
+            [(ngModel)]="nuevaMedicion.grasa_corporal_pct"
+            step="0.1"
+          ></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Masa muscular (kg)</ion-label>
-          <ion-input type="number" [(ngModel)]="nuevaMedicion.masa_muscular_kg" step="0.1"></ion-input>
+          <ion-input
+            type="number"
+            [(ngModel)]="nuevaMedicion.masa_muscular_kg"
+            step="0.1"
+          ></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Perímetro cintura (cm)</ion-label>
-          <ion-input type="number" [(ngModel)]="nuevaMedicion.perimetro_cintura_cm" step="0.1"></ion-input>
+          <ion-input
+            type="number"
+            [(ngModel)]="nuevaMedicion.perimetro_cintura_cm"
+            step="0.1"
+          ></ion-input>
         </ion-item>
         <ion-item class="full-width">
           <ion-label position="stacked">Notas</ion-label>
           <ion-textarea [(ngModel)]="nuevaMedicion.notas" rows="2"></ion-textarea>
         </ion-item>
       </div>
-      <ion-button expand="block" (click)="guardarMedicion()" [disabled]="guardandoMedicion" style="margin-top:16px">
-        @if (guardandoMedicion) { <ion-spinner name="crescent"></ion-spinner> }
-        @else { Guardar medición }
+      <ion-button
+        expand="block"
+        (click)="guardarMedicion()"
+        [disabled]="guardandoMedicion"
+        style="margin-top: 16px"
+      >
+        @if (guardandoMedicion) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          Guardar medición
+        }
       </ion-button>
+      <!-- Al final de ficha-paciente.html, antes del cierre de ion-content -->
+      @if ((tabActiva === 'clinica' || tabActiva === 'alimentacion') && hayCambiosSinGuardar) {
+        <ion-button class="fab-guardar" (click)="guardarTabActual()">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Guardar cambios
+        </ion-button>
+      }
     </ion-content>
   </ng-template>
 </ion-modal>
