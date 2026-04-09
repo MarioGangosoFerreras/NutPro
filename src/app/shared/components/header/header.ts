@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth';
 import {
@@ -11,7 +11,7 @@ import { logOutOutline, notificationsOutline, personCircleOutline } from 'ionico
 
 @Component({
   selector: 'app-header',
-  imports: [FormsModule, IonHeader, IonToolbar, IonButton, IonIcon, IonSearchbar, IonAvatar, IonBadge],
+  imports: [FormsModule, IonHeader, IonToolbar, IonButton, IonIcon, IonSearchbar, IonAvatar, IonBadge, RouterLink],
   templateUrl: './header.html',
   styleUrl: './header.css'
 })

@@ -1,44 +1,47 @@
 <ion-header class="header">
-    <ion-toolbar class="header-toolbar">
+  <ion-toolbar class="header-toolbar">
+    <!-- Logo y nombre -->
+    <div class="header-brand" slot="start" routerLink="/dashboard" style="cursor: pointer">
+      <img src="img/Logo_app.png" alt="NutriPro" class="header-logo" />
+      <span class="header-title">NutPro</span>
+    </div>
 
-        <!-- Logo y nombre -->
-        <div class="header-brand" slot="start">
-            <img src="img/Logo_app.png" alt="NutriPro" class="header-logo" />
-            <span class="header-title">NutPro</span>
-        </div>
+    <!-- Buscador -->
+    <ion-searchbar
+      slot="start"
+      class="header-search"
+      placeholder="Buscar paciente..."
+      [(ngModel)]="searchQuery"
+      (keyup.enter)="buscarPaciente()"
+      animated
+    >
+    </ion-searchbar>
 
-        <!-- Buscador -->
-        <ion-searchbar slot="start" class="header-search" placeholder="Buscar paciente..." [(ngModel)]="searchQuery"
-            (keyup.enter)="buscarPaciente()" animated>
-        </ion-searchbar>
+    <!-- Acciones -->
+    <div class="header-actions" slot="end">
+      <!-- Notificaciones -->
+      <ion-button fill="clear" class="action-btn">
+        <ion-icon name="notifications-outline"></ion-icon>
+        @if (notificaciones > 0) {
+          <ion-badge color="danger">{{ notificaciones }}</ion-badge>
+        }
+      </ion-button>
 
-        <!-- Acciones -->
-        <div class="header-actions" slot="end">
+      <!-- Avatar -->
+      <ion-button fill="clear" class="action-btn avatar-btn">
+        @if (avatarUrl) {
+          <ion-avatar>
+            <img [src]="avatarUrl" alt="Avatar" />
+          </ion-avatar>
+        } @else {
+          <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
+        }
+      </ion-button>
 
-            <!-- Notificaciones -->
-            <ion-button fill="clear" class="action-btn">
-                <ion-icon name="notifications-outline"></ion-icon>
-                @if (notificaciones > 0) {
-                <ion-badge color="danger">{{ notificaciones }}</ion-badge>
-                }
-            </ion-button>
-
-            <!-- Avatar -->
-            <ion-button fill="clear" class="action-btn avatar-btn">
-                @if (avatarUrl) {
-                <ion-avatar>
-                    <img [src]="avatarUrl" alt="Avatar" />
-                </ion-avatar>
-                } @else {
-                <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
-                }
-            </ion-button>
-            
-            <!-- Cerrar sesión -->
-            <ion-button fill="clear" class="action-btn" (click)="logout()">
-                <ion-icon name="log-out-outline"></ion-icon>
-            </ion-button>
-
-        </div>
-    </ion-toolbar>
+      <!-- Cerrar sesión -->
+      <ion-button fill="clear" class="action-btn" (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-toolbar>
 </ion-header>
