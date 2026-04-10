@@ -176,10 +176,19 @@ ion-segment-button {
 
 /* --- Mediciones --- */
 .medicion-card {
-  border-radius: 18px;
-  margin-bottom: 16px;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: white;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  border: 1px solid #e2e8f0;
+  border-left: 5px solid var(--primary-medical); /* Toque de color estético */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); /* Sombra más moderna */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden; /* Asegura que la cabecera respete los bordes redondeados */
+}
+
+.medicion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .medicion-card-header {
@@ -187,25 +196,64 @@ ion-segment-button {
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  background: #f8fafc; /* Fondo muy sutil para separar la cabecera */
+  border-bottom: 1px solid #f1f5f9; /* Línea separadora de los cálculos */
+}
+
+/* NUEVO: Clase específica para la fecha */
+.medicion-fecha {
+  font-size: 16px; /* Más pequeño y estético */
+  font-weight: 600;
+  color: #64748b; /* Gris que no compite con los datos médicos */
+  padding-right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .medicion-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 12px;
-  background: var(--bg-subtle);
-  padding: 15px;
-  border-radius: 12px;
+   gap: 7px; /*espacio entre las medidciones maximo para que no se separen */
+  background: white;
 }
 
 .medicion-dato {
   text-align: center;
   display: flex;
   flex-direction: column;
+  background: #f8fafc; /* Cajitas individuales para cada dato */
+  padding: 10px 8px;
+  border-radius: 12px;
+  border: 1px solid #00a1564f;
 }
 
-.dato-label { font-size: 10px; color: #94a3b8; font-weight: 700; }
-.dato-valor { font-size: 15px; color: var(--primary-medical); font-weight: 700; }
+.dato-label { 
+  font-size: 11px; 
+  color: #94a3b8; 
+  font-weight: 700; 
+  text-transform: uppercase;
+}
+
+.dato-valor { 
+  font-size: 16px; /* Número ligeramente más grande para que sea el protagonista */
+  color: var(--primary-medical); 
+  font-weight: 800; 
+}
+
+/* --- Badges y Acciones dentro de la Card --- */
+.medicion-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px; /* Un poco más de aire entre etiquetas */
+  flex: 1;
+}
+
+.medicion-acciones {
+  display: flex;
+  gap: 4px;
+  margin-left: auto; /* Empuja las acciones a la derecha */
+}
 
 /* --- Botones --- */
 .btn-guardar {
@@ -313,4 +361,17 @@ ion-segment-button {
 
 .dropdown-item.danger:hover {
   background: #fef2f2;
+}
+
+.medicion-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+}
+
+.medicion-acciones {
+  display: flex;
+  gap: 0;
+  margin-left: 4px;
 }

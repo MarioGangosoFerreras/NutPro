@@ -120,12 +120,17 @@ export class FichaPaciente implements OnInit {
     grasa_corporal_pct: null,
     masa_muscular_kg: null,
     perimetro_cintura_cm: null,
+    perimetro_cadera_cm: null,
+    perimetro_abdomen_cm: null,
     notas: '',
   };
   guardandoMedicion = false;
 
   cambiosClinica = false;
   cambiosAlimentacion = false;
+  //Modal editar medición
+  modalEditarMedicion = false;
+  medicionEditando: any = {};
 
   get hayCambiosSinGuardar(): boolean {
     return this.cambiosClinica || this.cambiosAlimentacion;
@@ -382,6 +387,8 @@ export class FichaPaciente implements OnInit {
       grasa_corporal_pct: null,
       masa_muscular_kg: null,
       perimetro_cintura_cm: null,
+      perimetro_cadera_cm: null,
+      perimetro_abdomen_cm: null,
       notas: '',
     };
   }
@@ -392,6 +399,41 @@ export class FichaPaciente implements OnInit {
     if (imc < 30) return { label: 'Sobrepeso', color: 'warning' };
     return { label: 'Obesidad', color: 'danger' };
   }
+
+  iccCategoria(icc: number, sexo: string): { label: string; color: string } {
+  // Riesgo cardiovascular según OMS
+  const esMujer = sexo === 'femenino';
+  if (esMujer) {
+    if (icc < 0.8) return { label: 'Bajo riesgo', color: 'success' };
+    if (icc < 0.85) return { label: 'Riesgo moderado', color: 'warning' };
+    return { label: 'Riesgo alto', color: 'danger' };
+  } else {
+    if (icc < 0.95) return { label: 'Bajo riesgo', color: 'success' };
+    if (icc < 1.0) return { label: 'Riesgo moderado', color: 'warning' };
+    return { label: 'Riesgo alto', color: 'danger' };
+  }
+}
+
+abrirEditarMedicion(m: any) {
+  this.medicionEditando = { ...m };
+  this.modalEditarMedicion = true;
+}
+
+async guardarEdicionMedicion() {
+  this.guardandoMedicion = true;
+  try {
+    await this.fichaClinicaService.updateMedicion(this.medicionEditando.id, this.medicionEditando);
+    this.mediciones = await this.fichaClinicaService.getMediciones(this.paciente.id);
+    this.modalEditarMedicion = false;
+    await this.mostrarToast('Medición actualizada', 'success');
+  } catch (e) {
+    console.error(e);
+    await this.mostrarToast('Error al actualizar la medición', 'danger');
+  } finally {
+    this.guardandoMedicion = false;
+    this.cdr.detectChanges();
+  }
+}
 
   // ── Datos personales (igual que antes) ──
   calcularEdad(fechaNacimiento: string): number {
