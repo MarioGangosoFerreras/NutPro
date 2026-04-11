@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef  } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonButton } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth';
 import { Header } from "../../../shared/components/header/header";
+import { EstadisticasDashboardComponent } from '../estadisticas-dashboard/estadisticas-dashboard';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, IonContent, IonButton, Header, RouterLink],
+  imports: [CommonModule, IonContent, IonButton, Header, RouterLink, EstadisticasDashboardComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -16,7 +17,8 @@ export class Dashboard implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
@@ -39,6 +41,8 @@ export class Dashboard implements OnInit {
     } catch (error) {
       const { data } = await this.authService.getSession();
       this.nombreUsuario = data.session?.user?.email || 'usuario';
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 
