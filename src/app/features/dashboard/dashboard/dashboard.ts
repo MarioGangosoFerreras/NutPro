@@ -5,10 +5,11 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth';
 import { Header } from "../../../shared/components/header/header";
 import { EstadisticasDashboardComponent } from '../estadisticas-dashboard/estadisticas-dashboard';
+import { ListaPacientesPreviewComponent } from "../lista-pacientes-preview/lista-pacientes-preview";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, IonContent, IonButton, Header, RouterLink, EstadisticasDashboardComponent],
+  imports: [CommonModule, IonContent, Header, EstadisticasDashboardComponent, ListaPacientesPreviewComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

@@ -1,0 +1,206 @@
+.preview-container {
+  --primary-medical: #2d6a4f;
+  --primary-soft: #e8f5e9;
+  --bg-subtle: #f8fafc;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --divider: #f1f5f9;
+
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Cabecera */
+.preview-header {
+  margin-bottom: 16px;
+}
+
+.preview-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-titulo h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.titulo-icon {
+  font-size: 1.2rem;
+  color: var(--primary-medical);
+}
+
+/* Lista */
+.pacientes-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fila de paciente */
+.paciente-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--divider);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-radius: 8px;
+}
+
+.paciente-row:hover {
+  background: var(--primary-soft);
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.paciente-row.last {
+  border-bottom: none;
+}
+
+/* Avatar */
+.paciente-avatar {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--primary-medical);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--primary-soft);
+}
+
+.paciente-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.paciente-avatar span {
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Info */
+.paciente-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.paciente-nombre {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.paciente-sub {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Flecha */
+.item-arrow {
+  font-size: 1rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* Skeleton */
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--divider);
+  cursor: default;
+}
+
+.skeleton-avatar {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+}
+
+.skeleton-info {
+  flex: 1;
+}
+
+/* Estado vacío */
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px;
+  gap: 8px;
+}
+
+.vacio-icon {
+  font-size: 2.2rem;
+  color: var(--text-muted);
+  opacity: 0.35;
+}
+
+.estado-vacio p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+/* Footer */
+.preview-footer {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--divider);
+}
+
+.btn-ver-todos {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: none;
+  border: 1.5px solid var(--primary-medical);
+  border-radius: 12px;
+  color: var(--primary-medical);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-ver-todos:hover {
+  background: var(--primary-soft);
+}
+
+.btn-ver-todos ion-icon {
+  font-size: 1rem;
+}
+.sub-icon {
+  font-size: 0.75rem;
+  vertical-align: middle;
+  margin-right: 3px;
+  opacity: 0.6;
+}

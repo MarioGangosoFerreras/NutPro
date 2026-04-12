@@ -1,89 +1,72 @@
-import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core'; // ✅ Añadido signal
-import { Router } from '@angular/router';
+import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PacientesService } from '../../../core/services/pacientes';
 import { AuthService } from '../../../core/services/auth';
 import { Header } from '../../../shared/components/header/header';
 import {
-  IonContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonButton,
-  IonIcon,
-  IonSpinner,
-  IonText,
-  IonAvatar,
-  IonBadge,
-  IonFab,
-  IonFabButton,
+  IonContent, IonList, IonItem, IonLabel, IonButton,
+  IonIcon, IonSpinner, IonAvatar, IonBadge, IonFab, IonFabButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addOutline, personOutline, callOutline, mailOutline } from 'ionicons/icons';
+import { addOutline, personOutline, callOutline, mailOutline, searchOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-lista-pacientes',
   imports: [
-    Header,
-    IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonButton,
-    IonIcon,
-    IonSpinner,
-    IonAvatar,
-    IonBadge,
-    IonFab,
-    IonFabButton,
+    Header, IonContent, IonList, IonItem, IonLabel, IonButton,
+    IonIcon, IonSpinner, IonAvatar, IonBadge, IonFab, IonFabButton,
   ],
   templateUrl: './lista-pacientes.html',
   styleUrl: './lista-pacientes.css',
 })
 export class ListaPacientes implements OnInit {
-  // ✅ Usamos señales para que Angular no se confunda con el origen del cambio
   pacientes = signal<any[]>([]);
+  pacientesFiltrados = signal<any[]>([]);
   loading = signal<boolean>(true);
+  busquedaActiva = signal<string>('');
   version = 0;
 
   constructor(
     private pacientesService: PacientesService,
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,  // 👈
     private cdr: ChangeDetectorRef,
   ) {
-    addIcons({ addOutline, personOutline, callOutline, mailOutline });
+    addIcons({ addOutline, personOutline, callOutline, mailOutline, searchOutline });
   }
 
   ngOnInit() {}
 
   async ionViewWillEnter() {
-    // Al entrar, reseteamos el estado de carga de forma inmediata
     this.loading.set(true);
   }
 
   async ionViewDidEnter() {
     this.version = new Date().getTime();
     await this.cargarPacientes();
+
+    // Lee ?q= del header tras cargar
+    this.route.queryParams.subscribe(params => {
+      const q = params['q'] ?? '';
+      this.busquedaActiva.set(q);
+      this.aplicarFiltro(q);
+    });
   }
 
   private async cargarPacientes() {
     try {
       const nutricionistaId = await this.authService.getNutricionistaId();
-      if (!nutricionistaId) {
-        this.loading.set(false);
-        return;
-      }
+      if (!nutricionistaId) { this.loading.set(false); return; }
 
       const data = await this.pacientesService.getPacientes(nutricionistaId);
 
-      // ✅ El uso de Promise.resolve().then() es más prioritario que setTimeout
-      // y garantiza que el cambio se procese justo después del chequeo de Angular
       Promise.resolve().then(() => {
         this.pacientes.set(data || []);
+        this.pacientesFiltrados.set(data || []);
         this.loading.set(false);
         this.cdr.detectChanges();
       });
-
     } catch (error) {
       console.error('Error cargando:', error);
       this.loading.set(false);
@@ -91,13 +74,31 @@ export class ListaPacientes implements OnInit {
     }
   }
 
-  verPaciente(id: string) {
-    this.router.navigate(['/pacientes', id]);
+  private aplicarFiltro(query: string) {
+    if (!query.trim()) {
+      this.pacientesFiltrados.set(this.pacientes());
+      return;
+    }
+
+    const q = query.toLowerCase().trim();
+    const filtrados = this.pacientes().filter(p => {
+      const nombre = `${p.usuario?.nombre ?? ''} ${p.usuario?.apellidos ?? ''}`.toLowerCase();
+      const email = (p.email ?? '').toLowerCase();
+      const telefono = (p.telefono ?? '').toLowerCase();
+      return nombre.includes(q) || email.includes(q) || telefono.includes(q);
+    });
+
+    this.pacientesFiltrados.set(filtrados);
+    this.cdr.detectChanges();
   }
 
-  nuevoPaciente() {
-    this.router.navigate(['/pacientes/nuevo']);
+  limpiarBusqueda() {
+    this.busquedaActiva.set('');
+    this.router.navigate(['/pacientes']);
   }
+
+  verPaciente(id: string) { this.router.navigate(['/pacientes', id]); }
+  nuevoPaciente() { this.router.navigate(['/pacientes/nuevo']); }
 
   calcularEdad(fechaNacimiento: string): number {
     if (!fechaNacimiento) return 0;

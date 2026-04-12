@@ -206,12 +206,35 @@ export class PacientesService {
   }
 
   async eliminarPaciente(id: string, usuarioId: string) {
-  // Al borrar usuario, paciente se borra en cascada
-  const { error } = await this.supabase
-    .from('usuarios')
-    .delete()
-    .eq('id', usuarioId);
+    // Al borrar usuario, paciente se borra en cascada
+    const { error } = await this.supabase
+      .from('usuarios')
+      .delete()
+      .eq('id', usuarioId);
 
-  if (error) throw error;
-}
+    if (error) throw error;
+  }
+
+  async getPacientesPreview(nutricionistaId: string, limite: number = 5) {
+    const { data, error } = await this.supabase
+      .from('pacientes')
+      .select(`
+      id,
+      usuario:usuario_id (
+        nombre,
+        apellidos,
+        avatar_url
+      )
+    `)
+      .eq('nutricionista_id', nutricionistaId)
+      .order('created_at', { ascending: false })
+      .limit(limite);
+
+    if (error) {
+      console.error('Error obteniendo preview de pacientes:', error.message);
+      return [];
+    }
+
+    return data ?? [];
+  }
 }

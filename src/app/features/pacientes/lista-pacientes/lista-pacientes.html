@@ -6,8 +6,17 @@
       <ion-spinner name="crescent" color="primary"></ion-spinner>
     </div>
   } @else {
-    
-    @if (pacientes().length === 0) {
+
+    <!-- Banner búsqueda activa -->
+    @if (busquedaActiva()) {
+      <div class="busqueda-banner">
+        <ion-icon name="search-outline" class="busqueda-icon" />
+        <span>Resultados para <strong>{{ busquedaActiva() }}</strong></span>
+        <button class="btn-limpiar" (click)="limpiarBusqueda()">✕ Limpiar</button>
+      </div>
+    }
+
+    @if (pacientesFiltrados().length === 0 && !busquedaActiva()) {
       <div class="empty-container">
         <ion-icon name="person-outline" class="empty-icon"></ion-icon>
         <p>No tienes pacientes todavía</p>
@@ -15,9 +24,17 @@
       </div>
     }
 
-    @if (pacientes().length > 0) {
+    @if (pacientesFiltrados().length === 0 && busquedaActiva()) {
+      <div class="empty-container">
+        <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+        <p>No se encontraron pacientes para <strong>{{ busquedaActiva() }}</strong></p>
+        <ion-button fill="outline" shape="round" (click)="limpiarBusqueda()">Ver todos</ion-button>
+      </div>
+    }
+
+    @if (pacientesFiltrados().length > 0) {
       <ion-list lines="none">
-        @for (paciente of pacientes(); track paciente.id) {
+        @for (paciente of pacientesFiltrados(); track paciente.id) {
           <ion-item button (click)="verPaciente(paciente.id)" class="paciente-item" detail="false">
             <ion-avatar slot="start">
               @if (paciente.usuario?.avatar_url) {
@@ -41,7 +58,7 @@
               </p>
             </ion-label>
 
-            <ion-badge slot="end"> {{ calcularEdad(paciente.fecha_nacimiento) }} años </ion-badge>
+            <ion-badge slot="end">{{ calcularEdad(paciente.fecha_nacimiento) }} años</ion-badge>
           </ion-item>
         }
       </ion-list>
