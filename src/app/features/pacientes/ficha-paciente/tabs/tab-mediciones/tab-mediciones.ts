@@ -217,12 +217,12 @@ export class TabMediciones implements OnInit {
   iccCategoria(icc: number, sexo: string): { label: string; color: string } {
     const esMujer = sexo === 'femenino';
     if (esMujer) {
-      if (icc < 0.8)  return { label: 'Bajo riesgo', color: 'success' };
-      if (icc < 0.85) return { label: 'Riesgo moderado', color: 'warning' };
+      if (icc < 0.75)  return { label: 'Bajo riesgo', color: 'warning' };
+      if (icc < 0.85) return { label: 'Normal', color: 'success' };
       return { label: 'Riesgo alto', color: 'danger' };
     } else {
-      if (icc < 0.95) return { label: 'Bajo riesgo', color: 'success' };
-      if (icc < 1.0)  return { label: 'Riesgo moderado', color: 'warning' };
+      if (icc < 0.8) return { label: 'Bajo riesgo', color: 'warning' };
+      if (icc < 0.9)  return { label: 'Normal', color: 'success' };
       return { label: 'Riesgo alto', color: 'danger' };
     }
   }
