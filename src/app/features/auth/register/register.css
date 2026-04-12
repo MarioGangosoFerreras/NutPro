@@ -182,3 +182,33 @@
   color: #999;
   margin-top: 8px;
 }
+
+.centro-item {
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.centro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.centro-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2d6a4f;
+}
+
+.btn-add-centro {
+  --border-radius: 10px;
+  --color: #2d6a4f;
+  --border-color: #52b788;
+  font-size: 13px;
+  width: 100%;
+}

@@ -12,7 +12,7 @@ export class AdminService {
     this.supabase = this.supabaseService.client;
   }
 
-  async getNutricionistasPorEstado(estado: 'pendiente' | 'activo' | 'rechazado') {
+  async getNutricionistasPorEstado(estado: 'pendiente' | 'activo' | 'rechazado' | 'inactivo') {
     const { data, error } = await this.supabase
       .from('nutricionistas')
       .select(`
@@ -52,17 +52,17 @@ export class AdminService {
     return true;
   }
 
-  async eliminarNutricionista(nutricionistaId: string) {
-  const { error } = await this.supabase
-    .from('nutricionistas')
-    .delete()
-    .eq('id', nutricionistaId);
+  async desactivarNutricionista(nutricionistaId: string) {
+    const { error } = await this.supabase
+      .from('nutricionistas')
+      .update({ estado: 'inactivo' })
+      .eq('id', nutricionistaId);
 
-  if (error) {
-    console.error('Error eliminando nutricionista:', error.message);
-    return false;
+    if (error) {
+      console.error('Error desactivando nutricionista:', error.message);
+      return false;
+    }
+
+    return true;
   }
-
-  return true;
-}
 }

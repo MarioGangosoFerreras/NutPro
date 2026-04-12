@@ -7,7 +7,7 @@ import {
   IonSpinner, IonBadge, IonAvatar, IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { checkmarkCircleOutline, closeCircleOutline, personCircleOutline, trashOutline } from 'ionicons/icons';
+import { banOutline, checkmarkCircleOutline, closeCircleOutline, personCircleOutline, refreshOutline, trashOutline } from 'ionicons/icons';
 import { AdminService } from '../../../core/services/admin';
 
 @Component({
@@ -23,6 +23,8 @@ import { AdminService } from '../../../core/services/admin';
 export class PanelAdmin implements OnInit {
   nutricionistasPendientes: any[] = [];
   nutricionistasActivos: any[] = [];
+  nutricionistasInactivos: any[] = [];
+
   loading = true;
 
   constructor(
@@ -31,7 +33,7 @@ export class PanelAdmin implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
-    addIcons({ checkmarkCircleOutline, closeCircleOutline, personCircleOutline, trashOutline });
+    addIcons({ checkmarkCircleOutline, closeCircleOutline, personCircleOutline, banOutline, refreshOutline });
   }
 
   async ngOnInit() {
@@ -44,6 +46,7 @@ export class PanelAdmin implements OnInit {
     try {
       this.nutricionistasPendientes = await this.adminService.getNutricionistasPorEstado('pendiente');
       this.nutricionistasActivos = await this.adminService.getNutricionistasPorEstado('activo');
+      this.nutricionistasInactivos = await this.adminService.getNutricionistasPorEstado('inactivo');
     } catch (error) {
       console.error('Error cargando nutricionistas:', error);
     } finally {
@@ -63,7 +66,7 @@ export class PanelAdmin implements OnInit {
   }
 
   async eliminar(nutricionistaId: string) {
-  await this.adminService.eliminarNutricionista(nutricionistaId);
-  await this.ngOnInit();
-}
+    await this.adminService.desactivarNutricionista(nutricionistaId);
+    await this.ngOnInit();
+  }
 }
