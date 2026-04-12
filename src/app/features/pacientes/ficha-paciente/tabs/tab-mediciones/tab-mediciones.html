@@ -1,0 +1,226 @@
+@if (loading) {
+  <div class="loading-container"><ion-spinner name="crescent"></ion-spinner></div>
+} @else {
+
+  <div class="mediciones-header">
+    <p class="section-title">📏 Historial de mediciones</p>
+    <div class="header-actions">
+      <ion-segment [value]="vistaActual" (ionChange)="cambiarVista($event)" class="vista-toggle">
+        <ion-segment-button value="lista">
+          <ion-icon name="list-outline"></ion-icon>
+          <ion-label>Lista</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="grafico">
+          <ion-icon name="bar-chart-outline"></ion-icon>
+          <ion-label>Gráfico</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+      <ion-button size="small" (click)="abrirNueva()">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Nueva
+      </ion-button>
+    </div>
+  </div>
+
+  @if (mediciones.length === 0) {
+    <div class="empty-state">
+      <ion-icon name="scale-outline"></ion-icon>
+      <p>No hay mediciones registradas</p>
+    </div>
+  }
+
+  <!-- ── VISTA LISTA ── -->
+  @if (vistaActual === 'lista') {
+    @for (m of mediciones; track m.id) {
+      <ion-card class="medicion-card">
+        <ion-card-header>
+          <div class="medicion-card-header">
+            <ion-card-title class="medicion-fecha">{{ m.fecha }}</ion-card-title>
+            <div class="medicion-badges">
+              @if (m.imc) {
+                <ion-badge [color]="imcCategoria(m.imc).color">
+                  IMC {{ m.imc }} · {{ imcCategoria(m.imc).label }}
+                </ion-badge>
+              }
+              @if (m.indice_cintura_cadera) {
+                <ion-badge [color]="iccCategoria(m.indice_cintura_cadera, paciente.sexo).color">
+                  ICC {{ m.indice_cintura_cadera }} · {{ iccCategoria(m.indice_cintura_cadera, paciente.sexo).label }}
+                </ion-badge>
+              }
+            </div>
+            <div class="medicion-acciones">
+              <ion-button fill="clear" size="small" (click)="abrirEditar(m)">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" size="small" (click)="confirmarEliminar(m.id)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="medicion-grid">
+            @if (m.peso_kg) {
+              <div class="medicion-dato"><span class="dato-label">Peso</span><span class="dato-valor">{{ m.peso_kg }} kg</span></div>
+            }
+            @if (m.altura_cm) {
+              <div class="medicion-dato"><span class="dato-label">Altura</span><span class="dato-valor">{{ m.altura_cm }} cm</span></div>
+            }
+            @if (m.grasa_corporal_pct) {
+              <div class="medicion-dato"><span class="dato-label">Grasa</span><span class="dato-valor">{{ m.grasa_corporal_pct }}%</span></div>
+            }
+            @if (m.masa_muscular_kg) {
+              <div class="medicion-dato"><span class="dato-label">Músculo</span><span class="dato-valor">{{ m.masa_muscular_kg }} kg</span></div>
+            }
+            @if (m.perimetro_cintura_cm) {
+              <div class="medicion-dato"><span class="dato-label">Cintura</span><span class="dato-valor">{{ m.perimetro_cintura_cm }} cm</span></div>
+            }
+            @if (m.perimetro_cadera_cm) {
+              <div class="medicion-dato"><span class="dato-label">Cadera</span><span class="dato-valor">{{ m.perimetro_cadera_cm }} cm</span></div>
+            }
+            @if (m.perimetro_abdomen_cm) {
+              <div class="medicion-dato"><span class="dato-label">Abdomen</span><span class="dato-valor">{{ m.perimetro_abdomen_cm }} cm</span></div>
+            }
+          </div>
+          @if (m.notas) {
+            <p class="medicion-notas">{{ m.notas }}</p>
+          }
+        </ion-card-content>
+      </ion-card>
+    }
+  }
+
+  <!-- ── VISTA GRÁFICO ── -->
+  @if (vistaActual === 'grafico' && mediciones.length > 0) {
+    <div class="grafico-container section-block">
+      <div class="grafico-selector">
+        <button [class.activo]="graficaActiva === 'peso'"    (click)="cambiarGrafica('peso')">Peso</button>
+        <button [class.activo]="graficaActiva === 'grasa'"   (click)="cambiarGrafica('grasa')">Grasa corporal</button>
+        <button [class.activo]="graficaActiva === 'musculo'" (click)="cambiarGrafica('musculo')">Masa muscular</button>
+        <button [class.activo]="graficaActiva === 'cintura'" (click)="cambiarGrafica('cintura')">Cintura</button>
+      </div>
+      <div class="canvas-wrapper">
+        <canvas id="medicionesChart"></canvas>
+      </div>
+    </div>
+  }
+
+  @if (vistaActual === 'grafico' && mediciones.length === 0) {
+    <div class="empty-state">
+      <ion-icon name="bar-chart-outline"></ion-icon>
+      <p>Añade mediciones para ver el gráfico de evolución</p>
+    </div>
+  }
+}
+
+<!-- ── Modal NUEVA medición ── -->
+<ion-modal [isOpen]="modalNueva" (didDismiss)="modalNueva = false">
+  <ng-template>
+    <ion-content class="ion-padding">
+      <div class="modal-header">
+        <h2>Nueva medición</h2>
+        <ion-button fill="clear" (click)="modalNueva = false">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      </div>
+      <div class="edit-grid">
+        <ion-item class="full-width">
+          <ion-label position="stacked">Fecha</ion-label>
+          <ion-input type="date" [(ngModel)]="nuevaMedicion.fecha"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Peso (kg)</ion-label>
+          <ion-input type="number" [(ngModel)]="nuevaMedicion.peso_kg" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Altura (cm)</ion-label>
+          <ion-input type="number" [(ngModel)]="nuevaMedicion.altura_cm" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Grasa corporal (%)</ion-label>
+          <ion-input type="number" [(ngModel)]="nuevaMedicion.grasa_corporal_pct" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Masa muscular (kg)</ion-label>
+          <ion-input type="number" [(ngModel)]="nuevaMedicion.masa_muscular_kg" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Perímetro cintura (cm)</ion-label>
+          <ion-input type="number" [(ngModel)]="nuevaMedicion.perimetro_cintura_cm" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Perímetro cadera (cm)</ion-label>
+          <ion-input type="number" [(ngModel)]="nuevaMedicion.perimetro_cadera_cm" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Perímetro abdomen (cm)</ion-label>
+          <ion-input type="number" [(ngModel)]="nuevaMedicion.perimetro_abdomen_cm" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item class="full-width">
+          <ion-label position="stacked">Notas</ion-label>
+          <ion-textarea [(ngModel)]="nuevaMedicion.notas" rows="2"></ion-textarea>
+        </ion-item>
+      </div>
+      <ion-button expand="block" (click)="guardarNueva()" [disabled]="guardandoMedicion" style="margin-top: 16px">
+        @if (guardandoMedicion) { <ion-spinner name="crescent"></ion-spinner> }
+        @else { <ion-icon name="save-outline" slot="start"></ion-icon> Guardar medición }
+      </ion-button>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- ── Modal EDITAR medición ── -->
+<ion-modal [isOpen]="modalEditar" (didDismiss)="modalEditar = false">
+  <ng-template>
+    <ion-content class="ion-padding">
+      <div class="modal-header">
+        <h2>Editar medición</h2>
+        <ion-button fill="clear" (click)="modalEditar = false">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      </div>
+      <div class="edit-grid">
+        <ion-item class="full-width">
+          <ion-label position="stacked">Fecha</ion-label>
+          <ion-input type="date" [(ngModel)]="medicionEditando.fecha"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Peso (kg)</ion-label>
+          <ion-input type="number" [(ngModel)]="medicionEditando.peso_kg" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Altura (cm)</ion-label>
+          <ion-input type="number" [(ngModel)]="medicionEditando.altura_cm" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Grasa corporal (%)</ion-label>
+          <ion-input type="number" [(ngModel)]="medicionEditando.grasa_corporal_pct" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Masa muscular (kg)</ion-label>
+          <ion-input type="number" [(ngModel)]="medicionEditando.masa_muscular_kg" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Perímetro cintura (cm)</ion-label>
+          <ion-input type="number" [(ngModel)]="medicionEditando.perimetro_cintura_cm" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Perímetro cadera (cm)</ion-label>
+          <ion-input type="number" [(ngModel)]="medicionEditando.perimetro_cadera_cm" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Perímetro abdomen (cm)</ion-label>
+          <ion-input type="number" [(ngModel)]="medicionEditando.perimetro_abdomen_cm" step="0.1"></ion-input>
+        </ion-item>
+        <ion-item class="full-width">
+          <ion-label position="stacked">Notas</ion-label>
+          <ion-textarea [(ngModel)]="medicionEditando.notas" rows="2"></ion-textarea>
+        </ion-item>
+      </div>
+      <ion-button expand="block" (click)="guardarEdicion()" [disabled]="guardandoMedicion" style="margin-top: 16px">
+        @if (guardandoMedicion) { <ion-spinner name="crescent"></ion-spinner> }
+        @else { <ion-icon name="save-outline" slot="start"></ion-icon> Guardar cambios }
+      </ion-button>
+    </ion-content>
+  </ng-template>
+</ion-modal>

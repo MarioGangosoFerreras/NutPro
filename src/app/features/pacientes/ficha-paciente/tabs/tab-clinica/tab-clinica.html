@@ -1,0 +1,109 @@
+@if (loading) {
+  <div class="loading-container"><ion-spinner name="crescent"></ion-spinner></div>
+} @else {
+  <div class="section-block">
+    <p class="section-title">👨‍👩‍👧 Antecedentes familiares</p>
+    <div class="toggle-grid">
+      <div class="toggle-item">
+        <span>Hipertensión</span>
+        <ion-toggle [(ngModel)]="formAntFam.hta" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Enf. cardiovascular</span>
+        <ion-toggle [(ngModel)]="formAntFam.ecv" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Diabetes</span>
+        <ion-toggle [(ngModel)]="formAntFam.diabetes" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Enf. autoinmune</span>
+        <ion-toggle [(ngModel)]="formAntFam.enfermedad_autoinmune" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Alergias</span>
+        <ion-toggle [(ngModel)]="formAntFam.alergias" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Obesidad</span>
+        <ion-toggle [(ngModel)]="formAntFam.obesidad" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Cáncer</span>
+        <ion-toggle [(ngModel)]="formAntFam.cancer" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+    </div>
+    <ion-item>
+      <ion-label position="stacked">Otras enfermedades familiares</ion-label>
+      <ion-textarea [(ngModel)]="formAntFam.otra" rows="2" placeholder="Describe otras..." (ngModelChange)="marcarCambios()"></ion-textarea>
+    </ion-item>
+  </div>
+
+  <div class="section-block">
+    <p class="section-title">🧬 Antecedentes personales</p>
+    <div class="toggle-grid">
+      <div class="toggle-item">
+        <span>Alcohol</span>
+        <ion-toggle [(ngModel)]="formAntPer.alcohol" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Tabaco</span>
+        <ion-toggle [(ngModel)]="formAntPer.tabaco" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Cirugías previas</span>
+        <ion-toggle [(ngModel)]="formAntPer.cirugias" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Alergias</span>
+        <ion-toggle [(ngModel)]="formAntPer.alergias" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+      <div class="toggle-item">
+        <span>Descansa bien</span>
+        <ion-toggle [(ngModel)]="formAntPer.descansa_bien" (ngModelChange)="marcarCambios()"></ion-toggle>
+      </div>
+    </div>
+    <div class="edit-grid" style="margin-top: 12px">
+      <ion-item class="full-width">
+        <ion-label position="stacked">Enfermedades / Patologías</ion-label>
+        <ion-textarea [(ngModel)]="formAntPer.enfermedad_patologia" rows="2" (ngModelChange)="marcarCambios()"></ion-textarea>
+      </ion-item>
+      <ion-item class="full-width">
+        <ion-label position="stacked">Medicación actual</ion-label>
+        <ion-textarea [(ngModel)]="formAntPer.medicacion" rows="2" (ngModelChange)="marcarCambios()"></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Digestiones</ion-label>
+        <ion-input [(ngModel)]="formAntPer.digestiones" (ngModelChange)="marcarCambios()"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Menstruación</ion-label>
+        <ion-input [(ngModel)]="formAntPer.menstruacion" (ngModelChange)="marcarCambios()"></ion-input>
+      </ion-item>
+      <ion-item class="full-width">
+        <ion-label position="stacked">Suplementos nutricionales</ion-label>
+        <ion-input [(ngModel)]="formAntPer.suplementos_nutricionales" (ngModelChange)="marcarCambios()"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Actividad física</ion-label>
+        <ion-select [(ngModel)]="formAntPer.actividad_fisica" (ngModelChange)="marcarCambios()" placeholder="Selecciona">
+          <ion-select-option value="sedentario">Sedentario</ion-select-option>
+          <ion-select-option value="ligero">Ligero</ion-select-option>
+          <ion-select-option value="moderado">Moderado</ion-select-option>
+          <ion-select-option value="intenso">Intenso</ion-select-option>
+          <ion-select-option value="muy_intenso">Muy intenso</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+  </div>
+
+  @if (cambios) {
+    <ion-button expand="block" (click)="guardar()" [disabled]="guardando" class="btn-guardar">
+      @if (guardando) {
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+        <ion-icon name="save-outline" slot="start"></ion-icon> Guardar antecedentes
+      }
+    </ion-button>
+  }
+}

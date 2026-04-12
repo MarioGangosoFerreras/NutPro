@@ -1,11 +1,17 @@
-/* --- Variables y Reset General --- */
-:host {
+/* Variables y Contenedor Raíz */
+app-ficha-paciente {
   --primary-medical: #2d6a4f;
   --primary-soft: #e8f5e9;
-  --danger-medical: #c0392b;
-  --warning-medical: #f39c12;
   --bg-subtle: #f8fafc;
-  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: block;
+}
+
+/* Estructura General */
+.ficha-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 10px 20px 40px 20px;
 }
 
 .loading-container {
@@ -15,60 +21,126 @@
   height: 60vh;
 }
 
-.ficha-container {
-  max-width: 800px; /* Un poco más ancho para legibilidad */
-  margin: 0 auto;
-  padding-bottom: 40px;
-}
-
-/* --- Botón Volver --- */
-.btn-back {
-  --color: var(--primary-medical);
-  font-weight: 600;
-  margin-bottom: 20px;
-  transition: transform 0.2s;
-}
-.btn-back:hover { transform: translateX(-5px); }
-
-/* --- Hero Section (Cabecera Paciente) --- */
+/* Tarjeta Hero (Paciente) */
 .paciente-hero {
+  overflow: visible !important;
   position: relative;
+  margin-bottom: 30px;
+  border-radius: 20px;
+  --background: white;
+  height: auto;
+  min-height: 160px;
+  padding: 15px;
   display: flex;
-  align-items: flex-start;
-  gap: 24px;
-  background: white;
-  border-radius: 24px;
-  padding: 30px;
-  box-shadow: var(--card-shadow);
-  margin-bottom: 24px;
-  border: 1px solid rgba(0,0,0,0.03);
+  align-items: center;
 }
 
-.avatar-wrapper {
-  position: relative;
+.hero-item {
+  --background: transparent;
+  --padding-start: 10px;
+  width: 100%;
 }
 
 .paciente-avatar {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
+  margin-right: 20px;
   border: 3px solid var(--primary-soft);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
+/* Tipografía e Información */
 .paciente-info h1 {
-  font-size: 26px;
-  font-weight: 800;
-  color: #1a3c2e;
-  margin: 0 0 6px;
+  margin: 0 0 2px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
 }
 
 .paciente-info p {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
   color: #64748b;
-  font-size: 15px;
-  margin-bottom: 10px;
 }
 
-/* --- Segmentos (Tabs) --- */
+.email-text {
+  margin-bottom: 5px;
+  color: #64748b;
+}
+
+/* Componentes Ionic */
+ion-segment-button {
+  --color: #64748b;
+  --color-checked: #2d6a4f;
+  --indicator-color: #ffffff;
+  font-weight: 600;
+  min-height: 45px;
+}
+
+ion-badge {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+}
+
+.badge-motivo {
+  margin-top: 8px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  white-space: normal;
+  text-align: left;
+  max-width: 90%;
+}
+
+/* Menú de Acciones y Dropdown */
+.acciones-edicion {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.btn-dots {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 35px;
+  width: 180px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  z-index: 1000;
+  overflow: hidden;
+  border: 1px solid #edf2f7;
+}
+
+.dropdown-item {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #334155;
+}
+
+.dropdown-item:hover {
+  background-color: #f8fafc;
+}
+
+.dropdown-item.danger {
+  color: #ef4444;
+}
+
+/* Navegación y Otros */
 .ficha-tabs {
   background: #f1f5f9;
   border-radius: 14px;
@@ -76,302 +148,39 @@
   margin-bottom: 24px;
 }
 
-ion-segment-button {
-  --color: #64748b;
-  --color-checked: var(--primary-medical);
-  --indicator-color: white;
-  --indicator-box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  font-weight: 600;
-  min-height: 45px;
+.header-acciones {
+  margin-bottom: 5px;
 }
 
-/* --- Bloques de Sección --- */
-.section-block {
-  background: white;
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: var(--card-shadow);
-  border: 1px solid #f1f5f9;
-}
-
-.section-title {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--primary-medical);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 20px;
-  border-left: 4px solid var(--primary-medical);
-  padding-left: 12px;
-}
-
-/* --- Grid de Información --- */
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  background: var(--bg-subtle);
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  transition: all 0.2s;
-}
-
-.info-item:hover {
-  background: #f0fdf4;
-  border-color: var(--primary-soft);
-}
-
-/* NUEVO: contenedor interno que apila label + valor */
-.info-item > div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.info-label {
-  display: block;          /* ← esto era el problema */
-  font-size: 11px;
-  color: #94a3b8;
+.btn-volver {
+  --color: #006432;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --background: transparent;
+  --background-hover: transparent;
+  --background-focused: transparent;
+  
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 0.95rem;
+  text-transform: none;
+  
+  /* Eliminamos restricciones de altura que provocan el recorte */
+  height: auto; 
+  min-height: 32px; /* Tamaño táctil recomendado pero sin recortar contenido */
+  margin: 0;
+  overflow: visible;
 }
 
-.info-value {
-  display: block;          /* ← y esto */
-  font-size: 14px;
-  color: #334155;
-  font-weight: 600;
-  word-break: break-word;
+.btn-volver ion-icon {
+  /* Usamos font-size en lugar de width/height para evitar deformación */
+  font-size: 1rem; 
+  color: #006432;
+  margin-right: 2px;
 }
 
-/* --- Toggles y Edición --- */
-.toggle-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
+/* Efecto visual al pasar el ratón o pulsar */
+.btn-volver:hover {
+  opacity: 0.7;
 }
 
-.toggle-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-subtle);
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 14px;
-  color: #475569;
-}
 
-/* --- Mediciones --- */
-.medicion-card {
-  background: white;
-  border-radius: 16px;
-  margin-bottom: 24px;
-  border: 1px solid #e2e8f0;
-  border-left: 5px solid var(--primary-medical); /* Toque de color estético */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); /* Sombra más moderna */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden; /* Asegura que la cabecera respete los bordes redondeados */
-}
-
-.medicion-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.medicion-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  background: #f8fafc; /* Fondo muy sutil para separar la cabecera */
-  border-bottom: 1px solid #f1f5f9; /* Línea separadora de los cálculos */
-}
-
-/* NUEVO: Clase específica para la fecha */
-.medicion-fecha {
-  font-size: 16px; /* Más pequeño y estético */
-  font-weight: 600;
-  color: #64748b; /* Gris que no compite con los datos médicos */
-  padding-right: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.medicion-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-   gap: 7px; /*espacio entre las medidciones maximo para que no se separen */
-  background: white;
-}
-
-.medicion-dato {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  background: #f8fafc; /* Cajitas individuales para cada dato */
-  padding: 10px 8px;
-  border-radius: 12px;
-  border: 1px solid #00a1564f;
-}
-
-.dato-label { 
-  font-size: 11px; 
-  color: #94a3b8; 
-  font-weight: 700; 
-  text-transform: uppercase;
-}
-
-.dato-valor { 
-  font-size: 16px; /* Número ligeramente más grande para que sea el protagonista */
-  color: var(--primary-medical); 
-  font-weight: 800; 
-}
-
-/* --- Badges y Acciones dentro de la Card --- */
-.medicion-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px; /* Un poco más de aire entre etiquetas */
-  flex: 1;
-}
-
-.medicion-acciones {
-  display: flex;
-  gap: 4px;
-  margin-left: auto; /* Empuja las acciones a la derecha */
-}
-
-/* --- Botones --- */
-.btn-guardar {
-  --background: var(--primary-medical);
-  --background-activated: #1b4332;
-  --border-radius: 12px;
-  height: 50px;
-  margin-top: 10px;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.2);
-}
-
-.tag-chip {
-  padding: 6px 12px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 12px;
-}
-
-.fab-guardar {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 999;
-  --border-radius: 16px;
-  --box-shadow: 0 4px 16px rgba(45, 106, 79, 0.35);
-  height: 52px;
-  padding: 0 24px;
-  font-weight: 700;
-}
-
-/* --- Ajustes Responsive --- */
-.acciones-edicion {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-}
-
-@media (max-width: 600px) {
-  .paciente-hero {
-    flex-direction: column;
-    text-align: center;
-    padding: 20px;
-  }
-
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.menu-acciones {
-  position: relative;
-}
-
-.btn-dots {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  line-height: 1;
-}
-
-.btn-dots:hover {
-  background: #f1f5f9;
-}
-
-.dropdown {
-  position: absolute;
-  right: 0;
-  top: 42px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  overflow: hidden;
-  min-width: 170px;
-  z-index: 100;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-}
-
-.dropdown-item {
-  padding: 11px 16px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  color: #334155;
-  font-weight: 500;
-}
-
-.dropdown-item:hover {
-  background: #f8fafc;
-}
-
-.dropdown-item.danger {
-  color: #c0392b;
-}
-
-.dropdown-item.danger:hover {
-  background: #fef2f2;
-}
-
-.medicion-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  flex: 1;
-}
-
-.medicion-acciones {
-  display: flex;
-  gap: 0;
-  margin-left: 4px;
-}
