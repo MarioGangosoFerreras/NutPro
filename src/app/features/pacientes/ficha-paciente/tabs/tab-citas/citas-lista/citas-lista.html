@@ -1,0 +1,23 @@
+@if (grupos.length === 0) {
+  <div class="citas-empty">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <p>Sin citas registradas</p>
+  </div>
+}
+
+@for (grupo of grupos; track grupo.fecha) {
+  <div class="citas-grupo">
+    <p class="citas-grupo__fecha">
+      {{ grupo.fecha | date:'EEEE d MMMM yyyy':'':'es' | titlecase }}
+    </p>
+    @for (cita of grupo.citas; track cita.id) {
+      <app-cita-card
+        [cita]="cita"
+        [mostrarAcciones]="true"
+        (confirmar)="confirmarCita.emit($event)"
+        (cancelar)="cancelarCita.emit($event)"
+        (editar)="editarCita.emit($event)">
+      </app-cita-card>
+    }
+  </div>
+}

@@ -10,6 +10,7 @@ import { TabAlimentacion } from './tabs/tab-alimentacion/tab-alimentacion';
 import { TabMediciones } from './tabs/tab-mediciones/tab-mediciones';
 import { IonContent, IonButton, IonIcon, IonSpinner, IonBadge, IonSegment, IonSegmentButton, IonLabel, ToastController, AlertController, IonCard, IonCardContent, IonAvatar, IonItem } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
+import { TabCitas } from './tabs/tab-citas/tab-citas';
 import {
   arrowBackOutline,
   personCircleOutline,
@@ -18,6 +19,7 @@ import {
   scaleOutline,
   createOutline,
   trashOutline,
+  calendarOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -28,6 +30,7 @@ import {
     TabClinica,
     TabAlimentacion,
     TabMediciones,
+    TabCitas,
     IonContent,
     IonButton,
     IonIcon,

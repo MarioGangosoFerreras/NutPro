@@ -204,3 +204,16 @@
   margin-right: 3px;
   opacity: 0.6;
 }
+
+.proxima-cita {
+  color: var(--ion-color-primary);
+}
+
+.sin-cita {
+  color: var(--ion-color-medium);
+}
+
+.cita-tipo {
+  font-size: 11px;
+  opacity: 0.8;
+}

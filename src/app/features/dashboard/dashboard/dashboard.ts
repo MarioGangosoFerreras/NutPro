@@ -6,10 +6,11 @@ import { AuthService } from '../../../core/services/auth';
 import { Header } from "../../../shared/components/header/header";
 import { EstadisticasDashboardComponent } from '../estadisticas-dashboard/estadisticas-dashboard';
 import { ListaPacientesPreviewComponent } from "../lista-pacientes-preview/lista-pacientes-preview";
+import { CalendarioCitas } from "../calendario-citas/calendario-citas";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, IonContent, Header, EstadisticasDashboardComponent, ListaPacientesPreviewComponent],
+  imports: [CommonModule, IonContent, Header, EstadisticasDashboardComponent, ListaPacientesPreviewComponent, CalendarioCitas],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

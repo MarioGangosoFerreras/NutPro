@@ -1,8 +1,17 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" color="light">
   <h2>Bienvenido, {{ nombreUsuario }} 👋</h2>
-  
+
   <app-estadisticas-dashboard/>
-  <app-lista-pacientes-preview/>
+
+  <div class="dashboard-main">
+    <div class="dashboard-main__pacientes">
+      <app-lista-pacientes-preview/>
+    </div>
+    <div class="dashboard-main__calendario">
+      <app-calendario-citas/>
+    </div>
+  </div>
+
 </ion-content>

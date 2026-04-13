@@ -1,7 +1,6 @@
 <app-header></app-header>
 
 <ion-content class="ion-padding">
-
   @if (loading) {
     <div class="loading-container">
       <ion-spinner name="crescent"></ion-spinner>
@@ -10,7 +9,6 @@
 
   @if (!loading && paciente) {
     <div class="ficha-container">
-
       <div class="header-acciones">
         <ion-button fill="clear" (click)="volver()" class="btn-volver">
           <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
@@ -19,7 +17,6 @@
       </div>
 
       <ion-card class="paciente-hero">
-
         <div class="acciones-edicion">
           <div class="menu-acciones">
             <button class="btn-dots" (click)="toggleMenu()">⋯</button>
@@ -59,15 +56,10 @@
             }
           </ion-label>
         </ion-item>
-
       </ion-card>
 
       <!-- ✅ TABS -->
-      <ion-segment
-        [value]="tabActiva"
-        (ionChange)="onTabChange($event)"
-        class="ficha-tabs"
-      >
+      <ion-segment [value]="tabActiva" (ionChange)="onTabChange($event)" class="ficha-tabs">
         <ion-segment-button value="resumen">
           <ion-icon name="person-circle-outline"></ion-icon>
           <ion-label>Resumen</ion-label>
@@ -87,6 +79,11 @@
           <ion-icon name="scale-outline"></ion-icon>
           <ion-label>Mediciones</ion-label>
         </ion-segment-button>
+
+        <ion-segment-button value="citas">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <ion-label>Citas</ion-label>
+        </ion-segment-button>
       </ion-segment>
 
       <!-- CONTENIDO -->
@@ -94,7 +91,8 @@
         <app-tab-resumen
           [paciente]="paciente"
           (pacienteActualizado)="onPacienteActualizado($event)"
-          (eliminarPaciente)="onEliminarPaciente()">
+          (eliminarPaciente)="onEliminarPaciente()"
+        >
         </app-tab-resumen>
       }
 
@@ -110,7 +108,10 @@
         <app-tab-mediciones [paciente]="paciente"></app-tab-mediciones>
       }
 
+      @if (tabActiva === 'citas') {
+        <app-tab-citas [pacienteId]="paciente.id" [nutricionistaId]="paciente.nutricionista_id">
+        </app-tab-citas>
+      }
     </div>
   }
-
 </ion-content>

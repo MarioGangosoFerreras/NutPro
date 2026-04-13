@@ -33,7 +33,9 @@ export class AuthService {
   }
 
   async getUsuario() {
-    const { data: { session } } = await this.supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await this.supabase.auth.getSession();
     if (!session?.user) return null;
 
     const { data, error } = await this.supabase
@@ -51,7 +53,9 @@ export class AuthService {
   }
 
   async getNutricionistaId(): Promise<string | null> {
-    const { data: { session } } = await this.supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await this.supabase.auth.getSession();
     if (!session?.user) return null;
 
     const { data, error } = await this.supabase
@@ -64,24 +68,27 @@ export class AuthService {
     return data?.id ?? null;
   }
 
-  async signUp(email: string, password: string, metadata: {
-    nombre: string;
-    apellidos: string;
-    rol: string;
-    telefono: string;
-    numero_colegiado?: string;
-    titulacion?: string | null;
-    especialidad?: string;
-    nombre_empresa?: string;
-    avatar_url?: string | null;
-  }
+  async signUp(
+    email: string,
+    password: string,
+    metadata: {
+      nombre: string;
+      apellidos: string;
+      rol: string;
+      telefono: string;
+      numero_colegiado?: string;
+      titulacion?: string | null;
+      especialidad?: string;
+      nombre_empresa?: string;
+      avatar_url?: string | null;
+    },
   ) {
     return await this.supabase.auth.signUp({
       email,
       password,
       options: {
-        data: metadata
-      }
+        data: metadata,
+      },
     });
   }
 
@@ -97,5 +104,17 @@ export class AuthService {
 
     if (error) return null;
     return data;
+  }
+
+  async getUserId(): Promise<string> {
+    const {
+      data: { session },
+    } = await this.supabase.auth.getSession();
+    return session?.user?.id ?? '';
+  }
+
+  async getUsuarioId(): Promise<string> {
+    const usuario = await this.getUsuario();
+    return usuario?.id ?? '';
   }
 }

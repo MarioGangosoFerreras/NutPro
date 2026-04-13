@@ -207,26 +207,36 @@ export class PacientesService {
 
   async eliminarPaciente(id: string, usuarioId: string) {
     // Al borrar usuario, paciente se borra en cascada
-    const { error } = await this.supabase
-      .from('usuarios')
-      .delete()
-      .eq('id', usuarioId);
+    const { error } = await this.supabase.from('usuarios').delete().eq('id', usuarioId);
 
     if (error) throw error;
   }
 
   async getPacientesPreview(nutricionistaId: string, limite: number = 5) {
+    const ahora = new Date().toISOString();
+
     const { data, error } = await this.supabase
       .from('pacientes')
-      .select(`
+      .select(
+        `
       id,
       usuario:usuario_id (
         nombre,
         apellidos,
         avatar_url
+      ),
+      citas (
+        id,
+        fecha_hora,
+        tipo,
+        estado
       )
-    `)
+    `,
+      )
       .eq('nutricionista_id', nutricionistaId)
+      .eq('citas.nutricionista_id', nutricionistaId)
+      .neq('citas.estado', 'cancelada')
+      .gte('citas.fecha_hora', ahora)
       .order('created_at', { ascending: false })
       .limit(limite);
 
@@ -235,6 +245,13 @@ export class PacientesService {
       return [];
     }
 
-    return data ?? [];
+    // Ordenar las citas de cada paciente y quedarse con la más próxima
+    return (data ?? []).map((p: any) => ({
+      ...p,
+      proximaCita:
+        p.citas?.sort(
+          (a: any, b: any) => new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime(),
+        )[0] ?? null,
+    }));
   }
 }

@@ -1,0 +1,77 @@
+<div class="cal-widget">
+  <div class="cal-widget__nav">
+    <ion-button fill="clear" size="small" (click)="mesAnterior()">
+      <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
+    </ion-button>
+    <span class="cal-widget__titulo">
+      {{ mesActual | date: 'MMMM yyyy' : '' : 'es' | titlecase }}
+    </span>
+    <ion-button fill="clear" size="small" (click)="mesSiguiente()">
+      <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  @if (cargando) {
+    <div class="cal-widget__loading">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else {
+    <div class="cal-widget__grid">
+      @for (d of DIAS; track d) {
+        <div class="cal-widget__dia-header">{{ d }}</div>
+      }
+      @for (semana of semanas; track $index) {
+        @for (dia of semana; track dia.fecha) {
+          <div
+            class="cal-widget__dia"
+            [class.otro-mes]="!dia.esDelMes"
+            [class.hoy]="esHoy(dia.fecha)"
+            [class.seleccionado]="esSeleccionado(dia.fecha)"
+            [class.con-citas]="dia.citas.length > 0"
+            (click)="seleccionarFecha(dia.fecha)"
+          >
+            <span>{{ dia.fecha.getDate() }}</span>
+            @if (dia.citas.length > 0) {
+              <span class="cal-widget__dot"></span>
+            }
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Citas del día seleccionado -->
+    <div class="cal-widget__detalle">
+      <p class="cal-widget__detalle-titulo">
+        {{ diaSeleccionado | date: 'EEEE d MMMM' : '' : 'es' | titlecase }}
+      </p>
+
+      @if (citasDelDia.length === 0) {
+        <p class="cal-widget__empty">Sin citas este día</p>
+      }
+
+      @for (cita of citasDelDia; track cita.id) {
+        <div class="cal-cita-row" (click)="irAPaciente(cita)">
+          <div class="cal-cita-row__hora">
+            {{ cita.fecha_hora | date: 'HH:mm' }}
+          </div>
+
+          <div class="cal-cita-row__info">
+            <span class="cal-cita-row__nombre">
+              {{ cita.pacientes?.usuarios?.nombre }} {{ cita.pacientes?.usuarios?.apellidos }}
+            </span>
+            <span class="cal-cita-row__meta">
+              <ion-icon
+                [name]="cita.tipo === 'videollamada' ? 'videocam-outline' : 'location-outline'"
+              ></ion-icon>
+              {{ cita.tipo }} · {{ cita.duracion_min }} min
+            </span>
+          </div>
+
+          <ion-badge [color]="colorEstado(cita.estado)">
+            {{ cita.estado }}
+          </ion-badge>
+        </div>
+      }
+    </div>
+  }
+</div>
