@@ -48,11 +48,6 @@ interface NavItem {
     IonIcon,
     IonRouterOutlet,
     IonSplitPane,
-    IonHeader,      // <--- Añadir aquí
-    IonToolbar,     // <--- Añadir aquí
-    IonButtons,     // <--- Añadir aquí
-    IonMenuButton,  // <--- Añadir aquí
-    IonTitle        // <--- Añadir aquí
   ],
   templateUrl: './shell.html',
   styleUrls: ['./shell.css'],
