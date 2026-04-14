@@ -5,49 +5,60 @@ export const routes: Routes = [
   {
     path: '',
     redirectTo: 'login',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'login',
-    loadComponent: () => import('./features/auth/login/login').then(m => m.Login)
+    loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
   },
   {
-    path: 'dashboard',
+    path: 'register',
+    loadComponent: () => import('./features/auth/register/register').then((m) => m.Register),
+  },
+  {
+    path: 'pendiente-verificacion',
+    loadComponent: () =>
+      import('./features/auth/pendiente-verificacion/pendiente-verificacion').then(
+        (m) => m.PendienteVerificacion,
+      ),
+  },
+  // ── Rutas protegidas envueltas en el Shell ──
+  {
+    path: '',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard)
+    loadComponent: () => import('./shared/shell/shell').then((m) => m.Shell),
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'pacientes',
+        loadComponent: () =>
+          import('./features/pacientes/lista-pacientes/lista-pacientes').then(
+            (m) => m.ListaPacientes,
+          ),
+      },
+      {
+        path: 'pacientes/nuevo',
+        loadComponent: () =>
+          import('./features/pacientes/nuevo-paciente/nuevo-paciente').then(
+            (m) => m.NuevoPaciente,
+          ),
+      },
+      {
+        path: 'pacientes/:id',
+        loadComponent: () =>
+          import('./features/pacientes/ficha-paciente/ficha-paciente').then(
+            (m) => m.FichaPaciente,
+          ),
+      },
+      {
+        path: 'admin',
+        loadComponent: () =>
+          import('./features/admin/panel-admin/panel-admin').then((m) => m.PanelAdmin),
+      },
+    ],
   },
-
-  {
-  path: 'register',
-  loadComponent: () => import('./features/auth/register/register').then(m => m.Register)
-},
-
-{
-  path: 'pacientes',
-  canActivate: [authGuard],
-  loadComponent: () => import('./features/pacientes/lista-pacientes/lista-pacientes').then(m => m.ListaPacientes)
-},
-{
-  path: 'pacientes/nuevo',
-  canActivate: [authGuard],
-  loadComponent: () => import('./features/pacientes/nuevo-paciente/nuevo-paciente')
-    .then(m => m.NuevoPaciente)
-},
-{
-  path: 'pendiente-verificacion',
-  loadComponent: () => import('./features/auth/pendiente-verificacion/pendiente-verificacion')
-    .then(m => m.PendienteVerificacion)
-},
-{
-  path: 'admin',
-  canActivate: [authGuard],
-  loadComponent: () => import('./features/admin/panel-admin/panel-admin')
-    .then(m => m.PanelAdmin)
-},
-{
-  path: 'pacientes/:id',
-  canActivate: [authGuard],
-  loadComponent: () => import('./features/pacientes/ficha-paciente/ficha-paciente')
-    .then(m => m.FichaPaciente)
-}
 ];

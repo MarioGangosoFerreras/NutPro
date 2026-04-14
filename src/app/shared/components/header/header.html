@@ -1,12 +1,10 @@
 <ion-header class="header">
   <ion-toolbar class="header-toolbar">
-    <!-- Logo y nombre -->
-    <div class="header-brand" slot="start" routerLink="/dashboard" style="cursor: pointer">
-      <img src="img/Logo_app.png" alt="NutriPro" class="header-logo" />
-      <span class="header-title">NutPro</span>
-    </div>
+    
+    <ion-buttons slot="start">
+      <ion-menu-button menu="main-menu"></ion-menu-button>
+    </ion-buttons>
 
-    <!-- Buscador -->
     <ion-searchbar
       slot="start"
       class="header-search"
@@ -17,9 +15,7 @@
     >
     </ion-searchbar>
 
-    <!-- Acciones -->
     <div class="header-actions" slot="end">
-      <!-- Notificaciones -->
       <ion-button fill="clear" class="action-btn">
         <ion-icon name="notifications-outline"></ion-icon>
         @if (notificaciones > 0) {
@@ -27,7 +23,6 @@
         }
       </ion-button>
 
-      <!-- Avatar -->
       <ion-button fill="clear" class="action-btn avatar-btn">
         @if (avatarUrl) {
           <ion-avatar>
@@ -36,11 +31,6 @@
         } @else {
           <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
         }
-      </ion-button>
-
-      <!-- Cerrar sesión -->
-      <ion-button fill="clear" class="action-btn" (click)="logout()">
-        <ion-icon name="log-out-outline"></ion-icon>
       </ion-button>
     </div>
   </ion-toolbar>

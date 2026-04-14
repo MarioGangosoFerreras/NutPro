@@ -4,14 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth';
 import {
   IonHeader, IonToolbar, IonButton, IonIcon,
-  IonSearchbar, IonAvatar, IonBadge
+  IonSearchbar, IonAvatar, IonBadge, IonButtons, IonMenuButton
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logOutOutline, notificationsOutline, personCircleOutline } from 'ionicons/icons';
+import { menuOutline, notificationsOutline, personCircleOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-header',
-  imports: [FormsModule, IonHeader, IonToolbar, IonButton, IonIcon, IonSearchbar, IonAvatar, IonBadge, RouterLink],
+  standalone: true, // Asegúrate de tener esto si usas standalone
+  imports: [FormsModule, IonHeader, IonToolbar, IonButton, IonIcon, IonSearchbar, IonAvatar, IonBadge, IonButtons, IonMenuButton],
   templateUrl: './header.html',
   styleUrl: './header.css'
 })
@@ -24,7 +25,7 @@ export class Header implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-    addIcons({ notificationsOutline, personCircleOutline, logOutOutline  });
+    addIcons({ notificationsOutline, personCircleOutline, menuOutline});
   }
 
   async ngOnInit() {
@@ -38,10 +39,5 @@ export class Header implements OnInit {
         queryParams: { q: this.searchQuery }
       });
     }
-  }
-
-  async logout() {
-    await this.authService.signOut();
-    this.router.navigate(['/login']);
   }
 }

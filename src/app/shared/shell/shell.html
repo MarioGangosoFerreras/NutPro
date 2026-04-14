@@ -1,0 +1,45 @@
+<ion-split-pane contentId="main-content" when="lg">
+
+  <ion-menu menuId="main-menu" contentId="main-content" type="overlay" side="start">
+    <div class="sidebar">
+      
+      <div class="sidebar__brand">
+        <div class="sidebar__logo-container">
+          <img src="img/Logo_app.png" alt="NutriPro" class="sidebar__logo-img" />
+        </div>
+        <span class="sidebar__app-name">NutPro</span>
+      </div>
+
+      <nav class="sidebar__nav">
+        @for (item of navItems; track item.route) {
+          <button
+            class="nav-item"
+            [class.nav-item--active]="isActive(item)"
+            (click)="navegar(item.route)"
+          >
+            <ion-icon [name]="item.icon" class="nav-item__icon"></ion-icon>
+            <span class="nav-item__label">{{ item.label }}</span>
+            @if (isActive(item)) {
+              <span class="nav-item__indicator"></span>
+            }
+          </button>
+        }
+      </nav>
+
+      <div class="sidebar__footer">
+        <button class="nav-item nav-item--logout" (click)="cerrarSesion()">
+          <ion-icon name="log-out-outline" class="nav-item__icon"></ion-icon>
+          <span class="nav-item__label">Cerrar sesión</span>
+        </button>
+      </div>
+
+    </div>
+  </ion-menu>
+
+  <div class="ion-page" id="main-content">
+    <ion-content>
+      <ion-router-outlet></ion-router-outlet>
+    </ion-content>
+  </div>
+
+</ion-split-pane>

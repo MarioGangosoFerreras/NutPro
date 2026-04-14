@@ -30,7 +30,7 @@
   --background: #f0f4f2;
   --border-radius: 10px;
   --box-shadow: none;
-  max-width: 320px;
+  max-width: 1000px;
 }
 
 .header-actions {
