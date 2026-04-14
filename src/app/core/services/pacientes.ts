@@ -12,6 +12,10 @@ export class PacientesService {
     this.supabase = this.supabaseService.client;
   }
 
+  get supabaseClient() {
+    return this.supabase;
+  }
+
   async getPacientes(nutricionistaId: string) {
     const { data, error } = await this.supabase
       .from('pacientes')
@@ -213,45 +217,64 @@ export class PacientesService {
   }
 
   async getPacientesPreview(nutricionistaId: string, limite: number = 5) {
-    const ahora = new Date().toISOString();
+    // 1. Filtramos desde el inicio de hoy para que las citas que ya pasaron
+    // hoy sigan apareciendo en la lista hasta que acabe el día.
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const filtroFecha = hoy.toISOString();
 
     const { data, error } = await this.supabase
       .from('pacientes')
       .select(
         `
       id,
-      usuario:usuario_id (
-        nombre,
-        apellidos,
-        avatar_url
-      ),
-      citas (
-        id,
-        fecha_hora,
-        tipo,
-        estado
-      )
+      usuario:usuario_id (nombre, apellidos, avatar_url),
+      citas (id, fecha_hora, tipo, estado, nutricionista_id)
     `,
       )
       .eq('nutricionista_id', nutricionistaId)
-      .eq('citas.nutricionista_id', nutricionistaId)
-      .neq('citas.estado', 'cancelada')
-      .gte('citas.fecha_hora', ahora)
-      .order('created_at', { ascending: false })
-      .limit(limite);
+      // Traemos un poco más del límite para poder ordenar bien en memoria
+      .limit(50);
 
     if (error) {
-      console.error('Error obteniendo preview de pacientes:', error.message);
+      console.error('Error:', error.message);
       return [];
     }
 
-    // Ordenar las citas de cada paciente y quedarse con la más próxima
-    return (data ?? []).map((p: any) => ({
-      ...p,
-      proximaCita:
-        p.citas?.sort(
+    // 2. Procesamos en el cliente para evitar los fallos de los "Inner Filters" de Supabase
+    const pacientesProcesados = (data ?? []).map((p: any) => {
+      const citasFuturas = (p.citas || [])
+        .filter(
+          (c: any) =>
+            c.nutricionista_id === nutricionistaId &&
+            c.estado !== 'cancelada' &&
+            c.fecha_hora >= filtroFecha,
+        )
+        .sort(
           (a: any, b: any) => new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime(),
-        )[0] ?? null,
-    }));
+        );
+
+      return { ...p, proximaCita: citasFuturas[0] || null };
+    });
+
+    // 3. ORDENACIÓN: Citas más próximas arriba, pacientes sin cita abajo
+    return pacientesProcesados
+      .sort((a, b) => {
+        if (a.proximaCita && b.proximaCita) {
+          return (
+            new Date(a.proximaCita.fecha_hora).getTime() -
+            new Date(b.proximaCita.fecha_hora).getTime()
+          );
+        }
+        if (a.proximaCita && !b.proximaCita) return -1;
+        if (!a.proximaCita && b.proximaCita) return 1;
+        return 0;
+      })
+      .slice(0, limite); // Aplicamos el límite visual final
+  }
+
+  // Método para limpiar canales desde el componente
+  async desuscribirCitas(canal: any) {
+    if (canal) await this.supabase.removeChannel(canal);
   }
 }

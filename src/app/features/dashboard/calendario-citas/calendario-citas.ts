@@ -8,7 +8,11 @@ import { CitasService, Cita } from '../../../core/services/citas';
 import { AuthService } from '../../../core/services/auth';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
-interface DiaCal { fecha: Date; esDelMes: boolean; citas: Cita[]; }
+interface DiaCal {
+  fecha: Date;
+  esDelMes: boolean;
+  citas: Cita[];
+}
 
 @Component({
   selector: 'app-calendario-citas',
@@ -19,9 +23,9 @@ interface DiaCal { fecha: Date; esDelMes: boolean; citas: Cita[]; }
 })
 export class CalendarioCitas implements OnInit, OnDestroy {
   private citasService = inject(CitasService);
-  private authService  = inject(AuthService);
-  private router       = inject(Router);
-  private cdr          = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   hoy = new Date();
   mesActual = new Date(this.hoy.getFullYear(), this.hoy.getMonth(), 1);
@@ -41,11 +45,11 @@ export class CalendarioCitas implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-  this.nutricionistaId = (await this.authService.getNutricionistaId()) ?? '';
-  await this.cargarMes();
-  this.seleccionarFecha(this.hoy);
-  this.suscribirRealtime();
-}
+    this.nutricionistaId = (await this.authService.getNutricionistaId()) ?? '';
+    await this.cargarMes();
+    this.seleccionarFecha(this.hoy);
+    this.suscribirRealtime();
+  }
 
   async cargarMes() {
     this.cargando = true;
@@ -53,7 +57,7 @@ export class CalendarioCitas implements OnInit, OnDestroy {
       this.citas = await this.citasService.getCitasMes(
         this.nutricionistaId,
         this.mesActual.getFullYear(),
-        this.mesActual.getMonth()
+        this.mesActual.getMonth(),
       );
       this.construirCalendario();
       // Refresca citas del día seleccionado si hay uno
@@ -69,7 +73,7 @@ export class CalendarioCitas implements OnInit, OnDestroy {
     const mes = this.mesActual.getMonth();
     const dias: DiaCal[] = [];
 
-    const primerDia  = new Date(año, mes, 1);
+    const primerDia = new Date(año, mes, 1);
     const offsetInicio = (primerDia.getDay() + 6) % 7;
     for (let i = offsetInicio - 1; i >= 0; i--) {
       const f = new Date(año, mes, -i);
@@ -94,10 +98,14 @@ export class CalendarioCitas implements OnInit, OnDestroy {
   }
 
   private citasEnFecha(fecha: Date): Cita[] {
-    return this.citas.filter(c => {
+    return this.citas.filter((c) => {
       const fc = new Date(c.fecha_hora);
       return fc.toDateString() === fecha.toDateString();
     });
+  }
+
+  tieneEstado(dia: DiaCal, estado: string): boolean {
+    return dia.citas.some((c) => c.estado === estado);
   }
 
   seleccionarFecha(fecha: Date) {
@@ -116,8 +124,12 @@ export class CalendarioCitas implements OnInit, OnDestroy {
     await this.cargarMes();
   }
 
-  esHoy(f: Date)         { return f.toDateString() === this.hoy.toDateString(); }
-  esSeleccionado(f: Date) { return this.diaSeleccionado?.toDateString() === f.toDateString(); }
+  esHoy(f: Date) {
+    return f.toDateString() === this.hoy.toDateString();
+  }
+  esSeleccionado(f: Date) {
+    return this.diaSeleccionado?.toDateString() === f.toDateString();
+  }
 
   colorEstado(estado: string) {
     return { pendiente: 'warning', confirmada: 'success', cancelada: 'danger' }[estado] ?? 'medium';
@@ -128,11 +140,10 @@ export class CalendarioCitas implements OnInit, OnDestroy {
   }
 
   private suscribirRealtime() {
-    this.channel = this.citasService.suscribirCambios(
-      this.nutricionistaId,
-      () => this.cargarMes()
-    );
+    this.channel = this.citasService.suscribirCambios(this.nutricionistaId, () => this.cargarMes());
   }
 
-  ngOnDestroy() { this.channel?.unsubscribe(); }
+  ngOnDestroy() {
+    this.channel?.unsubscribe();
+  }
 }

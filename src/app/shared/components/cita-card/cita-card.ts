@@ -23,6 +23,7 @@ export class CitaCard {
   @Output() confirmar = new EventEmitter<Cita>();
   @Output() cancelar  = new EventEmitter<Cita>();
   @Output() editar    = new EventEmitter<Cita>();
+  @Output() eliminar = new EventEmitter<Cita>();
 
   constructor() {
     addIcons({ videocamOutline, locationOutline, checkmarkCircleOutline, closeCircleOutline, timeOutline });

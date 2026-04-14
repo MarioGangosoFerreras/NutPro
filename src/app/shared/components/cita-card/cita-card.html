@@ -1,5 +1,4 @@
 <div class="cita-card" [class]="'cita-card--' + cita.estado">
-
   <div class="cita-card__header">
     <div class="cita-card__tipo">
       <ion-icon [name]="icono"></ion-icon>
@@ -10,39 +9,33 @@
 
   <div class="cita-card__fecha">
     <ion-icon name="time-outline"></ion-icon>
-    <span>{{ cita.fecha_hora | date:'d MMM · HH:mm':'':'es' }}</span>
+    <span>{{ cita.fecha_hora | date: 'd MMM · HH:mm' : 'UTC' : 'es' }}</span>
     <span class="cita-card__duracion">· {{ cita.duracion_min }} min</span>
   </div>
 
-  @if (mostrarPaciente && cita.pacientes?.usuarios) {
-    <div class="cita-card__paciente">
-      {{ cita.pacientes!.usuarios.nombre }} {{ cita.pacientes!.usuarios.apellidos }}
-    </div>
-  }
-
-  @if (cita.notas) {
-    <p class="cita-card__notas">{{ cita.notas }}</p>
-  }
-
-  @if (mostrarAcciones && cita.estado === 'pendiente') {
+  @if (mostrarAcciones) {
     <div class="cita-card__acciones">
-      <ion-button fill="clear" color="success" size="small" (click)="confirmar.emit(cita)">
-        <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-        Confirmar
-      </ion-button>
-      <ion-button fill="clear" color="danger" size="small" (click)="cancelar.emit(cita)">
-        <ion-icon slot="start" name="close-circle-outline"></ion-icon>
-        Cancelar
+      @if (cita.estado === 'pendiente') {
+        <ion-button fill="clear" color="success" size="small" (click)="confirmar.emit(cita)">
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          Confirmar
+        </ion-button>
+        <ion-button fill="clear" color="warning" size="small" (click)="cancelar.emit(cita)">
+          <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+          Cancelar
+        </ion-button>
+      }
+
+      @if (cita.estado !== 'cancelada') {
+        <ion-button fill="clear" size="small" (click)="editar.emit(cita)">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
+          Editar
+        </ion-button>
+      }
+
+      <ion-button fill="clear" color="danger" size="small" (click)="eliminar.emit(cita)">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
       </ion-button>
     </div>
   }
-
-  @if (mostrarAcciones && cita.estado !== 'cancelada') {
-    <div class="cita-card__acciones">
-      <ion-button fill="clear" size="small" (click)="editar.emit(cita)">
-        Editar
-      </ion-button>
-    </div>
-  }
-
 </div>

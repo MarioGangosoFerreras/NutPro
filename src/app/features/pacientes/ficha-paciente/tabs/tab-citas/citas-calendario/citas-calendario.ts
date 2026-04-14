@@ -1,4 +1,12 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -6,7 +14,11 @@ import { chevronBackOutline, chevronForwardOutline, addCircleOutline } from 'ion
 import { Cita } from '../../../../../../core/services/citas';
 import { CitaCard } from '../../../../../../shared/components/cita-card/cita-card';
 
-interface DiaCal { fecha: Date; esDelMes: boolean; citas: Cita[]; }
+interface DiaCal {
+  fecha: Date;
+  esDelMes: boolean;
+  citas: Cita[];
+}
 
 @Component({
   selector: 'app-citas-calendario',
@@ -15,11 +27,11 @@ interface DiaCal { fecha: Date; esDelMes: boolean; citas: Cita[]; }
   templateUrl: './citas-calendario.html',
   styleUrls: ['./citas-calendario.css'],
 })
-export class CitasCalendario implements OnChanges {
+export class CitasCalendario implements OnChanges, OnInit {
   @Input() citas: Cita[] = [];
   @Input() nutricionistaId!: string;
   @Output() editarCita = new EventEmitter<Cita>();
-  @Output() nuevaCita  = new EventEmitter<void>();
+  @Output() nuevaCita = new EventEmitter<void>();
 
   hoy = new Date();
   mesActual = new Date(this.hoy.getFullYear(), this.hoy.getMonth(), 1);
@@ -32,46 +44,62 @@ export class CitasCalendario implements OnChanges {
   constructor() {
     addIcons({ chevronBackOutline, chevronForwardOutline, addCircleOutline });
   }
+
+  ngOnInit(): void {
+    this.construirCalendario();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    throw new Error('Method not implemented.');
+    if (changes['citas']) {
+      this.construirCalendario();
+
+      // Si ya había un día seleccionado, refrescamos sus citas
+      if (this.diaSeleccionado) {
+        this.citasDelDia = this.citasEnFecha(this.diaSeleccionado);
+      }
+    }
   }
 
   nngOnChanges(changes: SimpleChanges) {
-  if (changes['citas']) {
-    this.construirCalendario();
-    if (this.diaSeleccionado) {                                    
-      this.citasDelDia = this.citasEnFecha(this.diaSeleccionado); 
-    }                                                              
+    if (changes['citas']) {
+      this.construirCalendario();
+      if (this.diaSeleccionado) {
+        this.citasDelDia = this.citasEnFecha(this.diaSeleccionado);
+      }
+    }
   }
-}
 
   construirCalendario() {
-    const año  = this.mesActual.getFullYear();
-    const mes  = this.mesActual.getMonth();
+    const año = this.mesActual.getFullYear();
+    const mes = this.mesActual.getMonth();
     const dias: DiaCal[] = [];
 
-    // Relleno inicio (lunes = 0)
-    const primerDia = new Date(año, mes, 1);
-    const offsetInicio = (primerDia.getDay() + 6) % 7;
-    for (let i = offsetInicio - 1; i >= 0; i--) {
-      const f = new Date(año, mes, -i);
+    // 1. Calcular el primer día y el desfase (Lunes = 0)
+    const primerDiaMes = new Date(año, mes, 1);
+    // Ajuste para que Lunes sea 0 y Domingo 6
+    let offsetInicio = primerDiaMes.getDay() === 0 ? 6 : primerDiaMes.getDay() - 1;
+
+    // 2. Rellenar días del mes anterior
+    for (let i = offsetInicio; i > 0; i--) {
+      const f = new Date(año, mes, 1 - i);
       dias.push({ fecha: f, esDelMes: false, citas: this.citasEnFecha(f) });
     }
 
-    // Días del mes
-    const ultimoDia = new Date(año, mes + 1, 0).getDate();
-    for (let d = 1; d <= ultimoDia; d++) {
+    // 3. Días del mes actual
+    const ultimoDiaMes = new Date(año, mes + 1, 0).getDate();
+    for (let d = 1; d <= ultimoDiaMes; d++) {
       const f = new Date(año, mes, d);
       dias.push({ fecha: f, esDelMes: true, citas: this.citasEnFecha(f) });
     }
 
-    // Relleno final
+    // 4. Rellenar días del mes siguiente hasta completar la semana
+    let cont = 1;
     while (dias.length % 7 !== 0) {
-      const f = new Date(año, mes + 1, dias.length - ultimoDia - offsetInicio + 1);
+      const f = new Date(año, mes + 1, cont++);
       dias.push({ fecha: f, esDelMes: false, citas: this.citasEnFecha(f) });
     }
 
-    // Agrupar en semanas
+    // 5. Agrupar en semanas
     this.semanas = [];
     for (let i = 0; i < dias.length; i += 7) {
       this.semanas.push(dias.slice(i, i + 7));
@@ -79,11 +107,14 @@ export class CitasCalendario implements OnChanges {
   }
 
   private citasEnFecha(fecha: Date): Cita[] {
-    return this.citas.filter(c => {
+    if (!this.citas) return [];
+    return this.citas.filter((c) => {
       const fc = new Date(c.fecha_hora);
-      return fc.getFullYear() === fecha.getFullYear() &&
-             fc.getMonth()    === fecha.getMonth() &&
-             fc.getDate()     === fecha.getDate();
+      return (
+        fc.getFullYear() === fecha.getFullYear() &&
+        fc.getMonth() === fecha.getMonth() &&
+        fc.getDate() === fecha.getDate()
+      );
     });
   }
 

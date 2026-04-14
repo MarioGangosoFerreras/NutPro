@@ -1,5 +1,4 @@
 <div class="preview-container">
-
   <div class="preview-header">
     <div class="preview-titulo">
       <ion-icon name="people-outline" class="titulo-icon" />
@@ -10,12 +9,18 @@
   <!-- Skeleton -->
   @if (cargando) {
     <div class="pacientes-list">
-      @for (i of [1,2,3]; track i) {
+      @for (i of [1, 2, 3]; track i) {
         <div class="paciente-row skeleton-row">
           <ion-skeleton-text [animated]="true" class="skeleton-avatar" />
           <div class="skeleton-info">
-            <ion-skeleton-text [animated]="true" style="width: 50%; height: 13px; border-radius: 6px;" />
-            <ion-skeleton-text [animated]="true" style="width: 35%; height: 11px; border-radius: 6px; margin-top: 5px;" />
+            <ion-skeleton-text
+              [animated]="true"
+              style="width: 50%; height: 13px; border-radius: 6px"
+            />
+            <ion-skeleton-text
+              [animated]="true"
+              style="width: 35%; height: 11px; border-radius: 6px; margin-top: 5px"
+            />
           </div>
         </div>
       }
@@ -27,7 +32,6 @@
     <div class="pacientes-list">
       @for (paciente of pacientes; track paciente.id; let last = $last) {
         <div class="paciente-row" [class.last]="last" (click)="irAFicha(paciente.id)">
-
           <div class="paciente-avatar">
             @if (paciente.usuario?.avatar_url) {
               <img [src]="paciente.usuario.avatar_url" [alt]="paciente.usuario?.nombre" />
@@ -37,13 +41,19 @@
           </div>
 
           <div class="paciente-info">
-            <p class="paciente-nombre">{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</p>
+            <p class="paciente-nombre">
+              {{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}
+            </p>
 
             @if (paciente.proximaCita) {
               <p class="paciente-sub proxima-cita">
                 <ion-icon name="calendar-outline" class="sub-icon" />
-                {{ paciente.proximaCita.fecha_hora | date:'d MMM · HH:mm':'':'es' }}
-                <span class="cita-tipo">· {{ paciente.proximaCita.tipo }}</span>
+
+                @if (esHoy(paciente.proximaCita.fecha_hora)) {
+                  <span class="badge-hoy">HOY</span>
+                }
+
+                {{ paciente.proximaCita.fecha_hora | date: 'd MMM · HH:mm' : 'UTC' : 'es' }}
               </p>
             } @else {
               <p class="paciente-sub sin-cita">
@@ -68,9 +78,6 @@
   }
 
   <div class="preview-footer">
-    <button class="btn-ver-todos" (click)="verTodos()">
-      Ver todos los pacientes
-    </button>
+    <button class="btn-ver-todos" (click)="verTodos()">Ver todos los pacientes</button>
   </div>
-
 </div>

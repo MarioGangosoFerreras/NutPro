@@ -31,9 +31,15 @@
             (click)="seleccionarFecha(dia.fecha)"
           >
             <span>{{ dia.fecha.getDate() }}</span>
-            @if (dia.citas.length > 0) {
-              <span class="cal-widget__dot"></span>
-            }
+
+            <div class="cal-widget__dots-container">
+              @if (tieneEstado(dia, 'confirmada')) {
+                <span class="cal-widget__dot dot-confirmada"></span>
+              }
+              @if (tieneEstado(dia, 'pendiente')) {
+                <span class="cal-widget__dot dot-pendiente"></span>
+              }
+            </div>
           </div>
         }
       }

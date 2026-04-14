@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  NgZone,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { addCircleOutline, listOutline, calendarOutline } from 'ionicons/icons';
@@ -7,30 +15,31 @@ import { CitasLista } from './citas-lista/citas-lista';
 import { CitasCalendario } from './citas-calendario/citas-calendario';
 import { ModalCitaComponent } from '../../../../../shared/components/modal-cita/modal-cita';
 import { AuthService } from '../../../../../core/services/auth';
-import { 
-  IonSegment, 
-  IonSegmentButton, 
-  IonLabel, 
-  IonIcon, 
+import {
+  IonSegment,
+  IonSegmentButton,
+  IonLabel,
+  IonIcon,
   IonButton,
   IonSpinner,
-  ModalController, 
-  AlertController 
+  ModalController,
+  AlertController,
 } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-tab-citas',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule, 
-    IonSegment, 
-    IonSegmentButton, 
+    CommonModule,
+    IonSegment,
+    IonSegmentButton,
     IonLabel,
-    IonIcon, 
+    IonIcon,
     IonButton,
     IonSpinner,
-    CitasLista, 
-    CitasCalendario
+    CitasLista,
+    CitasCalendario,
   ],
   templateUrl: './tab-citas.html',
 })
@@ -39,9 +48,11 @@ export class TabCitas implements OnInit {
   @Input() nutricionistaId!: string;
 
   private citasService = inject(CitasService);
-  private authService  = inject(AuthService);
-  private modalCtrl    = inject(ModalController);
-  private alertCtrl    = inject(AlertController);
+  private authService = inject(AuthService);
+  private modalCtrl = inject(ModalController);
+  private alertCtrl = inject(AlertController);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   vistaActiva: 'lista' | 'calendario' = 'lista';
   citas: Cita[] = [];
@@ -51,39 +62,46 @@ export class TabCitas implements OnInit {
     addIcons({ addCircleOutline, listOutline, calendarOutline });
   }
 
-  private cdr = inject(ChangeDetectorRef);
-  
   async ngOnInit() {
     await this.cargarCitas();
-    this.cdr.detectChanges();
   }
 
   onVistaChange(e: any) {
     this.vistaActiva = e.detail.value;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   async cargarCitas() {
-    this.cargando = true;
-    try {
-      this.citas = await this.citasService.getCitasPaciente(
-        this.pacienteId, this.nutricionistaId
-      );
-      this.citas = [...this.citas];
-    } finally {
-      this.cargando = false;
-      this.cdr.detectChanges();
-    }
+    this.ngZone.run(async () => {
+      this.cargando = true;
+      this.cdr.markForCheck(); // ← para que muestre el spinner
+      try {
+        const datos = await this.citasService.getCitasPaciente(
+          this.pacienteId,
+          this.nutricionistaId,
+        );
+        this.citas = [...datos];
+      } finally {
+        this.cargando = false;
+        this.cdr.markForCheck(); // ← para que actualice la lista
+      }
+    });
   }
 
   async abrirModal(cita?: Cita) {
     const modal = await this.modalCtrl.create({
       component: ModalCitaComponent,
-      componentProps: { cita, pacienteId: this.pacienteId, nutricionistaId: this.nutricionistaId }
+      componentProps: {
+        cita,
+        pacienteId: this.pacienteId,
+        nutricionistaId: this.nutricionistaId,
+      },
     });
     await modal.present();
     const { role } = await modal.onDidDismiss();
-    if (role === 'guardado') await this.cargarCitas();
+    if (role === 'guardado') {
+      await this.cargarCitas();
+    }
   }
 
   async confirmar(cita: Cita) {
@@ -97,12 +115,16 @@ export class TabCitas implements OnInit {
       message: '¿Seguro que quieres cancelar esta cita?',
       buttons: [
         { text: 'No', role: 'cancel' },
-        { text: 'Sí', role: 'confirm', handler: async () => {
-          const userId = await this.authService.getUserId();
-          await this.citasService.cancelarCita(cita.id!, userId);
-          await this.cargarCitas();
-        }}
-      ]
+        {
+          text: 'Sí',
+          role: 'confirm',
+          handler: async () => {
+            const usuarioId = await this.authService.getUsuarioId(); // ← era getUserId()
+            await this.citasService.cancelarCita(cita.id!, usuarioId);
+            await this.cargarCitas();
+          },
+        },
+      ],
     });
     await alert.present();
   }
@@ -113,11 +135,15 @@ export class TabCitas implements OnInit {
       message: 'Esta acción no se puede deshacer.',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        { text: 'Eliminar', role: 'destructive', handler: async () => {
-          await this.citasService.eliminarCita(cita.id!);
-          await this.cargarCitas();
-        }}
-      ]
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            await this.citasService.eliminarCita(cita.id!);
+            await this.cargarCitas();
+          },
+        },
+      ],
     });
     await alert.present();
   }

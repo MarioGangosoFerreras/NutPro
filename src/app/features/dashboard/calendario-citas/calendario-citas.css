@@ -69,20 +69,29 @@
   font-weight: 600;
 }
 
-.cal-widget__dia.seleccionado .cal-widget__dot { background: #fff; }
+/* --- Lógica de Puntos --- */
+.cal-widget__dots-container {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  height: 4px;
+  margin-top: 2px;
+}
 
 .cal-widget__dot {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--ion-color-primary);
-  margin-top: 2px;
 }
 
-.cal-widget__dia.con-citas:not(.seleccionado) .cal-widget__dot {
-  background: var(--ion-color-success);
+.dot-confirmada { background: var(--ion-color-success, #2dd36f); }
+.dot-pendiente { background: var(--ion-color-warning, #ffc409); }
+
+.cal-widget__dia.seleccionado .cal-widget__dot { 
+  background: #ffffff !important; 
 }
 
+/* --- Detalle y Citas (Medidas Originales) --- */
 .cal-widget__detalle {
   flex: 1;
   overflow-y: auto;
@@ -130,10 +139,10 @@
   gap: 1px;
 }
 
-.cal-cita-row__nombre { font-size: 13px; font-weight: 500; }
-.cal-cita-row__tipo   { font-size: 11px; color: var(--ion-color-medium); }
-
-.cal-cita-row__badge { font-size: 10px; }
+.cal-cita-row__nombre { 
+  font-size: 13px; 
+  font-weight: 500; 
+}
 
 .cal-cita-row__meta {
   display: flex;
@@ -145,4 +154,10 @@
 
 .cal-cita-row__meta ion-icon {
   font-size: 12px;
+}
+
+ion-badge {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  font-size: 10px;
 }
