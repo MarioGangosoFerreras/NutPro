@@ -1,69 +1,74 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{ cita ? 'Editar cita' : 'Nueva cita' }}</ion-title>
+    <ion-title>{{ titulo }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrar()">
-        <ion-icon name="close-outline" />
-      </ion-button>
+      <ion-button fill="clear" (click)="cancelar()">Cancelar</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="form" (ngSubmit)="guardar()">
+
+  <ion-item>
+    <ion-label position="stacked">Fecha</ion-label>
+    <ion-input type="date" [(ngModel)]="fecha"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Hora</ion-label>
+    <ion-input type="time" [(ngModel)]="hora"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Duración (minutos)</ion-label>
+    <ion-select [(ngModel)]="duracion">
+      <ion-select-option [value]="30">30 min</ion-select-option>
+      <ion-select-option [value]="45">45 min</ion-select-option>
+      <ion-select-option [value]="60">60 min</ion-select-option>
+      <ion-select-option [value]="90">90 min</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Tipo</ion-label>
+    <ion-select [(ngModel)]="tipo">
+      <ion-select-option value="presencial">Presencial</ion-select-option>
+      <ion-select-option value="videollamada">Videollamada</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  @if (tipo === 'videollamada') {
     <ion-item>
-      <ion-label position="stacked">Fecha y hora</ion-label>
-      <ion-datetime
-        formControlName="fecha_hora"
-        presentation="date-time"
-        [min]="hoy"
-        locale="es-ES"
-        prefer-wheel="true"
-      >
-      </ion-datetime>
+      <ion-label position="stacked">URL videollamada</ion-label>
+      <ion-input type="url" [(ngModel)]="urlVideo" placeholder="https://meet.google.com/..."></ion-input>
     </ion-item>
+  }
 
-    <ion-item>
-      <ion-label position="stacked">Tipo de cita</ion-label>
-      <ion-select formControlName="tipo" interface="popover">
-        <ion-select-option value="presencial">Presencial</ion-select-option>
-        <ion-select-option value="videollamada">Videollamada</ion-select-option>
-      </ion-select>
-    </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Estado</ion-label>
+    <ion-select [(ngModel)]="estado">
+      <ion-select-option value="pendiente">Pendiente</ion-select-option>
+      <ion-select-option value="confirmada">Confirmada</ion-select-option>
+      <ion-select-option value="cancelada">Cancelada</ion-select-option>
+    </ion-select>
+  </ion-item>
 
-    <ion-item>
-      <ion-label position="stacked">Duración (min)</ion-label>
-      <ion-select formControlName="duracion_min" interface="popover">
-        <ion-select-option [value]="30">30 min</ion-select-option>
-        <ion-select-option [value]="45">45 min</ion-select-option>
-        <ion-select-option [value]="60">60 min</ion-select-option>
-        <ion-select-option [value]="90">90 min</ion-select-option>
-      </ion-select>
-    </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Notas</ion-label>
+    <ion-textarea [(ngModel)]="notas" rows="3" placeholder="Observaciones..."></ion-textarea>
+  </ion-item>
 
-    <ion-item *ngIf="form.get('tipo')?.value === 'videollamada'">
-      <ion-label position="stacked">URL de videollamada</ion-label>
-      <ion-input
-        formControlName="url_videollamada"
-        type="url"
-        placeholder="https://meet.google.com/..."
-      />
-    </ion-item>
+  <ion-button
+    expand="block"
+    class="ion-margin-top"
+    (click)="guardar()"
+    [disabled]="guardando || !fecha || !hora"
+  >
+    @if (guardando) {
+      <ion-spinner name="crescent"></ion-spinner>
+    } @else {
+      {{ esEdicion ? 'Guardar cambios' : 'Crear cita' }}
+    }
+  </ion-button>
 
-    <ion-item>
-      <ion-label position="stacked">Motivo / notas</ion-label>
-      <ion-textarea
-        formControlName="notas"
-        rows="3"
-        placeholder="Primera consulta, revisión de analítica..."
-      />
-    </ion-item>
-
-    <div class="ion-padding-top">
-      <ion-button expand="block" type="submit" [disabled]="form.invalid || guardando">
-        <ion-spinner *ngIf="guardando" name="crescent" slot="start" />
-        {{ cita ? 'Guardar cambios' : 'Solicitar cita' }}
-      </ion-button>
-    </div>
-  </form>
 </ion-content>

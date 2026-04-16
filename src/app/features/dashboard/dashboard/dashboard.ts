@@ -4,13 +4,14 @@ import { IonContent, IonHeader, IonToolbar, IonTitle, IonButton } from '@ionic/a
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth';
 import { Header } from "../../../shared/components/header/header";
+import { UniversalCalendar } from "../../../shared/components/universal-calendar/universal-calendar";
 import { EstadisticasDashboardComponent } from '../estadisticas-dashboard/estadisticas-dashboard';
 import { ListaPacientesPreviewComponent } from "../lista-pacientes-preview/lista-pacientes-preview";
 import { CalendarioCitas } from "../calendario-citas/calendario-citas";
-
+imports: [CommonModule, IonContent, IonButton, Header, RouterLink, UniversalCalendar]
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, IonContent, Header, EstadisticasDashboardComponent, ListaPacientesPreviewComponent, CalendarioCitas],
+  imports: [CommonModule, IonContent, Header, EstadisticasDashboardComponent, ListaPacientesPreviewComponent, CalendarioCitas, UniversalCalendar],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

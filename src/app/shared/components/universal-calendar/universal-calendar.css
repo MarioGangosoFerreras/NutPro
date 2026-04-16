@@ -1,0 +1,183 @@
+.ucal {
+  padding: 1rem;
+  background: var(--ion-background-color, #fff);
+  border-radius: 12px;
+}
+
+/* ── Navegación ── */
+.ucal__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.ucal__mes-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ion-text-color);
+}
+
+/* ── Grid ── */
+.ucal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 1rem;
+}
+
+.ucal__dia-header {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 0;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+}
+
+.ucal__dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 6px 2px 4px;
+  cursor: pointer;
+  border-radius: 8px;
+  min-height: 44px;
+  gap: 3px;
+  transition: background 0.15s;
+}
+
+.ucal__dia:hover {
+  background: var(--ion-color-light);
+}
+
+.ucal__num {
+  font-size: 13px;
+  color: var(--ion-text-color);
+  line-height: 1;
+  font-weight: 400;
+}
+
+.ucal__dia.otro-mes .ucal__num {
+  color: var(--ion-color-medium);
+  opacity: 0.5;
+}
+
+/* Hoy */
+.ucal__dia.hoy {
+  background: #eaf3de;
+}
+
+.ucal__dia.hoy .ucal__num {
+  color: #3b6d11;
+  font-weight: 500;
+}
+
+/* Seleccionado */
+.ucal__dia.seleccionado {
+  background: #639922;
+}
+
+.ucal__dia.seleccionado .ucal__num {
+  color: #fff;
+  font-weight: 500;
+}
+
+/* ── Dots de estado ── */
+.ucal__dots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  min-height: 6px;
+}
+
+.ucal__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+}
+
+.ucal__dot--confirmada { background: #27a96c; }
+.ucal__dot--pendiente  { background: #f59e0b; }
+.ucal__dot--cancelada  { background: #e24b4a; }
+
+/* ── Detalle del día ── */
+.ucal__detalle {
+  border-top: 0.5px solid var(--ion-border-color, #e0e0e0);
+  padding-top: 1rem;
+}
+
+.ucal__detalle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.ucal__detalle-header span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ucal__empty {
+  font-size: 13px;
+  color: var(--ion-color-medium);
+  text-align: center;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+/* ── Fila de cita (modo full/dashboard) ── */
+.ucal__cita-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  margin-bottom: 6px;
+  background: var(--ion-color-light);
+  border-radius: 0 8px 8px 0;
+}
+
+.ucal__cita-row:hover {
+  background: var(--ion-color-light-shade);
+}
+
+.ucal__cita-row.confirmada { border-left-color: #27a96c; }
+.ucal__cita-row.pendiente  { border-left-color: #f59e0b; }
+.ucal__cita-row.cancelada  { border-left-color: #e24b4a; }
+
+.ucal__cita-hora {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ion-text-color);
+  min-width: 40px;
+}
+
+.ucal__cita-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ucal__cita-nombre {
+  font-size: 13px;
+  color: var(--ion-text-color);
+}
+
+.ucal__cita-meta {
+  font-size: 11px;
+  color: var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

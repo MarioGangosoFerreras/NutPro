@@ -12,7 +12,6 @@ import { addIcons } from 'ionicons';
 import { addCircleOutline, listOutline, calendarOutline } from 'ionicons/icons';
 import { CitasService, Cita } from '../../../../../core/services/citas';
 import { CitasLista } from './citas-lista/citas-lista';
-import { CitasCalendario } from './citas-calendario/citas-calendario';
 import { ModalCitaComponent } from '../../../../../shared/components/modal-cita/modal-cita';
 import { AuthService } from '../../../../../core/services/auth';
 import {
@@ -25,6 +24,7 @@ import {
   ModalController,
   AlertController,
 } from '@ionic/angular/standalone';
+import { UniversalCalendar } from "../../../../../shared/components/universal-calendar/universal-calendar";
 
 @Component({
   selector: 'app-tab-citas',
@@ -39,8 +39,8 @@ import {
     IonButton,
     IonSpinner,
     CitasLista,
-    CitasCalendario,
-  ],
+    UniversalCalendar
+],
   templateUrl: './tab-citas.html',
 })
 export class TabCitas implements OnInit {

@@ -39,12 +39,11 @@
   }
 
   @if (!cargando && vistaActiva === 'calendario') {
-    <app-citas-calendario
-      [citas]="citas"
-      [nutricionistaId]="nutricionistaId"
-      (editarCita)="abrirModal($event)"
+    <app-universal-calendar
+      mode="patient"
+      [citasInput]="citas"
       (nuevaCita)="abrirModal()"
-    >
-    </app-citas-calendario>
+      (editarCita)="abrirModal($event)"
+    ></app-universal-calendar>
   }
 </div>
