@@ -11,7 +11,7 @@ import { CalendarioCitas } from "../calendario-citas/calendario-citas";
 imports: [CommonModule, IonContent, IonButton, Header, RouterLink, UniversalCalendar]
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, IonContent, Header, EstadisticasDashboardComponent, ListaPacientesPreviewComponent, CalendarioCitas, UniversalCalendar],
+  imports: [CommonModule, IonContent, Header, EstadisticasDashboardComponent, ListaPacientesPreviewComponent, UniversalCalendar],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

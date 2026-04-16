@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Ajustes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item lines="none">
+    <ion-icon name="logo-google" slot="start" color="danger"></ion-icon>
+    <ion-label>
+      <h3>Google Calendar</h3>
+      <p>{{ conectado ? 'Sincronización activa' : 'No conectado' }}</p>
+    </ion-label>
+    <ion-button
+      slot="end"
+      [color]="conectado ? 'danger' : 'primary'"
+      fill="outline"
+      (click)="toggleConexion()"
+    >
+      {{ conectado ? 'Desconectar' : 'Conectar' }}
+    </ion-button>
+  </ion-item>
+</ion-content>

@@ -27,6 +27,7 @@ import {
   menuOutline,
   closeOutline,
   chevronForwardOutline,
+  settingsOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth';
 
@@ -79,6 +80,12 @@ export class Shell {
       route: '/citas',
       activeRoutes: ['/citas'],
     },
+    {
+      label: 'Ajustes',
+      icon: 'settings-outline',
+      route: '/ajustes',
+      activeRoutes: ['/ajustes'],
+    },
   ];
 
   constructor() {
@@ -90,13 +97,12 @@ export class Shell {
       menuOutline,
       closeOutline,
       chevronForwardOutline,
+      settingsOutline,
     });
 
-    this.router.events
-      .pipe(filter((e) => e instanceof NavigationEnd))
-      .subscribe((e: any) => {
-        this.rutaActiva.set(e.urlAfterRedirects);
-      });
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e: any) => {
+      this.rutaActiva.set(e.urlAfterRedirects);
+    });
 
     this.rutaActiva.set(this.router.url);
   }

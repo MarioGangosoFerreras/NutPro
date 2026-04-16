@@ -43,21 +43,26 @@ export const routes: Routes = [
       {
         path: 'pacientes/nuevo',
         loadComponent: () =>
-          import('./features/pacientes/nuevo-paciente/nuevo-paciente').then(
-            (m) => m.NuevoPaciente,
-          ),
+          import('./features/pacientes/nuevo-paciente/nuevo-paciente').then((m) => m.NuevoPaciente),
       },
       {
         path: 'pacientes/:id',
         loadComponent: () =>
-          import('./features/pacientes/ficha-paciente/ficha-paciente').then(
-            (m) => m.FichaPaciente,
-          ),
+          import('./features/pacientes/ficha-paciente/ficha-paciente').then((m) => m.FichaPaciente),
+      },
+      {
+        path: 'ajustes',
+        loadComponent: () => import('./features/ajustes/ajustes').then((m) => m.AjustesPage),
       },
       {
         path: 'admin',
         loadComponent: () =>
           import('./features/admin/panel-admin/panel-admin').then((m) => m.PanelAdmin),
+      },
+      {
+        path: 'oauth/google',
+        loadComponent: () =>
+          import('./features/auth/oauth-callback.page').then((m) => m.OAuthCallbackPage),
       },
     ],
   },
