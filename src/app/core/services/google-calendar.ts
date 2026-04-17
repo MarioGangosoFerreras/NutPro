@@ -1,12 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase';
-import { AuthService } from './auth';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class GoogleCalendarService {
   private supabase = inject(SupabaseService).client;
-  private authService = inject(AuthService);
 
   private readonly SCOPES = [
     'https://www.googleapis.com/auth/calendar.events',
@@ -26,24 +24,21 @@ export class GoogleCalendarService {
   }
 
   async handleCallback(code: string): Promise<void> {
-    const {
-      data: { session },
-    } = await this.supabase.auth.getSession();
+    const { data: { session } } = await this.supabase.auth.getSession();
+    if (!session?.access_token) throw new Error('No hay sesión activa');
 
-    if (!session?.access_token) {
-      throw new Error('No hay sesión activa al manejar el callback de Google');
-    }
-
-    // Usar fetch directo en lugar de functions.invoke para tener control total del header
-    const response = await fetch(`${environment.supabaseUrl}/functions/v1/google-oauth-exchange`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-        apikey: environment.supabaseKey,
-      },
-      body: JSON.stringify({ code }),
-    });
+    const response = await fetch(
+      `${environment.supabaseUrl}/functions/v1/google-oauth-exchange`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': environment.supabaseKey,
+        },
+        body: JSON.stringify({ code }),
+      }
+    );
 
     if (!response.ok) {
       const err = await response.text();
@@ -51,19 +46,41 @@ export class GoogleCalendarService {
     }
   }
 
-  async estaConectado(nutricionistaId: string): Promise<boolean> {
-    const { data } = await this.supabase
-      .from('nutricionista_google_tokens')
-      .select('nutricionista_id')
-      .eq('nutricionista_id', nutricionistaId)
-      .maybeSingle();
-    return !!data;
+  // Usa el token de sesión para llamar a una Edge Function
+  // en lugar de consultar la tabla directamente con RLS
+  async estaConectado(): Promise<boolean> {
+    const { data: { session } } = await this.supabase.auth.getSession();
+    if (!session?.access_token) return false;
+
+    const response = await fetch(
+      `${environment.supabaseUrl}/functions/v1/google-calendar-status`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': environment.supabaseKey,
+        },
+      }
+    );
+
+    if (!response.ok) return false;
+    const { conectado } = await response.json();
+    return conectado;
   }
 
-  async desconectar(nutricionistaId: string): Promise<void> {
-    await this.supabase
-      .from('nutricionista_google_tokens')
-      .delete()
-      .eq('nutricionista_id', nutricionistaId);
+  async desconectar(): Promise<void> {
+    const { data: { session } } = await this.supabase.auth.getSession();
+    if (!session?.access_token) return;
+
+    await fetch(
+      `${environment.supabaseUrl}/functions/v1/google-calendar-status`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': environment.supabaseKey,
+        },
+      }
+    );
   }
 }

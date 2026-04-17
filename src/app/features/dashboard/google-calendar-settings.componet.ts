@@ -1,9 +1,8 @@
 // google-calendar-settings.component.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonButton, IonIcon, IonItem, IonLabel, IonToggle } from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { GoogleCalendarService } from '../../core/services/google-calendar';
-import { AuthService } from '../../core/services/auth';
 
 @Component({
   selector: 'app-google-calendar-settings',
@@ -24,22 +23,19 @@ import { AuthService } from '../../core/services/auth';
   `
 })
 export class GoogleCalendarSettingsComponent implements OnInit {
-  private gcalService  = inject(GoogleCalendarService);
-  private authService  = inject(AuthService);
+  private gcalService = inject(GoogleCalendarService);
   conectado = false;
-  nutricionistaId = '';
 
   async ngOnInit() {
-    this.nutricionistaId = (await this.authService.getNutricionistaId()) ?? '';
-    this.conectado = await this.gcalService.estaConectado(this.nutricionistaId);
+    this.conectado = await this.gcalService.estaConectado();
   }
 
   async toggleConexion() {
     if (this.conectado) {
-      await this.gcalService.desconectar(this.nutricionistaId);
+      await this.gcalService.desconectar();
       this.conectado = false;
     } else {
-      this.gcalService.iniciarOAuth(); // redirige a Google
+      this.gcalService.iniciarOAuth();
     }
   }
 }
