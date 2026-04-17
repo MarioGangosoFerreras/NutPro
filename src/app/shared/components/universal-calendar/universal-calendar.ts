@@ -121,6 +121,7 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
 
   async cargarMes() {
     this.cargando = true;
+    this.cdr.markForCheck();
     try {
       this.citas = await this.citasService.getCitasMes(
         this.nutricionistaId,
@@ -131,7 +132,7 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
       if (this.diaSeleccionado) this.seleccionarFecha(this.diaSeleccionado);
     } finally {
       this.cargando = false;
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }
   }
 
@@ -185,7 +186,7 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   seleccionarFecha(fecha: Date) {
     this.diaSeleccionado = fecha;
     this.citasDelDia = this.citasEnFecha(fecha);
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   async mesAnterior() {

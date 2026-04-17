@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 };
 
 serve(async (req) => {
@@ -22,20 +23,6 @@ serve(async (req) => {
     const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
 
-    // Resuelve nutricionista_id a partir del token
-    const { data: nutricionista } = await supabase
-      .from('nutricionistas')
-      .select('id')
-      .eq('usuario_id',
-        supabase
-          .from('usuarios')
-          .select('id')
-          .eq('auth_user_id', user.id)
-          .single()
-      )
-      .single();
-
-    // Forma más directa con join en SQL
     const { data: result } = await supabase
       .from('nutricionistas')
       .select('id, nutricionista_google_tokens(nutricionista_id)')
@@ -45,8 +32,10 @@ serve(async (req) => {
       .single();
 
     if (req.method === 'GET') {
-      const conectado = !!(result?.nutricionista_google_tokens as any)?.length ||
-                        result?.nutricionista_google_tokens !== null;
+      // CORRECCIÓN: Comprobamos si el array tiene algún elemento real
+      const tokens = result?.nutricionista_google_tokens as any[];
+      const conectado = Array.isArray(tokens) ? tokens.length > 0 : !!tokens;
+      
       return new Response(JSON.stringify({ conectado }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
