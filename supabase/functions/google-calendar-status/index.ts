@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, DELETE, OPTIONS',
 };
 
 serve(async (req) => {
@@ -17,44 +17,54 @@ serve(async (req) => {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (error || !user) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    const {
+      data: { user },
+      error: userErr,
+    } = await supabase.auth.getUser(token);
+    if (userErr || !user)
+      return new Response('Invalid Token', { status: 401, headers: corsHeaders });
 
-    const { data: result } = await supabase
+    // 1. Buscamos al nutricionista de forma segura
+    const { data: usuario } = await supabase
+      .from('usuarios')
+      .select('id')
+      .eq('auth_user_id', user.id)
+      .maybeSingle();
+    const { data: nutri } = await supabase
       .from('nutricionistas')
-      .select('id, nutricionista_google_tokens(nutricionista_id)')
-      .eq('usuario_id',
-        (await supabase.from('usuarios').select('id').eq('auth_user_id', user.id).single()).data?.id
-      )
-      .single();
+      .select('id')
+      .eq('usuario_id', usuario?.id)
+      .maybeSingle();
+
+    if (!nutri)
+      return new Response(JSON.stringify({ conectado: false }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
 
     if (req.method === 'GET') {
-      // CORRECCIÓN: Comprobamos si el array tiene algún elemento real
-      const tokens = result?.nutricionista_google_tokens as any[];
-      const conectado = Array.isArray(tokens) ? tokens.length > 0 : !!tokens;
-      
-      return new Response(JSON.stringify({ conectado }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      // 2. Comprobamos si el token existe de verdad
+      const { data: tokenData } = await supabase
+        .from('nutricionista_google_tokens')
+        .select('nutricionista_id')
+        .eq('nutricionista_id', nutri.id)
+        .maybeSingle();
+      return new Response(JSON.stringify({ conectado: !!tokenData }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (req.method === 'DELETE') {
-      await supabase
-        .from('nutricionista_google_tokens')
-        .delete()
-        .eq('nutricionista_id', result?.id);
+      await supabase.from('nutricionista_google_tokens').delete().eq('nutricionista_id', nutri.id);
       return new Response(JSON.stringify({ ok: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });
