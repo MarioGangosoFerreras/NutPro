@@ -1,0 +1,64 @@
+<ion-split-pane contentId="main-content" when="lg" [class.menu-collapsed]="collapsed">
+  
+  <ion-menu menuId="main-menu" contentId="main-content" side="start">
+    <div class="sidebar-wrapper">
+      
+      <div class="brand" (click)="navegar('/dashboard')">
+        <img src="img/Logo_app.png" alt="NutPro" class="logo" />
+        @if (!collapsed) {
+          <span class="brand-text">NutPro</span>
+        }
+      </div>
+
+      <div class="nav-container">      
+        @for (item of navItems; track item.route) {
+          <button 
+            class="nav-btn" 
+            [class.active]="isActive(item)" 
+            (click)="navegar(item.route)" 
+            [title]="collapsed ? item.label : ''"
+          >
+            <ion-icon [name]="item.icon"></ion-icon>
+            @if (!collapsed) {
+              <span>{{ item.label }}</span>
+            }
+          </button>
+        }
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="footer-container">
+        <div class="user-profile">
+          <ion-avatar>
+            @if (usuarioActual().avatar) {
+              <img [src]="usuarioActual().avatar" />
+            } @else {
+              <ion-icon name="person-circle-outline"></ion-icon>
+            }
+          </ion-avatar>
+          
+          @if (!collapsed) {
+            <div class="user-details">
+              <span class="name">{{ usuarioActual().nombre }}</span>
+              <span class="role">{{ usuarioActual().rol }}</span>
+            </div>
+          }
+        </div>
+        
+        <button class="nav-btn logout-btn" (click)="cerrarSesion()" [title]="collapsed ? 'Cerrar sesión' : ''">
+          <ion-icon name="log-out-outline"></ion-icon>
+          @if (!collapsed) {
+            <span>Cerrar sesión</span>
+          }
+        </button>
+      </div>
+
+    </div>
+  </ion-menu>
+
+  <div class="ion-page" id="main-content">
+    <ion-router-outlet></ion-router-outlet>
+  </div>
+
+</ion-split-pane>

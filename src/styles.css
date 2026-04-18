@@ -3,3 +3,35 @@
 @import '@ionic/angular/css/structure.css';
 @import '@ionic/angular/css/typography.css';
 @import '@ionic/angular/css/display.css';
+
+.nutri-loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 30px;
+}
+
+/* El Aguacate Giratorio (Sin salto) */
+.avocado-spinner {
+  /* Tamaño ajustable para un loader principal */
+  width: 60px; 
+  height: 60px;
+  
+  /* Animación continua y lineal */
+  animation: giro-aguacate 1.5s linear infinite;
+  
+  /* Asegura un giro perfecto sobre su centro */
+  transform-origin: center;
+  display: block;
+}
+
+/* Solo giro suave de 0 a 360 grados */
+@keyframes giro-aguacate {
+  from { 
+    transform: rotate(0deg); 
+  }
+  to { 
+    transform: rotate(360deg); 
+  }
+}

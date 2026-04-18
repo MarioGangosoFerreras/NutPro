@@ -14,7 +14,7 @@ import { addOutline, personOutline, callOutline, mailOutline, searchOutline } fr
   selector: 'app-lista-pacientes',
   imports: [
     Header, IonContent, IonList, IonItem, IonLabel, IonButton,
-    IonIcon, IonSpinner, IonAvatar, IonBadge, IonFab, IonFabButton,
+    IonIcon, IonAvatar, IonBadge, IonFab, IonFabButton,
   ],
   templateUrl: './lista-pacientes.html',
   styleUrl: './lista-pacientes.css',

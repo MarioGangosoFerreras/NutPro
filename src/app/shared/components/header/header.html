@@ -2,7 +2,13 @@
   <ion-toolbar class="header-toolbar">
     
     <ion-buttons slot="start">
-      <ion-menu-button menu="main-menu"></ion-menu-button>
+      <div class="hamburger-container" (click)="toggleMenu()">
+        <div class="hamburger" [class.is-active]="!collapsed">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </div>
+      </div>
     </ion-buttons>
 
     <ion-searchbar

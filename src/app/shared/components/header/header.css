@@ -1,65 +1,54 @@
-.header-toolbar {
-  --background: #ffffff;
-  --border-color: #e8f0eb;
-  padding: 0 16px;
+/* ─── ANIMACIÓN DEL ICONO HAMBURGUESA A FLECHA ─── */
+.hamburger-container {
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 8px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
 }
 
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
+.hamburger-container:hover {
+  background: #f0f4f2;
 }
 
-.header-logo {
-  height: 36px;
-  width: auto;
-  object-fit: contain;
-}
-
-.header-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #2d6a4f;
-  white-space: nowrap;
-}
-
-.header-search {
-  --background: #f0f4f2;
-  --border-radius: 10px;
-  --box-shadow: none;
-  max-width: 1000px;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.action-btn {
-  --color: #2d6a4f;
+.hamburger {
+  width: 20px;
+  height: 14px;
   position: relative;
-  font-size: 22px;
 }
 
-ion-badge {
+.hamburger .line {
+  display: block;
   position: absolute;
-  top: 4px;
-  right: 4px;
-  font-size: 10px;
-  min-width: 16px;
-  height: 16px;
+  height: 2px;
+  background: #2d6a4f;
+  border-radius: 2px;
+  left: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center; /* El eje de rotación se queda a la izquierda */
 }
 
-.avatar-icon {
-  font-size: 32px;
-  color: #2d6a4f;
-}
+/* Posiciones iniciales (Hamburguesa normal) */
+.hamburger .line:nth-child(1) { top: 0px; width: 100%; }
+.hamburger .line:nth-child(2) { top: 6px; width: 100%; }
+.hamburger .line:nth-child(3) { top: 12px; width: 100%; }
 
-ion-avatar {
-  width: 34px;
-  height: 34px;
+/* Animación a "Flecha izquierda" cuando el menú está desplegado */
+.hamburger.is-active .line:nth-child(1) {
+  top: 6px; /* Baja al nivel de la línea central */
+  transform: rotate(-45deg);
+  width: 10px; /* Se acorta para formar la punta de arriba */
+}
+.hamburger.is-active .line:nth-child(2) {
+  /* La línea central se queda como el 'palo' de la flecha */
+  width: 100%; 
+}
+.hamburger.is-active .line:nth-child(3) {
+  top: 6px; /* Sube al nivel de la línea central */
+  transform: rotate(45deg);
+  width: 10px; /* Se acorta para formar la punta de abajo */
 }

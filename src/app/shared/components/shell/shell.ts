@@ -1,21 +1,14 @@
-import { Component, inject, signal, HostListener } from '@angular/core';
+import { Component, inject, signal, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import {
   IonMenu,
-  IonHeader,
-  IonToolbar,
   IonContent,
-  IonList,
-  IonItem,
-  IonLabel,
   IonIcon,
   IonRouterOutlet,
   IonSplitPane,
-  IonMenuButton,
-  IonButtons,
-  IonTitle,
+  IonAvatar,
   MenuController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -28,14 +21,15 @@ import {
   closeOutline,
   chevronForwardOutline,
   settingsOutline,
+  giftOutline,
+  personCircleOutline,
 } from 'ionicons/icons';
-import { AuthService } from '../../core/services/auth';
+import { AuthService } from '../../../core/services/auth';
 
 interface NavItem {
   label: string;
   icon: string;
   route: string;
-  activeRoutes?: string[];
 }
 
 @Component({
@@ -45,47 +39,38 @@ interface NavItem {
     CommonModule,
     RouterModule,
     IonMenu,
-    IonContent,
     IonIcon,
     IonRouterOutlet,
     IonSplitPane,
+    IonAvatar,
   ],
   templateUrl: './shell.html',
   styleUrls: ['./shell.css'],
 })
-export class Shell {
+export class Shell implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
   private menuCtrl = inject(MenuController);
 
+  // Signal estático: permite al Header cambiar el estado sin usar un servicio
+  static isCollapsed = signal(false);
+
+  get collapsed() {
+    return Shell.isCollapsed();
+  }
+
   rutaActiva = signal('');
-  isMobile = signal(window.innerWidth < 992);
+  usuarioActual = signal({
+    nombre: 'Cargando...',
+    rol: 'Nutricionista',
+    avatar: null as string | null,
+  });
 
   navItems: NavItem[] = [
-    {
-      label: 'Inicio',
-      icon: 'grid-outline',
-      route: '/dashboard',
-      activeRoutes: ['/dashboard'],
-    },
-    {
-      label: 'Pacientes',
-      icon: 'people-outline',
-      route: '/pacientes',
-      activeRoutes: ['/pacientes'],
-    },
-    {
-      label: 'Citas',
-      icon: 'calendar-outline',
-      route: '/citas',
-      activeRoutes: ['/citas'],
-    },
-    {
-      label: 'Ajustes',
-      icon: 'settings-outline',
-      route: '/ajustes',
-      activeRoutes: ['/ajustes'],
-    },
+    { label: 'Dashboard', icon: 'grid-outline', route: '/dashboard' },
+    { label: 'Pacientes', icon: 'people-outline', route: '/pacientes' },
+    { label: 'Citas', icon: 'calendar-outline', route: '/citas' }, // Opción restaurada
+    { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
   ];
 
   constructor() {
@@ -98,30 +83,33 @@ export class Shell {
       closeOutline,
       chevronForwardOutline,
       settingsOutline,
+      giftOutline,
+      personCircleOutline,
     });
-
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e: any) => {
       this.rutaActiva.set(e.urlAfterRedirects);
     });
-
     this.rutaActiva.set(this.router.url);
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    this.isMobile.set(window.innerWidth < 992);
+  async ngOnInit() {
+    const user = await this.authService.getUsuario();
+    if (user) {
+      this.usuarioActual.set({
+        nombre: `${user.nombre} ${user.apellidos}`.trim(),
+        rol: user.rol === 'admin' ? 'Administrador' : 'Nutricionista',
+        avatar: user.avatar_url || null,
+      });
+    }
   }
 
   isActive(item: NavItem): boolean {
-    const ruta = this.rutaActiva();
-    return (item.activeRoutes ?? [item.route]).some((r) => ruta.startsWith(r));
+    return this.rutaActiva().startsWith(item.route);
   }
 
   navegar(route: string) {
     this.router.navigate([route]);
-    if (this.isMobile()) {
-      this.menuCtrl.close('main-menu');
-    }
+    if (window.innerWidth < 992) this.menuCtrl.close('main-menu');
   }
 
   async cerrarSesion() {
