@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle,
@@ -17,21 +17,27 @@ import { logoGoogle } from 'ionicons/icons';
 })
 export class AjustesPage implements ViewWillEnter { // <-- Cambiado OnInit por ViewWillEnter
   private gcalService = inject(GoogleCalendarService);
+  private cdr = inject(ChangeDetectorRef);
   conectado = false;
 
   constructor() { addIcons({ logoGoogle }); }
 
   // <-- Se ejecuta SIEMPRE que entras a la pantalla, no solo la primera vez
   async ionViewWillEnter() { 
+    // Verificamos el estado real contra la Edge Function
     this.conectado = await this.gcalService.estaConectado();
+    this.cdr.detectChanges();
   }
 
   async toggleConexion() {
     if (this.conectado) {
+      // El usuario decide desconectar manualmente
       await this.gcalService.desconectar();
       this.conectado = false;
     } else {
+      // Iniciar flujo de Google
       this.gcalService.iniciarOAuth();
     }
+    this.cdr.detectChanges();
   }
 }
