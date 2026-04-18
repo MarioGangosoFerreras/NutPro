@@ -53,7 +53,7 @@
                   <span class="badge-hoy">HOY</span>
                 }
 
-                {{ paciente.proximaCita.fecha_hora | date: 'd MMM · HH:mm' : 'UTC' : 'es' }}
+                {{ paciente.proximaCita.fecha_hora | date: 'd MMM · HH:mm' : '' : 'es' }}
               </p>
             } @else {
               <p class="paciente-sub sin-cita">

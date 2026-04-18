@@ -9,7 +9,7 @@
 
   <div class="cita-card__fecha">
     <ion-icon name="time-outline"></ion-icon>
-    <span>{{ cita.fecha_hora | date: 'd MMM · HH:mm' : 'UTC' : 'es' }}</span>
+    <span>{{ cita.fecha_hora | date: 'd MMM · HH:mm' : '' : 'es' }}</span>
     <span class="cita-card__duracion">· {{ cita.duracion_min }} min</span>
   </div>
 
