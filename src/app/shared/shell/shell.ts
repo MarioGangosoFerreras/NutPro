@@ -63,7 +63,7 @@ export class Shell {
 
   navItems: NavItem[] = [
     {
-      label: 'Dashboard',
+      label: 'Inicio',
       icon: 'grid-outline',
       route: '/dashboard',
       activeRoutes: ['/dashboard'],
@@ -74,12 +74,12 @@ export class Shell {
       route: '/pacientes',
       activeRoutes: ['/pacientes'],
     },
-    // {
-    //   label: 'Citas',
-    //   icon: 'calendar-outline',
-    //   route: '/citas',
-    //   activeRoutes: ['/citas'],
-    // },
+    {
+      label: 'Citas',
+      icon: 'calendar-outline',
+      route: '/citas',
+      activeRoutes: ['/citas'],
+    },
     {
       label: 'Ajustes',
       icon: 'settings-outline',

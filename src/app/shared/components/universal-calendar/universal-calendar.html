@@ -1,5 +1,5 @@
 <!-- universal-calendar.component.html -->
-<div class="ucal" [class.ucal--dashboard]="mode === 'dashboard'">
+<div class="ucal" [class.ucal--dashboard]="mode === 'dashboard'" [class.ucal--full]="mode === 'full'">
   <!-- Navegación de mes -->
   <div class="ucal__nav">
     <ion-button fill="clear" size="small" (click)="mesAnterior()">

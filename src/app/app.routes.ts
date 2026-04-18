@@ -41,6 +41,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'citas',
+        loadComponent: () =>
+          import('./features/dashboard/calendario-citas/calendario-citas').then(
+            (m) => m.CalendarioCitas,
+          ),
+      },
+      {
         path: 'pacientes/nuevo',
         loadComponent: () =>
           import('./features/pacientes/nuevo-paciente/nuevo-paciente').then((m) => m.NuevoPaciente),
