@@ -48,6 +48,27 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'alimentacion/recetas',
+        loadComponent: () =>
+          import('./features/alimentacion/recetas/lista-recetas/lista-recetas').then(
+            (m) => m.ListaRecetasPage,
+          ),
+      },
+      {
+        path: 'alimentacion/recetas/nueva',
+        loadComponent: () =>
+          import('./features/alimentacion/recetas/crear-receta/crear-receta').then(
+            (m) => m.CrearRecetaPage,
+          ),
+      },
+      {
+        path: 'alimentacion/recetas/:id', // 👈 añadir esto
+        loadComponent: () =>
+          import('./features/alimentacion/recetas/detalle-receta/detalle-receta').then(
+            (m) => m.DetalleRecetaPage,
+          ),
+      },
+      {
         path: 'pacientes/nuevo',
         loadComponent: () =>
           import('./features/pacientes/nuevo-paciente/nuevo-paciente').then((m) => m.NuevoPaciente),

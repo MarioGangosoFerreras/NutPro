@@ -23,6 +23,7 @@ import {
   settingsOutline,
   giftOutline,
   personCircleOutline,
+  restaurantOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 
@@ -69,7 +70,8 @@ export class Shell implements OnInit {
   navItems: NavItem[] = [
     { label: 'Dashboard', icon: 'grid-outline', route: '/dashboard' },
     { label: 'Pacientes', icon: 'people-outline', route: '/pacientes' },
-    { label: 'Citas', icon: 'calendar-outline', route: '/citas' }, // Opción restaurada
+    { label: 'Citas', icon: 'calendar-outline', route: '/citas' },
+    { label: 'Recetas', icon: 'restaurant-outline', route: '/alimentacion/recetas'},
     { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
   ];
 
@@ -85,6 +87,7 @@ export class Shell implements OnInit {
       settingsOutline,
       giftOutline,
       personCircleOutline,
+      restaurantOutline,
     });
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e: any) => {
       this.rutaActiva.set(e.urlAfterRedirects);
