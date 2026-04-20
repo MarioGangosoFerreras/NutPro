@@ -20,14 +20,12 @@
 
 <ion-content class="ion-padding">
 
-  <!-- ── DATOS BÁSICOS ──────────────────────────────────────────────────── -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Datos básicos</ion-card-title>
     </ion-card-header>
     <ion-card-content>
 
-      <!-- Imagen de la receta -->
       <div class="imagen-upload-wrapper">
         @if (imagenUrl()) {
           <div class="imagen-preview-container">
@@ -102,7 +100,6 @@
         </ion-item>
       </div>
 
-      <!-- Visibilidad -->
       <ion-item>
         <ion-label position="stacked">Visibilidad</ion-label>
         <ion-select
@@ -116,7 +113,6 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- ── TIPO DE COMIDA ──────────────────────────────────────────────────── -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Tipo de comida</ion-card-title>
@@ -135,7 +131,6 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- ── ETIQUETAS ───────────────────────────────────────────────────────── -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Etiquetas dietéticas</ion-card-title>
@@ -154,7 +149,6 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- ── INGREDIENTES ────────────────────────────────────────────────────── -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Ingredientes</ion-card-title>
@@ -163,7 +157,6 @@
 
       @if (!foodSeleccionado()) {
 
-        <!-- Toggle búsqueda / manual -->
         <div class="modo-toggle">
           <ion-button
             [fill]="!modoManual() ? 'solid' : 'outline'"
@@ -181,7 +174,6 @@
           </ion-button>
         </div>
 
-        <!-- ── MODO BÚSQUEDA ──────────────────────────────────────────────── -->
         @if (!modoManual()) {
           <ion-searchbar
             placeholder="Buscar alimento..."
@@ -201,6 +193,13 @@
             <ion-list>
               @for (food of resultadosBusqueda(); track food.id) {
                 <ion-item button (click)="seleccionarFood(food)" detail>
+                  
+                  <ion-thumbnail slot="start">
+                    <img [src]="food.imagen_url || 'assets/imgs/no-image.png'" 
+                         alt="Imagen de {{ food.nombre }}" 
+                         style="border-radius: 8px; object-fit: cover;" />
+                  </ion-thumbnail>
+
                   <ion-label>
                     <h3>{{ food.nombre }}</h3>
                     <p>{{ food.calorias_kcal }} kcal · P: {{ food.proteina_g }}g · C: {{ food.carbohidratos_g }}g · G: {{ food.grasa_g }}g <ion-note>(por 100g)</ion-note></p>
@@ -211,7 +210,6 @@
           }
         }
 
-        <!-- ── MODO MANUAL ────────────────────────────────────────────────── -->
         @if (modoManual()) {
           <div class="manual-form">
             <p class="manual-hint">El alimento se guardará en tu base de datos para usarlo en futuras recetas.</p>
@@ -296,7 +294,6 @@
 
       }
 
-      <!-- ── PANEL CONFIGURAR INGREDIENTE SELECCIONADO ─────────────────── -->
       @if (foodSeleccionado(); as food) {
         <div class="configurar-ingrediente">
           <div class="food-seleccionado-header">
@@ -350,12 +347,18 @@
         </div>
       }
 
-      <!-- ── LISTA DE INGREDIENTES AÑADIDOS ────────────────────────────── -->
       @if (ingredientes().length > 0) {
         <div class="ingredientes-lista">
           @for (ing of ingredientes(); track ing.food_item_id; let i = $index) {
             <div class="ingrediente-row">
-              <div class="ingrediente-info">
+              
+              <ion-thumbnail style="margin-right: 12px; width: 45px; height: 45px;">
+                <img [src]="ing.imagen_url || 'assets/imgs/no-image.png'" 
+                     alt="Imagen de {{ ing.nombre }}" 
+                     style="border-radius: 6px; object-fit: cover;" />
+              </ion-thumbnail>
+
+              <div class="ingrediente-info" style="flex: 1;">
                 <span class="ingrediente-nombre">
                   {{ ing.nombre }}
                   @if (ing.es_opcional) { <ion-note>(opcional)</ion-note> }
@@ -364,6 +367,7 @@
                   <span class="ingrediente-medida">{{ ing.cantidad_texto }}</span>
                 }
               </div>
+              
               <div class="ingrediente-acciones">
                 <ion-input
                   type="number"
@@ -385,7 +389,6 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- ── MACROS TOTALES ──────────────────────────────────────────────────── -->
   @if (ingredientes().length > 0) {
     <ion-card class="macros-card">
       <ion-card-header>
@@ -434,7 +437,6 @@
     </ion-card>
   }
 
-  <!-- ── INSTRUCCIONES ───────────────────────────────────────────────────── -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Instrucciones de preparación</ion-card-title>
@@ -452,7 +454,6 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Botón guardar al final -->
   <ion-button
     expand="block"
     class="ion-margin"

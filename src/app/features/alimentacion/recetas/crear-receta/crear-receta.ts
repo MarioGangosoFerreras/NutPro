@@ -3,13 +3,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import {
-  IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonTitle,
-  IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-  IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption,
-  IonChip, IonSearchbar, IonSpinner, IonList, IonNote, IonCheckbox,
-  IonProgressBar
-} from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonChip, IonSearchbar, IonSpinner, IonList, IonNote, IonCheckbox, IonProgressBar, IonThumbnail } from '@ionic/angular/standalone';
 import { computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController, ToastController } from '@ionic/angular/standalone';
@@ -33,8 +27,9 @@ import { CloudinaryService } from '../../../../core/services/cloudinary';
     IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent,
     IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption,
     IonChip, IonSearchbar, IonSpinner, IonList, IonNote, IonCheckbox,
-    IonProgressBar
-  ],
+    IonProgressBar,
+    IonThumbnail
+],
   templateUrl: './crear-receta.html',
 })
 export class CrearReceta {

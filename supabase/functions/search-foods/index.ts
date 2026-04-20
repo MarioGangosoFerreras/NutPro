@@ -51,23 +51,37 @@ serve(async (req) => {
       });
     }
 
-    // 2. IR A OPEN FOOD FACTS (Sustituye a USDA + DeepL)
-    // Filtramos por España y pedimos solo campos necesarios para ahorrar ancho de banda
-    const urlOFF = new URL('https://es.openfoodfacts.org/cgi/search.pl');
+    // 2. IR A OPEN FOOD FACTS
+    const urlOFF = new URL('https://world.openfoodfacts.org/cgi/search.pl');
     urlOFF.searchParams.set('search_terms', queryNormalizada);
     urlOFF.searchParams.set('search_simple', '1');
     urlOFF.searchParams.set('action', 'process');
     urlOFF.searchParams.set('json', '1');
     urlOFF.searchParams.set('page_size', '20');
-    // Campos específicos para que la respuesta sea ligera
-    urlOFF.searchParams.set('fields', 'code,product_name_es,product_name,brands,nutriments,image_front_small_url');
+    urlOFF.searchParams.set(
+      'fields',
+      'code,product_name_es,product_name,brands,nutriments,image_front_small_url',
+    );
 
+    // OFF pide explícitamente este formato para no bloquearte: NombreApp/Version (Contacto)
     const resOFF = await fetch(urlOFF.toString(), {
-      headers: { 'User-Agent': 'MiAppNutricion - Web - Version 1.0' }
+      headers: { 'User-Agent': 'MiAppNutricion/1.0 (tu-email@gmail.com)' }, // <-- Pon un email tuyo real aquí
     });
-    
-    const dataOFF = await resOFF.json();
-    const productos = dataOFF.products || [];
+
+    let productos = [];
+
+    // Solo intentamos parsear JSON si la respuesta fue un éxito real
+    if (resOFF.ok) {
+      const contentType = resOFF.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const dataOFF = await resOFF.json();
+        productos = dataOFF.products || [];
+      } else {
+        console.error('Open Food Facts devolvió HTML en vez de JSON');
+      }
+    } else {
+      console.error(`Error de Open Food Facts: Status ${resOFF.status}`);
+    }
 
     // 3. MAPEAR PRODUCTOS A TU FORMATO
     const itemsParaUpsert = productos
@@ -79,6 +93,7 @@ serve(async (req) => {
           fuente: 'off', // Cambiamos fuente a 'off' (Open Food Facts)
           external_id: String(p.code), // Usamos el código de barras como ID único
           categoria: p.brands || 'Genérico',
+          imagen_url: p.image_front_small_url || null, // <-- Imagen mapeada correctamente
           es_publico: true,
           sincronizado_at: new Date().toISOString(),
           ...macros,
@@ -87,26 +102,38 @@ serve(async (req) => {
 
     // 4. UPSERT EN SUPABASE PARA CACHEAR
     let resultadoFinal = resultadosLocales || [];
-    
+    let errorDeBaseDeDatos = null; // <- Variable para capturar el error
+
     if (itemsParaUpsert.length > 0) {
       const { data: insertados, error: upsertError } = await supabase
         .from('food_items')
         .upsert(itemsParaUpsert, { onConflict: 'external_id' })
         .select();
 
-      if (!upsertError && insertados) {
+      if (upsertError) {
+        errorDeBaseDeDatos = upsertError; // Lo guardamos para enviarlo al frontend
+        console.error('Error en upsert:', upsertError);
+      } else if (insertados) {
         // Combinar locales con nuevos (evitando duplicados por ID)
-        const idsExistentes = new Set(resultadoFinal.map(r => r.id));
-        const nuevos = insertados.filter(ins => !idsExistentes.has(ins.id));
+        const idsExistentes = new Set(resultadoFinal.map((r) => r.id));
+        const nuevos = insertados.filter((ins) => !idsExistentes.has(ins.id));
         resultadoFinal = [...resultadoFinal, ...nuevos];
       }
     }
 
-    return new Response(JSON.stringify({ data: resultadoFinal, fuente: 'openfoodfacts' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-
-  } catch (err) {
+    // Devolvemos la respuesta añadiendo campos "debug" para ver qué está pasando
+    return new Response(
+      JSON.stringify({
+        data: resultadoFinal,
+        fuente: 'openfoodfacts',
+        debug_encontrados_en_off: productos.length,
+        debug_error_db: errorDeBaseDeDatos,
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
+    );
+  } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
