@@ -4,6 +4,383 @@
 @import '@ionic/angular/css/typography.css';
 @import '@ionic/angular/css/display.css';
 
+/* ═══════════════════════════════════════════════════════════════
+   NUTPRO — DESIGN TOKENS
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* Paleta */
+  --np-green-50:   #E8FAF0;
+  --np-green-100:  #B3EDCB;
+  --np-green-400:  #1DB954;
+  --np-green-600:  #0D8A3C;
+  --np-green-800:  #095C28;
+
+  --np-coral-50:   #FFF0EA;
+  --np-coral-400:  #FF5E2C;
+  --np-coral-600:  #C13D14;
+
+  --np-blue-50:    #E8F4FF;
+  --np-blue-600:   #185FA5;
+
+  --np-amber-50:   #FFF8E6;
+  --np-amber-600:  #854F0B;
+
+  /* Radios */
+  --np-radius-card:  16px;
+  --np-radius-btn:   12px;
+  --np-radius-chip:  20px;
+  --np-radius-input: 12px;
+
+  /* ── Ionic color primary → verde ─────────────────────────── */
+  --ion-color-primary:              #1DB954;
+  --ion-color-primary-rgb:          29,185,84;
+  --ion-color-primary-contrast:     #ffffff;
+  --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade:        #19a34a;
+  --ion-color-primary-tint:         #34c065;
+
+  /* ── Ionic color secondary → coral ──────────────────────── */
+  --ion-color-secondary:              #FF5E2C;
+  --ion-color-secondary-rgb:          255,94,44;
+  --ion-color-secondary-contrast:     #ffffff;
+  --ion-color-secondary-contrast-rgb: 255,255,255;
+  --ion-color-secondary-shade:        #e05227;
+  --ion-color-secondary-tint:         #ff6e41;
+
+  /* ── Fondos y superficies ────────────────────────────────── */
+  --ion-background-color:          #F4F7F5;
+  --ion-background-color-rgb:      244,247,245;
+  --ion-item-background:           #ffffff;
+  --ion-card-background:           #ffffff;
+
+  /* ── Texto ───────────────────────────────────────────────── */
+  --ion-text-color:                #1A1A1A;
+  --ion-text-color-rgb:            26,26,26;
+  --ion-color-medium:              #7A8A82;
+  --ion-color-medium-rgb:          122,138,130;
+
+  /* ── Bordes y divisores ──────────────────────────────────── */
+  --ion-border-color:              #E4EDE8;
+  --ion-color-light:               #EFF4F1;
+  --ion-color-light-shade:         #E4EDE8;
+  --ion-color-light-tint:          #F7FAF8;
+
+  /* ── Tipografía ──────────────────────────────────────────── */
+  --ion-font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+                     'Segoe UI', Roboto, sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════════ */
+* { -webkit-tap-highlight-color: transparent; }
+
+ion-content {
+  --background: var(--ion-background-color);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOOLBAR / HEADER
+   ═══════════════════════════════════════════════════════════════ */
+ion-toolbar {
+  --background: #ffffff;
+  --border-color: var(--ion-border-color);
+  --border-width: 0 0 0.5px 0;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+}
+
+ion-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ion-text-color);
+}
+
+ion-header ion-toolbar:first-child {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CARDS
+   ═══════════════════════════════════════════════════════════════ */
+ion-card {
+  --background: #ffffff;
+  border-radius: var(--np-radius-card) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.04) !important;
+  margin: 6px 12px !important;
+}
+
+ion-card-header {
+  padding-bottom: 8px;
+}
+
+ion-card-title {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--ion-text-color) !important;
+}
+
+ion-card-content {
+  padding-top: 4px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ITEMS / LIST
+   ═══════════════════════════════════════════════════════════════ */
+ion-item {
+  --background: #ffffff;
+  --border-color: var(--ion-border-color);
+  --inner-border-width: 0 0 0.5px 0;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --min-height: 52px;
+}
+
+ion-item:last-child {
+  --inner-border-width: 0;
+}
+
+ion-label {
+  font-size: 14px !important;
+}
+
+ion-label[position="stacked"] {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: var(--ion-color-medium) !important;
+  margin-bottom: 4px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+ion-note {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INPUTS
+   ═══════════════════════════════════════════════════════════════ */
+ion-input {
+  --color: var(--ion-text-color);
+  --placeholder-color: #B0BDB6;
+  --placeholder-opacity: 1;
+  font-size: 15px !important;
+}
+
+ion-textarea {
+  --color: var(--ion-text-color);
+  --placeholder-color: #B0BDB6;
+  font-size: 15px !important;
+}
+
+ion-searchbar {
+  --background: #ffffff;
+  --border-radius: var(--np-radius-input);
+  --box-shadow: 0 0 0 1px var(--ion-border-color);
+  --color: var(--ion-text-color);
+  --placeholder-color: #B0BDB6;
+  --icon-color: var(--np-green-400);
+  --clear-button-color: var(--ion-color-medium);
+  padding: 0 0 12px !important;
+  font-size: 15px !important;
+}
+
+ion-searchbar.searchbar-has-focus {
+  --box-shadow: 0 0 0 2px var(--np-green-400);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOTONES
+   ═══════════════════════════════════════════════════════════════ */
+ion-button {
+  --border-radius: var(--np-radius-btn);
+  --box-shadow: none;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-size: 14px;
+  text-transform: none;
+  height: 44px;
+}
+
+ion-button[fill="solid"][color="primary"],
+ion-button[fill="solid"]:not([color]) {
+  --background: var(--np-green-400);
+  --background-activated: var(--np-green-600);
+  --color: #ffffff;
+}
+
+ion-button[fill="solid"][color="secondary"] {
+  --background: var(--np-coral-400);
+  --background-activated: var(--np-coral-600);
+  --color: #ffffff;
+}
+
+ion-button[fill="outline"][color="primary"],
+ion-button[fill="outline"]:not([color]) {
+  --border-color: var(--np-green-400);
+  --color: var(--np-green-400);
+  --border-width: 1.5px;
+}
+
+ion-button[fill="clear"][color="primary"],
+ion-button[fill="clear"]:not([color]) {
+  --color: var(--np-green-400);
+}
+
+ion-button[fill="clear"][color="danger"] {
+  --color: var(--np-coral-400);
+}
+
+ion-button[expand="block"] {
+  --border-radius: var(--np-radius-btn);
+  height: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHIPS
+   ═══════════════════════════════════════════════════════════════ */
+ion-chip {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-medium);
+  border-radius: var(--np-radius-chip) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  height: 30px !important;
+  border: none !important;
+  transition: all 0.15s ease;
+}
+
+ion-chip[color="primary"] {
+  --background: var(--np-green-50);
+  --color: var(--np-green-600);
+}
+
+ion-chip[color="success"] {
+  --background: var(--np-green-50);
+  --color: var(--np-green-600);
+}
+
+ion-chip[color="secondary"] {
+  --background: var(--np-coral-50);
+  --color: var(--np-coral-600);
+}
+
+ion-chip[color="medium"] {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-medium);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SELECT
+   ═══════════════════════════════════════════════════════════════ */
+ion-select {
+  font-size: 15px;
+  color: var(--ion-text-color);
+  --placeholder-color: #B0BDB6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHECKBOX
+   ═══════════════════════════════════════════════════════════════ */
+ion-checkbox {
+  --checkbox-background-checked: var(--np-green-400);
+  --border-color-checked: var(--np-green-400);
+  --checkmark-color: #ffffff;
+  --border-radius: 6px;
+  --size: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SPINNER
+   ═══════════════════════════════════════════════════════════════ */
+ion-spinner {
+  color: var(--np-green-400);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FAB
+   ═══════════════════════════════════════════════════════════════ */
+ion-fab-button {
+  --background: var(--np-green-400);
+  --background-activated: var(--np-green-600);
+  --color: #ffffff;
+  --box-shadow: 0 4px 16px rgba(29,185,84,0.35);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TAB BAR
+   ═══════════════════════════════════════════════════════════════ */
+ion-tab-bar {
+  --background: #ffffff;
+  --border: 0.5px solid var(--ion-border-color);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+ion-tab-button {
+  --color: #B0BDB6;
+  --color-selected: var(--np-green-400);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════════════════ */
+ion-toast {
+  --border-radius: 12px;
+  --box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+ion-toast.toast-color-success {
+  --background: var(--np-green-400);
+  --color: #ffffff;
+}
+
+ion-toast.toast-color-danger {
+  --background: var(--np-coral-400);
+  --color: #ffffff;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING OVERLAY
+   ═══════════════════════════════════════════════════════════════ */
+ion-loading {
+  --background: #ffffff;
+  --spinner-color: var(--np-green-400);
+  --border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ion-text-color);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ALERT / ACTION SHEET
+   ═══════════════════════════════════════════════════════════════ */
+ion-alert {
+  --border-radius: 16px;
+}
+
+.alert-button.sc-ion-alert-md,
+.alert-button.sc-ion-alert-ios {
+  color: var(--np-green-400);
+  font-weight: 500;
+}
+
+ion-action-sheet {
+  --button-color: var(--ion-text-color);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AGUACATE SPINNER (sin cambios)
+   ═══════════════════════════════════════════════════════════════ */
 .nutri-loader-container {
   display: flex;
   justify-content: center;
@@ -12,26 +389,15 @@
   padding: 30px;
 }
 
-/* El Aguacate Giratorio (Sin salto) */
 .avocado-spinner {
-  /* Tamaño ajustable para un loader principal */
-  width: 60px; 
+  width: 60px;
   height: 60px;
-  
-  /* Animación continua y lineal */
   animation: giro-aguacate 1.5s linear infinite;
-  
-  /* Asegura un giro perfecto sobre su centro */
   transform-origin: center;
   display: block;
 }
 
-/* Solo giro suave de 0 a 360 grados */
 @keyframes giro-aguacate {
-  from { 
-    transform: rotate(0deg); 
-  }
-  to { 
-    transform: rotate(360deg); 
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }

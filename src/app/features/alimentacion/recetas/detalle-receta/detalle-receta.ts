@@ -29,7 +29,7 @@ import { RecetaService, Receta } from '../../../../core/services/receta';
     IonList, IonNote, IonAlert
   ]
 })
-export class DetalleRecetaPage implements OnInit {
+export class DetalleReceta implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private recetaService = inject(RecetaService);

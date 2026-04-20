@@ -1,103 +1,50 @@
-import { Component, inject, signal, computed } from '@angular/core';
+// crear-receta.ts
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonButtons,
-  IonButton,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonTextarea,
-  IonSelect,
-  IonSelectOption,
-  IonCheckbox,
-  IonSearchbar,
-  IonList,
-  IonChip,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonNote,
-  IonSpinner,
-  IonRange,
-  ToastController,
-  LoadingController,
+  IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonTitle,
+  IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent,
+  IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption,
+  IonChip, IonSearchbar, IonSpinner, IonList, IonNote, IonCheckbox,
+  IonProgressBar
 } from '@ionic/angular/standalone';
+import { computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { LoadingController, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  closeOutline,
-  addOutline,
-  removeOutline,
-  checkmarkOutline,
-  arrowBackOutline,
-  nutritionOutline,
+  addOutline, arrowBackOutline, cameraOutline, checkmarkOutline,
+  closeOutline, createOutline, nutritionOutline, removeOutline, searchOutline,
 } from 'ionicons/icons';
 import { RecetaService } from '../../../../core/services/receta';
-import { FoodItem, FoodService } from '../../../../core/services/food';
-
-interface IngredienteLocal {
-  food_item_id: string;
-  nombre: string;
-  cantidad_g: number;
-  cantidad_texto: string;
-  es_opcional: boolean;
-  // Macros del food_item (por 100g)
-  calorias_kcal: number;
-  proteina_g: number;
-  carbohidratos_g: number;
-  grasa_g: number;
-  fibra_g: number;
-}
+import { FoodItem, FoodService, IngredienteLocal } from '../../../../core/services/food';
+import { CloudinaryService } from '../../../../core/services/cloudinary';
 
 @Component({
   selector: 'app-crear-receta',
-  templateUrl: './crear-receta.html',
-  styleUrls: ['./crear-receta.css'],
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonButtons,
-    IonButton,
-    IonIcon,
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonTextarea,
-    IonSelect,
-    IonSelectOption,
-    IonCheckbox,
-    IonSearchbar,
-    IonList,
-    IonChip,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
-    IonNote,
-    IonSpinner,
-    IonRange,
+    RouterModule,
+    IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonTitle,
+    IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent,
+    IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption,
+    IonChip, IonSearchbar, IonSpinner, IonList, IonNote, IonCheckbox,
+    IonProgressBar
   ],
+  templateUrl: './crear-receta.html',
 })
-export class CrearRecetaPage {
+export class CrearReceta {
   private recetaService = inject(RecetaService);
   private foodService = inject(FoodService);
+  private cloudinaryService = inject(CloudinaryService);
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
   router = inject(Router);
 
-  // ─── Datos del formulario ──────────────────────────────────────────────────
   nombre = signal('');
   descripcion = signal('');
   instrucciones = signal('');
@@ -107,54 +54,48 @@ export class CrearRecetaPage {
   tiposComidaSeleccionados = signal<string[]>([]);
   etiquetasSeleccionadas = signal<string[]>([]);
 
-  // ─── Ingredientes añadidos a la receta ────────────────────────────────────
+  imagenUrl = signal<string | null>(null);
+  subiendoImagen = signal(false);
+
   ingredientes = signal<IngredienteLocal[]>([]);
 
-  // ─── Buscador de alimentos ─────────────────────────────────────────────────
   resultadosBusqueda = signal<FoodItem[]>([]);
   buscando = signal(false);
   busquedaQuery = signal('');
 
-  // ─── Estado del ingrediente que se está configurando ──────────────────────
   foodSeleccionado = signal<FoodItem | null>(null);
   cantidadGramos = signal(100);
   cantidadTexto = signal('');
   esOpcional = signal(false);
 
-  // ─── Opciones disponibles ──────────────────────────────────────────────────
+  modoManual = signal(false);
+  manualNombre = signal('');
+  manualCalorias = signal(0);
+  manualProteina = signal(0);
+  manualCarbs = signal(0);
+  manualGrasa = signal(0);
+  manualFibra = signal(0);
+  manualAzucar = signal(0);
+  guardandoManual = signal(false);
+
   readonly tiposComida = ['desayuno', 'almuerzo', 'comida', 'merienda', 'cena', 'snack'];
   readonly etiquetas = [
-    'sin_gluten',
-    'sin_lactosa',
-    'vegano',
-    'vegetariano',
-    'bajo_fodmap',
-    'sin_azucar',
-    'alto_proteico',
+    'sin_gluten', 'sin_lactosa', 'vegano', 'vegetariano',
+    'bajo_fodmap', 'sin_azucar', 'alto_proteico',
   ];
 
-  // ─── Macros totales calculados en tiempo real ─────────────────────────────
   macrosTotales = computed(() => {
     const lista = this.ingredientes();
     return {
-      calorias: Math.round(
-        lista.reduce((sum, i) => sum + (i.calorias_kcal * i.cantidad_g) / 100, 0),
-      ),
-      proteina:
-        Math.round(lista.reduce((sum, i) => sum + (i.proteina_g * i.cantidad_g) / 100, 0) * 10) /
-        10,
-      carbohidratos:
-        Math.round(
-          lista.reduce((sum, i) => sum + (i.carbohidratos_g * i.cantidad_g) / 100, 0) * 10,
-        ) / 10,
-      grasa:
-        Math.round(lista.reduce((sum, i) => sum + (i.grasa_g * i.cantidad_g) / 100, 0) * 10) / 10,
-      fibra:
-        Math.round(lista.reduce((sum, i) => sum + (i.fibra_g * i.cantidad_g) / 100, 0) * 10) / 10,
+      calorias: Math.round(lista.reduce((sum, i) => sum + (i.calorias_kcal * i.cantidad_g) / 100, 0)),
+      proteina: Math.round(lista.reduce((sum, i) => sum + (i.proteina_g * i.cantidad_g) / 100, 0) * 10) / 10,
+      carbohidratos: Math.round(lista.reduce((sum, i) => sum + (i.carbohidratos_g * i.cantidad_g) / 100, 0) * 10) / 10,
+      grasa: Math.round(lista.reduce((sum, i) => sum + (i.grasa_g * i.cantidad_g) / 100, 0) * 10) / 10,
+      fibra: Math.round(lista.reduce((sum, i) => sum + (i.fibra_g * i.cantidad_g) / 100, 0) * 10) / 10,
+      azucar: Math.round(lista.reduce((sum, i) => sum + ((i.azucar_g || 0) * i.cantidad_g) / 100, 0) * 10) / 10,
     };
   });
 
-  // Macros por ración
   macrosPorRacion = computed(() => {
     const total = this.macrosTotales();
     const r = this.raciones() || 1;
@@ -163,37 +104,67 @@ export class CrearRecetaPage {
       proteina: Math.round((total.proteina / r) * 10) / 10,
       carbohidratos: Math.round((total.carbohidratos / r) * 10) / 10,
       grasa: Math.round((total.grasa / r) * 10) / 10,
+      azucar: Math.round((total.azucar / r) * 10) / 10,
     };
   });
 
   formularioValido = computed(
-    () => this.nombre().trim().length >= 2 && this.ingredientes().length > 0,
+    () => this.nombre().trim().length >= 2 && this.ingredientes().length > 0
   );
+
+  macrosPreview = computed(() => {
+    const food = this.foodSeleccionado();
+    if (!food) return null;
+    const g = this.cantidadGramos();
+    return {
+      calorias: Math.round((food.calorias_kcal * g) / 100),
+      proteina: Math.round(((food.proteina_g * g) / 100) * 10) / 10,
+      carbohidratos: Math.round(((food.carbohidratos_g * g) / 100) * 10) / 10,
+      grasa: Math.round(((food.grasa_g * g) / 100) * 10) / 10,
+      azucar: Math.round(((food.azucar_g || 0) * g) / 100 * 10) / 10,
+    };
+  });
 
   constructor() {
     addIcons({
-      closeOutline,
-      addOutline,
-      removeOutline,
-      checkmarkOutline,
-      arrowBackOutline,
-      nutritionOutline,
+      closeOutline, addOutline, removeOutline, checkmarkOutline,
+      arrowBackOutline, nutritionOutline, cameraOutline, createOutline, searchOutline,
     });
   }
 
-  // ─── Búsqueda de alimentos ─────────────────────────────────────────────────
+  async onSeleccionarImagen(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.subiendoImagen.set(true);
+    try {
+      const url = await this.cloudinaryService.uploadImage(file);
+      if (url) {
+        this.imagenUrl.set(url);
+      } else {
+        await this.mostrarToast('Error subiendo la imagen', 'danger');
+      }
+    } catch {
+      await this.mostrarToast('Error subiendo la imagen', 'danger');
+    } finally {
+      this.subiendoImagen.set(false);
+      input.value = '';
+    }
+  }
+
+  quitarImagen() {
+    this.imagenUrl.set(null);
+  }
+
   private searchTimeout: any;
 
   onBuscarAlimento(event: any) {
     const query = event.detail.value?.trim();
     this.busquedaQuery.set(query);
-
     if (!query || query.length < 2) {
       this.resultadosBusqueda.set([]);
       return;
     }
-
-    // Debounce de 400ms para no llamar en cada tecla
     clearTimeout(this.searchTimeout);
     this.searchTimeout = setTimeout(async () => {
       try {
@@ -208,7 +179,6 @@ export class CrearRecetaPage {
     }, 400);
   }
 
-  // ─── Seleccionar un alimento del buscador ─────────────────────────────────
   seleccionarFood(food: FoodItem) {
     this.foodSeleccionado.set(food);
     this.cantidadGramos.set(100);
@@ -222,25 +192,10 @@ export class CrearRecetaPage {
     this.foodSeleccionado.set(null);
   }
 
-  // Preview de macros del alimento seleccionado según cantidad
-  macrosPreview = computed(() => {
-    const food = this.foodSeleccionado();
-    if (!food) return null;
-    const g = this.cantidadGramos();
-    return {
-      calorias: Math.round((food.calorias_kcal * g) / 100),
-      proteina: Math.round(((food.proteina_g * g) / 100) * 10) / 10,
-      carbohidratos: Math.round(((food.carbohidratos_g * g) / 100) * 10) / 10,
-      grasa: Math.round(((food.grasa_g * g) / 100) * 10) / 10,
-    };
-  });
-
-  // ─── Confirmar y añadir ingrediente ───────────────────────────────────────
   confirmarIngrediente() {
     const food = this.foodSeleccionado();
     if (!food || this.cantidadGramos() <= 0) return;
 
-    // Evitar duplicados
     const yaExiste = this.ingredientes().some((i) => i.food_item_id === food.id);
     if (yaExiste) {
       this.mostrarToast(`${food.nombre} ya está en la receta`, 'warning');
@@ -251,23 +206,50 @@ export class CrearRecetaPage {
     this.ingredientes.update((lista) => [
       ...lista,
       {
+        ...food,
         food_item_id: food.id,
-        nombre: food.nombre,
         cantidad_g: this.cantidadGramos(),
         cantidad_texto: this.cantidadTexto(),
         es_opcional: this.esOpcional(),
-        calorias_kcal: food.calorias_kcal,
-        proteina_g: food.proteina_g,
-        carbohidratos_g: food.carbohidratos_g,
-        grasa_g: food.grasa_g,
-        fibra_g: food.fibra_g,
       },
     ]);
-
     this.foodSeleccionado.set(null);
   }
 
-  // ─── Editar cantidad de un ingrediente ya añadido ─────────────────────────
+  async guardarIngredienteManual() {
+    if (!this.manualNombre().trim()) return;
+    this.guardandoManual.set(true);
+    try {
+      const nuevoFood = await this.foodService.crearAlimentoManual({
+        nombre: this.manualNombre().trim(),
+        calorias_kcal: this.manualCalorias(),
+        proteina_g: this.manualProteina(),
+        carbohidratos_g: this.manualCarbs(),
+        grasa_g: this.manualGrasa(),
+        fibra_g: this.manualFibra(),
+        azucar_g: this.manualAzucar(),
+      });
+      this.seleccionarFood(nuevoFood);
+      this.modoManual.set(false);
+      this.limpiarFormManual();
+      await this.mostrarToast('Alimento guardado en tu base de datos', 'success');
+    } catch {
+      await this.mostrarToast('Error guardando el alimento', 'danger');
+    } finally {
+      this.guardandoManual.set(false);
+    }
+  }
+
+  private limpiarFormManual() {
+    this.manualNombre.set('');
+    this.manualCalorias.set(0);
+    this.manualProteina.set(0);
+    this.manualCarbs.set(0);
+    this.manualGrasa.set(0);
+    this.manualFibra.set(0);
+    this.manualAzucar.set(0);
+  }
+
   actualizarCantidad(index: number, valor: number) {
     this.ingredientes.update((lista) => {
       const nueva = [...lista];
@@ -276,33 +258,27 @@ export class CrearRecetaPage {
     });
   }
 
-  // ─── Quitar ingrediente ────────────────────────────────────────────────────
   quitarIngrediente(index: number) {
     this.ingredientes.update((lista) => lista.filter((_, i) => i !== index));
   }
 
-  // ─── Toggle tipo de comida ─────────────────────────────────────────────────
   toggleTipoComida(tipo: string) {
     this.tiposComidaSeleccionados.update((tipos) =>
-      tipos.includes(tipo) ? tipos.filter((t) => t !== tipo) : [...tipos, tipo],
+      tipos.includes(tipo) ? tipos.filter((t) => t !== tipo) : [...tipos, tipo]
     );
   }
 
   toggleEtiqueta(etiqueta: string) {
     this.etiquetasSeleccionadas.update((ets) =>
-      ets.includes(etiqueta) ? ets.filter((e) => e !== etiqueta) : [...ets, etiqueta],
+      ets.includes(etiqueta) ? ets.filter((e) => e !== etiqueta) : [...ets, etiqueta]
     );
   }
 
-  // ─── Guardar receta ────────────────────────────────────────────────────────
   async guardarReceta() {
     if (!this.formularioValido()) return;
-
     const loading = await this.loadingCtrl.create({ message: 'Guardando receta...' });
     await loading.present();
-
     try {
-      // 1. Crear la receta
       const receta = await this.recetaService.crearReceta({
         nombre: this.nombre().trim(),
         descripcion: this.descripcion().trim() || undefined,
@@ -312,9 +288,9 @@ export class CrearRecetaPage {
         visibilidad: this.visibilidad(),
         tipo_comida: this.tiposComidaSeleccionados(),
         etiquetas: this.etiquetasSeleccionadas(),
+        imagen_url: this.imagenUrl() ?? undefined,
       });
 
-      // 2. Añadir ingredientes (el trigger de Supabase recalcula macros automáticamente)
       await Promise.all(
         this.ingredientes().map((ing, index) =>
           this.recetaService.addIngrediente({
@@ -324,30 +300,24 @@ export class CrearRecetaPage {
             cantidad_texto: ing.cantidad_texto || undefined,
             es_opcional: ing.es_opcional,
             orden: index,
-          }),
-        ),
+          })
+        )
       );
 
       await loading.dismiss();
       await this.mostrarToast('Receta guardada correctamente', 'success');
       this.router.navigate(['/alimentacion/recetas']);
-    } catch (e) {
+    } catch {
       await loading.dismiss();
       await this.mostrarToast('Error guardando la receta', 'danger');
     }
   }
 
   private async mostrarToast(message: string, color: string) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2500,
-      color,
-      position: 'bottom',
-    });
+    const toast = await this.toastCtrl.create({ message, duration: 2500, color, position: 'bottom' });
     await toast.present();
   }
 
-  //Limpiar formulario
   ionViewWillEnter() {
     this.nombre.set('');
     this.descripcion.set('');
@@ -361,5 +331,8 @@ export class CrearRecetaPage {
     this.foodSeleccionado.set(null);
     this.resultadosBusqueda.set([]);
     this.busquedaQuery.set('');
+    this.imagenUrl.set(null);
+    this.modoManual.set(false);
+    this.limpiarFormManual();
   }
 }

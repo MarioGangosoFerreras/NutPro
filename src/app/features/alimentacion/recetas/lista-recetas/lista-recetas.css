@@ -1,76 +1,201 @@
+/* ── Cards ───────────────────────────────────────────────────────────────── */
 ion-card {
-  margin: 8px 12px;
+  margin: 6px 12px;
+  transition: transform 0.15s ease;
+}
+
+ion-card:active { transform: scale(0.985); }
+
+/* ── Layout card horizontal (imagen izquierda + contenido derecha) ───────── */
+.card-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+}
+
+/* ── Imagen thumbnail cuadrada ───────────────────────────────────────────── */
+.card-imagen-wrapper {
+  flex-shrink: 0;
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--np-green-50);
+}
+
+.card-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.card-sin-imagen {
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--np-green-50);
   border-radius: 12px;
 }
 
+.card-sin-imagen ion-icon {
+  font-size: 32px;
+  color: var(--np-green-400);
+  opacity: 0.45;
+}
+
+/* ── Contenido a la derecha de la imagen ─────────────────────────────────── */
+.card-contenido {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Cabecera card ───────────────────────────────────────────────────────── */
 .card-header-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-
-  ion-icon {
-    font-size: 18px;
-    margin-top: 4px;
-  }
+  gap: 8px;
 }
 
-.macros-row {
-  display: flex;
-  gap: 16px;
-  margin: 8px 0 12px;
-
-  .macro {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .macro-valor {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--ion-color-primary);
-    }
-
-    .macro-label {
-      font-size: 11px;
-      color: var(--ion-color-medium);
-      text-transform: uppercase;
-    }
-  }
+.card-header-row ion-icon {
+  font-size: 18px;
+  margin-top: 2px;
+  color: var(--ion-color-medium);
+  flex-shrink: 0;
 }
 
+/* ── Badge visibilidad ───────────────────────────────────────────────────── */
+.badge-visibilidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+
+.badge-privada {
+  background: var(--ion-color-light);
+  color: var(--ion-color-medium);
+}
+
+.badge-publica {
+  background: var(--np-green-50);
+  color: var(--np-green-600);
+}
+
+/* ── Chips tipo comida ───────────────────────────────────────────────────── */
 .chips-row {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-bottom: 8px;
-
-  ion-chip {
-    height: 24px;
-    font-size: 12px;
-  }
+  margin-bottom: 6px;
 }
 
+/* ── Macros pills (4 colores semánticos) ─────────────────────────────────── */
+.macros-row {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 8px;
+  flex-wrap: wrap;
+}
+
+.macro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 10px;
+  min-width: 50px;
+}
+
+.macro-kcal  { background: var(--np-green-50); }
+.macro-prot  { background: var(--np-coral-50); }
+.macro-carbs { background: var(--np-blue-50); }
+.macro-grasa { background: var(--np-amber-50); }
+
+.macro-valor {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.macro-kcal  .macro-valor { color: var(--np-green-600); }
+.macro-prot  .macro-valor { color: var(--np-coral-600); }
+.macro-carbs .macro-valor { color: var(--np-blue-600); }
+.macro-grasa .macro-valor { color: var(--np-amber-600); }
+
+.macro-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 1px;
+}
+
+.macro-kcal  .macro-label { color: var(--np-green-600); }
+.macro-prot  .macro-label { color: var(--np-coral-600); }
+.macro-carbs .macro-label { color: var(--np-blue-600); }
+.macro-grasa .macro-label { color: var(--np-amber-600); }
+
+/* ── Acciones ────────────────────────────────────────────────────────────── */
 .acciones-row {
   display: flex;
   justify-content: flex-end;
+  gap: 4px;
+  padding-top: 4px;
+  border-top: 0.5px solid var(--ion-color-light);
   margin-top: 4px;
 }
 
+/* ── Empty state ─────────────────────────────────────────────────────────── */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 72px 32px 48px;
+  text-align: center;
+}
+
+.empty-state-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--np-green-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.empty-state-icon-wrapper ion-icon {
+  font-size: 36px;
+  color: var(--np-green-400);
+}
+
+.empty-state p {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.empty-state span {
+  font-size: 14px;
   color: var(--ion-color-medium);
-
-  ion-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
-  }
-
-  p {
-    font-size: 16px;
-    margin-bottom: 20px;
-  }
+  line-height: 1.5;
+  margin-bottom: 24px;
+  display: block;
 }

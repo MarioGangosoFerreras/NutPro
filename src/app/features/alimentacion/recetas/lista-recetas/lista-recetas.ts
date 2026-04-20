@@ -28,7 +28,7 @@ import { Receta, RecetaService } from '../../../../core/services/receta';
     IonSegment, IonSegmentButton
   ]
 })
-export class ListaRecetasPage implements OnInit {
+export class ListaRecetas implements OnInit {
   private recetaService = inject(RecetaService);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);

@@ -10,10 +10,7 @@
 
   <!-- Buscador -->
   <ion-toolbar>
-    <ion-searchbar
-      placeholder="Buscar receta..."
-      (ionInput)="onBusqueda($event)"
-      [debounce]="300">
+    <ion-searchbar placeholder="Buscar receta..." (ionInput)="onBusqueda($event)" [debounce]="300">
     </ion-searchbar>
   </ion-toolbar>
 
@@ -21,9 +18,9 @@
   <ion-toolbar>
     <ion-segment [value]="filtroActivo()" (ionChange)="onFiltro($event)" scrollable>
       @for (filtro of filtros; track filtro.valor) {
-        <ion-segment-button [value]="filtro.valor">
-          <ion-label>{{ filtro.label }}</ion-label>
-        </ion-segment-button>
+      <ion-segment-button [value]="filtro.valor">
+        <ion-label>{{ filtro.label }}</ion-label>
+      </ion-segment-button>
       }
     </ion-segment>
   </ion-toolbar>
@@ -37,114 +34,127 @@
   <!-- Skeletons mientras carga -->
   @if (cargando()) {
     @for (s of getSkeletons(); track $index) {
-      <ion-card>
-        <ion-card-header>
-          <ion-skeleton-text animated style="width: 60%; height: 20px;"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 40%; height: 16px;"></ion-skeleton-text>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-skeleton-text animated style="width: 100%; height: 14px;"></ion-skeleton-text>
-        </ion-card-content>
-      </ion-card>
+    <ion-card>
+      <div class="card-layout">
+        <ion-skeleton-text animated style="width: 90px; height: 90px; border-radius: 12px; flex-shrink: 0;"></ion-skeleton-text>
+        <div class="card-contenido">
+          <ion-skeleton-text animated style="width: 65%; height: 18px; margin-bottom: 8px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 14px; margin-bottom: 12px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 100%; height: 12px;"></ion-skeleton-text>
+        </div>
+      </div>
+    </ion-card>
     }
   }
 
   <!-- Lista de recetas -->
   @if (!cargando()) {
     @if (recetasFiltradas().length === 0) {
-      <div class="empty-state">
+    <div class="empty-state">
+      <div class="empty-state-icon-wrapper">
         <ion-icon name="restaurant-outline"></ion-icon>
-        <p>No hay recetas todavía</p>
-        <ion-button routerLink="/alimentacion/recetas/nueva" fill="outline">
-          Crear primera receta
-        </ion-button>
       </div>
+      <p>No hay recetas todavía</p>
+      <span>Crea tu primera receta y empieza a registrar tus comidas</span>
+      <ion-button routerLink="/alimentacion/recetas/nueva" fill="outline">
+        Crear primera receta
+      </ion-button>
+    </div>
     }
 
     @for (receta of recetasFiltradas(); track receta.id) {
-      <ion-card>
-        <ion-card-header>
+    <ion-card>
+      <div class="card-layout">
+
+        <!-- Imagen cuadrada a la izquierda -->
+        @if (receta.imagen_url) {
+        <div class="card-imagen-wrapper">
+          <img [src]="receta.imagen_url" alt="{{ receta.nombre }}" class="card-imagen" />
+        </div>
+        } @else {
+        <div class="card-sin-imagen">
+          <ion-icon name="restaurant-outline"></ion-icon>
+        </div>
+        }
+
+        <!-- Contenido a la derecha -->
+        <div class="card-contenido">
+
+          <!-- Título + visibilidad -->
           <div class="card-header-row">
             <ion-card-title>{{ receta.nombre }}</ion-card-title>
-            <!-- Pública o privada -->
             <ion-icon
               [name]="receta.visibilidad === 'publica' ? 'globe-outline' : 'lock-closed-outline'"
               [color]="receta.visibilidad === 'publica' ? 'success' : 'medium'">
             </ion-icon>
           </div>
 
+          <!-- Subtítulo -->
           <ion-card-subtitle>
             @if (receta.tiempo_prep_min) {
               <ion-icon name="time-outline"></ion-icon> {{ receta.tiempo_prep_min }} min ·
             }
             {{ receta.raciones }} {{ receta.raciones === 1 ? 'ración' : 'raciones' }}
           </ion-card-subtitle>
-        </ion-card-header>
 
-        <ion-card-content>
           <!-- Macros por ración -->
           <div class="macros-row">
             @let macros = getMacrosPorRacion(receta);
-            <div class="macro">
+            <div class="macro macro-kcal">
               <span class="macro-valor">{{ macros.kcal }}</span>
               <span class="macro-label">kcal</span>
             </div>
-            <div class="macro">
+            <div class="macro macro-prot">
               <span class="macro-valor">{{ macros.prot }}g</span>
               <span class="macro-label">prot</span>
             </div>
-            <div class="macro">
+            <div class="macro macro-carbs">
               <span class="macro-valor">{{ macros.carbs }}g</span>
               <span class="macro-label">carbs</span>
             </div>
-            <div class="macro">
+            <div class="macro macro-grasa">
               <span class="macro-valor">{{ macros.grasa }}g</span>
               <span class="macro-label">grasa</span>
             </div>
           </div>
 
-          <!-- Etiquetas de tipo de comida -->
+          <!-- Etiquetas tipo de comida -->
           @if (receta.tipo_comida?.length) {
-            <div class="chips-row">
-              @for (tipo of receta.tipo_comida; track tipo) {
-                <ion-chip color="primary" outline>
-                  <ion-label>{{ tipo }}</ion-label>
-                </ion-chip>
-              }
-            </div>
+          <div class="chips-row">
+            @for (tipo of receta.tipo_comida; track tipo) {
+            <ion-chip color="primary" outline>
+              <ion-label>{{ tipo }}</ion-label>
+            </ion-chip>
+            }
+          </div>
           }
 
-          <!-- Etiquetas de dieta -->
+          <!-- Etiquetas dieta -->
           @if (receta.etiquetas?.length) {
-            <div class="chips-row">
-              @for (etiqueta of receta.etiquetas; track etiqueta) {
-                <ion-chip color="success" outline>
-                  <ion-label>{{ etiqueta }}</ion-label>
-                </ion-chip>
-              }
-            </div>
+          <div class="chips-row">
+            @for (etiqueta of receta.etiquetas; track etiqueta) {
+            <ion-chip color="success" outline>
+              <ion-label>{{ etiqueta }}</ion-label>
+            </ion-chip>
+            }
+          </div>
           }
 
           <!-- Acciones -->
           <div class="acciones-row">
-            <ion-button
-              fill="clear"
-              size="small"
-              [routerLink]="['/alimentacion/recetas', receta.id]">
+            <ion-button fill="clear" size="small" [routerLink]="['/alimentacion/recetas', receta.id]">
               <ion-icon slot="start" name="eye-outline"></ion-icon>
               Ver
             </ion-button>
-            <ion-button
-              fill="clear"
-              size="small"
-              color="danger"
-              (click)="confirmarEliminar(receta)">
+            <ion-button fill="clear" size="small" color="danger" (click)="confirmarEliminar(receta)">
               <ion-icon slot="start" name="trash-outline"></ion-icon>
               Eliminar
             </ion-button>
           </div>
-        </ion-card-content>
-      </ion-card>
+
+        </div>
+      </div>
+    </ion-card>
     }
   }
 

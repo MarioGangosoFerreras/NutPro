@@ -51,21 +51,21 @@ export const routes: Routes = [
         path: 'alimentacion/recetas',
         loadComponent: () =>
           import('./features/alimentacion/recetas/lista-recetas/lista-recetas').then(
-            (m) => m.ListaRecetasPage,
+            (m) => m.ListaRecetas,
           ),
       },
       {
         path: 'alimentacion/recetas/nueva',
         loadComponent: () =>
           import('./features/alimentacion/recetas/crear-receta/crear-receta').then(
-            (m) => m.CrearRecetaPage,
+            (m) => m.CrearReceta,
           ),
       },
       {
-        path: 'alimentacion/recetas/:id', // 👈 añadir esto
+        path: 'alimentacion/recetas/:id',
         loadComponent: () =>
           import('./features/alimentacion/recetas/detalle-receta/detalle-receta').then(
-            (m) => m.DetalleRecetaPage,
+            (m) => m.DetalleReceta,
           ),
       },
       {

@@ -32,6 +32,11 @@
   <!-- Contenido -->
   <div *ngIf="!cargando() && receta() as r" class="detalle-contenido">
 
+    <!-- Imagen destacada -->
+    <div *ngIf="r.imagen_url" class="imagen-detalle-wrapper">
+      <img [src]="r.imagen_url" alt="{{ r.nombre }}" class="imagen-detalle" />
+    </div>
+
     <!-- Cabecera info general -->
     <div class="cabecera-receta">
       <div class="chips-tipo">

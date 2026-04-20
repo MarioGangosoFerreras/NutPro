@@ -3,7 +3,8 @@ import { SupabaseService } from './supabase';
 
 export interface Ingrediente {
   id?: string;
-  receta_id?: string;  
+  receta_id?: string;
+  imagen_url?: string;
   food_item_id: string;
   cantidad_g: number;
   cantidad_texto?: string;
@@ -47,21 +48,21 @@ export class RecetaService {
 
   // ─── Listar recetas (propias + públicas) ───────────────────────────────────
   async getRecetas(): Promise<Receta[]> {
-  // 1. Comprobamos si hay sesión activa
-  const { data: { session } } = await this.supabase.auth.getSession();
-  console.log('Sesión activa:', session?.user?.email ?? 'SIN SESIÓN');
+    // 1. Comprobamos si hay sesión activa
+    const { data: { session } } = await this.supabase.auth.getSession();
+    console.log('Sesión activa:', session?.user?.email ?? 'SIN SESIÓN');
 
-  const { data, error } = await this.supabase
-    .from('recetas')
-    .select('*')
-    .order('created_at', { ascending: false });
+    const { data, error } = await this.supabase
+      .from('recetas')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error('Error Supabase:', error.code, error.message, error.hint);
-    throw error;
+    if (error) {
+      console.error('Error Supabase:', error.code, error.message, error.hint);
+      throw error;
+    }
+    return data ?? [];
   }
-  return data ?? [];
-}
 
   // ─── Receta por ID con sus ingredientes ────────────────────────────────────
   async getRecetaById(id: string): Promise<Receta> {

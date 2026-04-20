@@ -27,6 +27,39 @@
     </ion-card-header>
     <ion-card-content>
 
+      <!-- Imagen de la receta -->
+      <div class="imagen-upload-wrapper">
+        @if (imagenUrl()) {
+          <div class="imagen-preview-container">
+            <img [src]="imagenUrl()" class="imagen-preview" alt="Imagen de la receta" />
+            <ion-button
+              class="imagen-quitar-btn"
+              fill="solid"
+              color="danger"
+              size="small"
+              (click)="quitarImagen()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </div>
+        } @else {
+          <label class="upload-label" [class.uploading]="subiendoImagen()">
+            @if (subiendoImagen()) {
+              <ion-spinner name="crescent"></ion-spinner>
+              <span>Subiendo imagen...</span>
+            } @else {
+              <ion-icon name="camera-outline"></ion-icon>
+              <span>Añadir foto a la receta</span>
+            }
+            <input
+              type="file"
+              accept="image/*"
+              style="display:none"
+              (change)="onSeleccionarImagen($event)"
+              [disabled]="subiendoImagen()" />
+          </label>
+        }
+      </div>
+
       <ion-item>
         <ion-label position="stacked">Nombre de la receta *</ion-label>
         <ion-input
@@ -128,39 +161,142 @@
     </ion-card-header>
     <ion-card-content>
 
-      <!-- Buscador de alimentos -->
       @if (!foodSeleccionado()) {
-        <ion-searchbar
-          placeholder="Buscar alimento..."
-          [value]="busquedaQuery()"
-          (ionInput)="onBuscarAlimento($event)"
-          [debounce]="0">
-        </ion-searchbar>
 
-        <!-- Spinner mientras busca -->
-        @if (buscando()) {
-          <div class="buscando-spinner">
-            <ion-spinner name="crescent"></ion-spinner>
-            <span>Buscando en base de datos...</span>
+        <!-- Toggle búsqueda / manual -->
+        <div class="modo-toggle">
+          <ion-button
+            [fill]="!modoManual() ? 'solid' : 'outline'"
+            size="small"
+            (click)="modoManual.set(false)">
+            <ion-icon slot="start" name="search-outline"></ion-icon>
+            Buscar
+          </ion-button>
+          <ion-button
+            [fill]="modoManual() ? 'solid' : 'outline'"
+            size="small"
+            (click)="modoManual.set(true)">
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            Añadir manualmente
+          </ion-button>
+        </div>
+
+        <!-- ── MODO BÚSQUEDA ──────────────────────────────────────────────── -->
+        @if (!modoManual()) {
+          <ion-searchbar
+            placeholder="Buscar alimento..."
+            [value]="busquedaQuery()"
+            (ionInput)="onBuscarAlimento($event)"
+            [debounce]="0">
+          </ion-searchbar>
+
+          @if (buscando()) {
+            <div class="buscando-spinner">
+              <ion-spinner name="crescent"></ion-spinner>
+              <span>Buscando en base de datos...</span>
+            </div>
+          }
+
+          @if (resultadosBusqueda().length > 0) {
+            <ion-list>
+              @for (food of resultadosBusqueda(); track food.id) {
+                <ion-item button (click)="seleccionarFood(food)" detail>
+                  <ion-label>
+                    <h3>{{ food.nombre }}</h3>
+                    <p>{{ food.calorias_kcal }} kcal · P: {{ food.proteina_g }}g · C: {{ food.carbohidratos_g }}g · G: {{ food.grasa_g }}g <ion-note>(por 100g)</ion-note></p>
+                  </ion-label>
+                </ion-item>
+              }
+            </ion-list>
+          }
+        }
+
+        <!-- ── MODO MANUAL ────────────────────────────────────────────────── -->
+        @if (modoManual()) {
+          <div class="manual-form">
+            <p class="manual-hint">El alimento se guardará en tu base de datos para usarlo en futuras recetas.</p>
+
+            <ion-item>
+              <ion-label position="stacked">Nombre del alimento *</ion-label>
+              <ion-input
+                placeholder="Ej: Yogur de coco casero"
+                [value]="manualNombre()"
+                (ionInput)="manualNombre.set($event.detail.value ?? '')">
+              </ion-input>
+            </ion-item>
+
+            <p class="manual-hint macros-hint">Valores nutricionales por 100g</p>
+
+            <div class="row-dos-columnas">
+              <ion-item>
+                <ion-label position="stacked">Calorías (kcal)</ion-label>
+                <ion-input
+                  type="number"
+                  [value]="manualCalorias()"
+                  (ionInput)="manualCalorias.set(+($any($event).detail.value ?? 0))"
+                  min="0">
+                </ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-label position="stacked">Proteínas (g)</ion-label>
+                <ion-input
+                  type="number"
+                  [value]="manualProteina()"
+                  (ionInput)="manualProteina.set(+($any($event).detail.value ?? 0))"
+                  min="0">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <div class="row-dos-columnas">
+              <ion-item>
+                <ion-label position="stacked">Carbohidratos (g)</ion-label>
+                <ion-input
+                  type="number"
+                  [value]="manualCarbs()"
+                  (ionInput)="manualCarbs.set(+($any($event).detail.value ?? 0))"
+                  min="0">
+                </ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-label position="stacked">Grasas (g)</ion-label>
+                <ion-input
+                  type="number"
+                  [value]="manualGrasa()"
+                  (ionInput)="manualGrasa.set(+($any($event).detail.value ?? 0))"
+                  min="0">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <ion-item>
+              <ion-label position="stacked">Fibra (g)</ion-label>
+              <ion-input
+                type="number"
+                [value]="manualFibra()"
+                (ionInput)="manualFibra.set(+($any($event).detail.value ?? 0))"
+                min="0">
+              </ion-input>
+            </ion-item>
+
+            <ion-button
+              expand="block"
+              class="ion-margin-top"
+              [disabled]="!manualNombre().trim() || guardandoManual()"
+              (click)="guardarIngredienteManual()">
+              @if (guardandoManual()) {
+                <ion-spinner name="crescent" slot="start"></ion-spinner>
+              } @else {
+                <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+              }
+              Guardar y añadir a la receta
+            </ion-button>
           </div>
         }
 
-        <!-- Resultados de búsqueda -->
-        @if (resultadosBusqueda().length > 0) {
-          <ion-list>
-            @for (food of resultadosBusqueda(); track food.id) {
-              <ion-item button (click)="seleccionarFood(food)" detail>
-                <ion-label>
-                  <h3>{{ food.nombre }}</h3>
-                  <p>{{ food.calorias_kcal }} kcal · P: {{ food.proteina_g }}g · C: {{ food.carbohidratos_g }}g · G: {{ food.grasa_g }}g <ion-note>(por 100g)</ion-note></p>
-                </ion-label>
-              </ion-item>
-            }
-          </ion-list>
-        }
       }
 
-      <!-- Panel de configuración del ingrediente seleccionado -->
+      <!-- ── PANEL CONFIGURAR INGREDIENTE SELECCIONADO ─────────────────── -->
       @if (foodSeleccionado(); as food) {
         <div class="configurar-ingrediente">
           <div class="food-seleccionado-header">
@@ -198,7 +334,6 @@
             <ion-label>Ingrediente opcional</ion-label>
           </ion-item>
 
-          <!-- Preview de macros con esta cantidad -->
           @if (macrosPreview(); as preview) {
             <div class="macros-preview">
               <span>{{ preview.calorias }} kcal</span>
@@ -215,7 +350,7 @@
         </div>
       }
 
-      <!-- Lista de ingredientes añadidos -->
+      <!-- ── LISTA DE INGREDIENTES AÑADIDOS ────────────────────────────── -->
       @if (ingredientes().length > 0) {
         <div class="ingredientes-lista">
           @for (ing of ingredientes(); track ing.food_item_id; let i = $index) {
