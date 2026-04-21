@@ -3,14 +3,48 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonChip, IonSearchbar, IonSpinner, IonList, IonNote, IonCheckbox, IonProgressBar, IonThumbnail } from '@ionic/angular/standalone';
+import {
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonButton,
+  IonIcon,
+  IonTitle,
+  IonContent,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonTextarea,
+  IonSelect,
+  IonSelectOption,
+  IonChip,
+  IonSearchbar,
+  IonSpinner,
+  IonList,
+  IonNote,
+  IonCheckbox,
+  IonProgressBar,
+  IonThumbnail,
+  IonBadge,
+} from '@ionic/angular/standalone';
 import { computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  addOutline, arrowBackOutline, cameraOutline, checkmarkOutline,
-  closeOutline, createOutline, nutritionOutline, removeOutline, searchOutline,
+  addOutline,
+  arrowBackOutline,
+  cameraOutline,
+  checkmarkOutline,
+  closeOutline,
+  createOutline,
+  nutritionOutline,
+  removeOutline,
+  searchOutline,
 } from 'ionicons/icons';
 import { RecetaService } from '../../../../core/services/receta';
 import { FoodItem, FoodService, IngredienteLocal } from '../../../../core/services/food';
@@ -23,13 +57,31 @@ import { CloudinaryService } from '../../../../core/services/cloudinary';
     CommonModule,
     FormsModule,
     RouterModule,
-    IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonTitle,
-    IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-    IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption,
-    IonChip, IonSearchbar, IonSpinner, IonList, IonNote, IonCheckbox,
-    IonProgressBar,
-    IonThumbnail
-],
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonTitle,
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonTextarea,
+    IonSelect,
+    IonSelectOption,
+    IonChip,
+    IonSearchbar,
+    IonSpinner,
+    IonList,
+    IonNote,
+    IonCheckbox,
+    IonBadge,
+  ],
   templateUrl: './crear-receta.html',
 })
 export class CrearReceta {
@@ -70,24 +122,36 @@ export class CrearReceta {
   manualCarbs = signal(0);
   manualGrasa = signal(0);
   manualFibra = signal(0);
-  manualAzucar = signal(0);
   guardandoManual = signal(false);
 
   readonly tiposComida = ['desayuno', 'almuerzo', 'comida', 'merienda', 'cena', 'snack'];
   readonly etiquetas = [
-    'sin_gluten', 'sin_lactosa', 'vegano', 'vegetariano',
-    'bajo_fodmap', 'sin_azucar', 'alto_proteico',
+    'sin_gluten',
+    'sin_lactosa',
+    'vegano',
+    'vegetariano',
+    'bajo_fodmap',
+    'sin_azucar',
+    'alto_proteico',
   ];
 
   macrosTotales = computed(() => {
     const lista = this.ingredientes();
     return {
-      calorias: Math.round(lista.reduce((sum, i) => sum + (i.calorias_kcal * i.cantidad_g) / 100, 0)),
-      proteina: Math.round(lista.reduce((sum, i) => sum + (i.proteina_g * i.cantidad_g) / 100, 0) * 10) / 10,
-      carbohidratos: Math.round(lista.reduce((sum, i) => sum + (i.carbohidratos_g * i.cantidad_g) / 100, 0) * 10) / 10,
-      grasa: Math.round(lista.reduce((sum, i) => sum + (i.grasa_g * i.cantidad_g) / 100, 0) * 10) / 10,
-      fibra: Math.round(lista.reduce((sum, i) => sum + (i.fibra_g * i.cantidad_g) / 100, 0) * 10) / 10,
-      azucar: Math.round(lista.reduce((sum, i) => sum + ((i.azucar_g || 0) * i.cantidad_g) / 100, 0) * 10) / 10,
+      calorias: Math.round(
+        lista.reduce((sum, i) => sum + (i.calorias_kcal * i.cantidad_g) / 100, 0),
+      ),
+      proteina:
+        Math.round(lista.reduce((sum, i) => sum + (i.proteina_g * i.cantidad_g) / 100, 0) * 10) /
+        10,
+      carbohidratos:
+        Math.round(
+          lista.reduce((sum, i) => sum + (i.carbohidratos_g * i.cantidad_g) / 100, 0) * 10,
+        ) / 10,
+      grasa:
+        Math.round(lista.reduce((sum, i) => sum + (i.grasa_g * i.cantidad_g) / 100, 0) * 10) / 10,
+      fibra:
+        Math.round(lista.reduce((sum, i) => sum + (i.fibra_g * i.cantidad_g) / 100, 0) * 10) / 10,
     };
   });
 
@@ -99,12 +163,11 @@ export class CrearReceta {
       proteina: Math.round((total.proteina / r) * 10) / 10,
       carbohidratos: Math.round((total.carbohidratos / r) * 10) / 10,
       grasa: Math.round((total.grasa / r) * 10) / 10,
-      azucar: Math.round((total.azucar / r) * 10) / 10,
     };
   });
 
   formularioValido = computed(
-    () => this.nombre().trim().length >= 2 && this.ingredientes().length > 0
+    () => this.nombre().trim().length >= 2 && this.ingredientes().length > 0,
   );
 
   macrosPreview = computed(() => {
@@ -116,14 +179,20 @@ export class CrearReceta {
       proteina: Math.round(((food.proteina_g * g) / 100) * 10) / 10,
       carbohidratos: Math.round(((food.carbohidratos_g * g) / 100) * 10) / 10,
       grasa: Math.round(((food.grasa_g * g) / 100) * 10) / 10,
-      azucar: Math.round(((food.azucar_g || 0) * g) / 100 * 10) / 10,
     };
   });
 
   constructor() {
     addIcons({
-      closeOutline, addOutline, removeOutline, checkmarkOutline,
-      arrowBackOutline, nutritionOutline, cameraOutline, createOutline, searchOutline,
+      closeOutline,
+      addOutline,
+      removeOutline,
+      checkmarkOutline,
+      arrowBackOutline,
+      nutritionOutline,
+      cameraOutline,
+      createOutline,
+      searchOutline,
     });
   }
 
@@ -165,13 +234,28 @@ export class CrearReceta {
       try {
         this.buscando.set(true);
         const resultados = await this.foodService.buscarAlimentos(query);
-        this.resultadosBusqueda.set(resultados);
+
+        // ORDENAR: Primero los ingredientes de creación propia, luego los externos (Open Food Facts u otros)
+        const ordenados = resultados.sort((a, b) => {
+          const pesoA = a.fuente === 'manual' || a.fuente === 'custom' ? 0 : 1;
+          const pesoB = b.fuente === 'manual' || b.fuente === 'custom' ? 0 : 1;
+          return pesoA - pesoB;
+        });
+
+        this.resultadosBusqueda.set(ordenados);
       } catch {
         await this.mostrarToast('Error buscando alimentos', 'danger');
       } finally {
         this.buscando.set(false);
       }
     }, 400);
+  }
+
+  // Método auxiliar para mostrar la fuente de forma legible en el HTML
+  formatFuente(fuente: string | undefined): string {
+    if (fuente === 'manual' || fuente === 'custom') return 'Base de datos propia';
+    if (fuente === 'off') return 'Open Food Facts';
+    return 'Base de datos'; // Por defecto/caché general
   }
 
   seleccionarFood(food: FoodItem) {
@@ -222,7 +306,6 @@ export class CrearReceta {
         carbohidratos_g: this.manualCarbs(),
         grasa_g: this.manualGrasa(),
         fibra_g: this.manualFibra(),
-        azucar_g: this.manualAzucar(),
       });
       this.seleccionarFood(nuevoFood);
       this.modoManual.set(false);
@@ -242,7 +325,6 @@ export class CrearReceta {
     this.manualCarbs.set(0);
     this.manualGrasa.set(0);
     this.manualFibra.set(0);
-    this.manualAzucar.set(0);
   }
 
   actualizarCantidad(index: number, valor: number) {
@@ -259,13 +341,13 @@ export class CrearReceta {
 
   toggleTipoComida(tipo: string) {
     this.tiposComidaSeleccionados.update((tipos) =>
-      tipos.includes(tipo) ? tipos.filter((t) => t !== tipo) : [...tipos, tipo]
+      tipos.includes(tipo) ? tipos.filter((t) => t !== tipo) : [...tipos, tipo],
     );
   }
 
   toggleEtiqueta(etiqueta: string) {
     this.etiquetasSeleccionadas.update((ets) =>
-      ets.includes(etiqueta) ? ets.filter((e) => e !== etiqueta) : [...ets, etiqueta]
+      ets.includes(etiqueta) ? ets.filter((e) => e !== etiqueta) : [...ets, etiqueta],
     );
   }
 
@@ -295,8 +377,8 @@ export class CrearReceta {
             cantidad_texto: ing.cantidad_texto || undefined,
             es_opcional: ing.es_opcional,
             orden: index,
-          })
-        )
+          }),
+        ),
       );
 
       await loading.dismiss();
@@ -309,7 +391,12 @@ export class CrearReceta {
   }
 
   private async mostrarToast(message: string, color: string) {
-    const toast = await this.toastCtrl.create({ message, duration: 2500, color, position: 'bottom' });
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2500,
+      color,
+      position: 'bottom',
+    });
     await toast.present();
   }
 

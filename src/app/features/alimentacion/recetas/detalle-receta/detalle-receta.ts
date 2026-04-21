@@ -2,17 +2,40 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
-  IonButton, IonIcon, IonChip, IonLabel, IonCard, IonCardContent,
-  IonCardHeader, IonCardTitle, IonSpinner, IonBadge, IonItem,
-  IonList, IonNote, IonAlert,
-  AlertController, ToastController, LoadingController
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButtons,
+  IonButton,
+  IonIcon,
+  IonChip,
+  IonLabel,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonSpinner,
+  IonBadge,
+  IonItem,
+  IonList,
+  IonNote,
+  IonAlert,
+  AlertController,
+  ToastController,
+  LoadingController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  arrowBackOutline, trashOutline, createOutline, timeOutline,
-  restaurantOutline, peopleOutline, nutritionOutline, checkmarkCircleOutline,
-  ellipsisVerticalOutline
+  arrowBackOutline,
+  trashOutline,
+  createOutline,
+  timeOutline,
+  restaurantOutline,
+  peopleOutline,
+  nutritionOutline,
+  checkmarkCircleOutline,
+  ellipsisVerticalOutline,
 } from 'ionicons/icons';
 import { RecetaService, Receta } from '../../../../core/services/receta';
 
@@ -23,11 +46,22 @@ import { RecetaService, Receta } from '../../../../core/services/receta';
   standalone: true,
   imports: [
     CommonModule,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
-    IonButton, IonIcon, IonChip, IonLabel, IonCard, IonCardContent,
-    IonCardHeader, IonCardTitle, IonSpinner, IonBadge, IonItem,
-    IonList, IonNote, IonAlert
-  ]
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonChip,
+    IonLabel,
+    IonCard,
+    IonCardContent,
+    IonCardHeader,
+    IonCardTitle,
+    IonSpinner,
+    IonBadge,
+  ],
 })
 export class DetalleReceta implements OnInit {
   private route = inject(ActivatedRoute);
@@ -56,9 +90,15 @@ export class DetalleReceta implements OnInit {
 
   constructor() {
     addIcons({
-      arrowBackOutline, trashOutline, createOutline, timeOutline,
-      restaurantOutline, peopleOutline, nutritionOutline, checkmarkCircleOutline,
-      ellipsisVerticalOutline
+      arrowBackOutline,
+      trashOutline,
+      createOutline,
+      timeOutline,
+      restaurantOutline,
+      peopleOutline,
+      nutritionOutline,
+      checkmarkCircleOutline,
+      ellipsisVerticalOutline,
     });
   }
 
@@ -94,15 +134,16 @@ export class DetalleReceta implements OnInit {
   async confirmarEliminar() {
     const alert = await this.alertCtrl.create({
       header: 'Eliminar receta',
-      message: '¿Estás seguro de que quieres eliminar esta receta? Esta acción no se puede deshacer.',
+      message:
+        '¿Estás seguro de que quieres eliminar esta receta? Esta acción no se puede deshacer.',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
           role: 'destructive',
-          handler: () => this.eliminarReceta()
-        }
-      ]
+          handler: () => this.eliminarReceta(),
+        },
+      ],
     });
     await alert.present();
   }
@@ -131,11 +172,16 @@ export class DetalleReceta implements OnInit {
 
   // Calcula macros de un ingrediente según cantidad
   calcularMacrosIngrediente(macro: number, cantidad_g: number): number {
-    return Math.round((macro * cantidad_g / 100) * 10) / 10;
+    return Math.round(((macro * cantidad_g) / 100) * 10) / 10;
   }
 
   private async mostrarToast(message: string, color: string) {
-    const toast = await this.toastCtrl.create({ message, duration: 2500, color, position: 'bottom' });
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2500,
+      color,
+      position: 'bottom',
+    });
     await toast.present();
   }
 }

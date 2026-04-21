@@ -2,15 +2,43 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
-  IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
-  IonButton, IonIcon, IonSearchbar, IonChip, IonLabel,
-  IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
-  IonCardContent, IonBadge, IonSkeletonText, IonItem,
-  IonRefresher, IonRefresherContent, IonFab, IonFabButton,
-  IonSegment, IonSegmentButton, ToastController, AlertController
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButtons,
+  IonButton,
+  IonIcon,
+  IonSearchbar,
+  IonChip,
+  IonLabel,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonCardContent,
+  IonBadge,
+  IonSkeletonText,
+  IonItem,
+  IonRefresher,
+  IonRefresherContent,
+  IonFab,
+  IonFabButton,
+  IonSegment,
+  IonSegmentButton,
+  ToastController,
+  AlertController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, trashOutline, eyeOutline, timeOutline, restaurantOutline, lockClosedOutline, globeOutline } from 'ionicons/icons';
+import {
+  add,
+  trashOutline,
+  eyeOutline,
+  timeOutline,
+  restaurantOutline,
+  lockClosedOutline,
+  globeOutline,
+} from 'ionicons/icons';
 import { Receta, RecetaService } from '../../../../core/services/receta';
 
 @Component({
@@ -19,14 +47,29 @@ import { Receta, RecetaService } from '../../../../core/services/receta';
   styleUrls: ['./lista-recetas.css'],
   standalone: true,
   imports: [
-    CommonModule, RouterLink,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
-    IonButton, IonIcon, IonSearchbar, IonChip, IonLabel,
-    IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle,
-    IonCardContent, IonBadge, IonSkeletonText, IonItem,
-    IonRefresher, IonRefresherContent, IonFab, IonFabButton,
-    IonSegment, IonSegmentButton
-  ]
+    CommonModule,
+    RouterLink,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonSearchbar,
+    IonChip,
+    IonLabel,
+    IonCard,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonSkeletonText,
+    IonRefresher,
+    IonRefresherContent,
+    IonFab,
+    IonFabButton,
+    IonSegment,
+    IonSegmentButton,
+  ],
 })
 export class ListaRecetas implements OnInit {
   private recetaService = inject(RecetaService);
@@ -50,7 +93,15 @@ export class ListaRecetas implements OnInit {
   ];
 
   constructor() {
-    addIcons({ add, trashOutline, eyeOutline, timeOutline, restaurantOutline, lockClosedOutline, globeOutline });
+    addIcons({
+      add,
+      trashOutline,
+      eyeOutline,
+      timeOutline,
+      restaurantOutline,
+      lockClosedOutline,
+      globeOutline,
+    });
   }
 
   async ngOnInit() {
@@ -90,16 +141,12 @@ export class ListaRecetas implements OnInit {
 
     // Filtro por tipo de comida
     if (this.filtroActivo() !== 'todas') {
-      resultado = resultado.filter(r =>
-        r.tipo_comida?.includes(this.filtroActivo())
-      );
+      resultado = resultado.filter((r) => r.tipo_comida?.includes(this.filtroActivo()));
     }
 
     // Filtro por búsqueda de texto
     if (this.busqueda()) {
-      resultado = resultado.filter(r =>
-        r.nombre.toLowerCase().includes(this.busqueda())
-      );
+      resultado = resultado.filter((r) => r.nombre.toLowerCase().includes(this.busqueda()));
     }
 
     this.recetasFiltradas.set(resultado);
@@ -114,9 +161,9 @@ export class ListaRecetas implements OnInit {
         {
           text: 'Eliminar',
           role: 'destructive',
-          handler: () => this.eliminarReceta(receta.id)
-        }
-      ]
+          handler: () => this.eliminarReceta(receta.id),
+        },
+      ],
     });
     await alert.present();
   }
@@ -124,7 +171,7 @@ export class ListaRecetas implements OnInit {
   async eliminarReceta(id: string) {
     try {
       await this.recetaService.eliminarReceta(id);
-      this.recetas.update(rs => rs.filter(r => r.id !== id));
+      this.recetas.update((rs) => rs.filter((r) => r.id !== id));
       this.aplicarFiltros();
       await this.mostrarToast('Receta eliminada', 'success');
     } catch {
@@ -133,7 +180,9 @@ export class ListaRecetas implements OnInit {
   }
 
   // Helpers para la UI
-  getSkeletons() { return Array(4); }
+  getSkeletons() {
+    return Array(4);
+  }
 
   getMacrosPorRacion(receta: Receta) {
     return {
@@ -145,7 +194,12 @@ export class ListaRecetas implements OnInit {
   }
 
   private async mostrarToast(message: string, color: string) {
-    const toast = await this.toastCtrl.create({ message, duration: 2000, color, position: 'bottom' });
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom',
+    });
     await toast.present();
   }
 }

@@ -18,7 +18,6 @@ function extraerNutrientesOFF(product: any) {
     carbohidratos_g: nuts['carbohydrates_100g'] || 0,
     grasa_g: nuts['fat_100g'] || 0,
     fibra_g: nuts['fiber_100g'] || 0,
-    azucar_g: nuts['sugars_100g'] || 0,
   };
 }
 
