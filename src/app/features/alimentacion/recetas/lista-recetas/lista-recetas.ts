@@ -40,6 +40,9 @@ import {
   globeOutline,
 } from 'ionicons/icons';
 import { Receta, RecetaService } from '../../../../core/services/receta';
+import { Header } from "../../../../shared/components/header/header";
+import { MenuController } from '@ionic/angular/standalone';
+import { Shell } from '../../../../shared/components/shell/shell';
 
 @Component({
   selector: 'app-lista-recetas',
@@ -69,12 +72,13 @@ import { Receta, RecetaService } from '../../../../core/services/receta';
     IonFabButton,
     IonSegment,
     IonSegmentButton,
-  ],
+],
 })
 export class ListaRecetas implements OnInit {
   private recetaService = inject(RecetaService);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
+  private menuCtrl = inject(MenuController);
 
   recetas = signal<Receta[]>([]);
   recetasFiltradas = signal<Receta[]>([]);
@@ -85,11 +89,9 @@ export class ListaRecetas implements OnInit {
   readonly filtros = [
     { valor: 'todas', label: 'Todas' },
     { valor: 'desayuno', label: 'Desayuno' },
-    { valor: 'almuerzo', label: 'Almuerzo' },
     { valor: 'comida', label: 'Comida' },
-    { valor: 'merienda', label: 'Merienda' },
     { valor: 'cena', label: 'Cena' },
-    { valor: 'snack', label: 'Snack' },
+    { valor: 'snacks', label: 'Snacks' },
   ];
 
   constructor() {
@@ -106,6 +108,22 @@ export class ListaRecetas implements OnInit {
 
   async ngOnInit() {
     await this.cargarRecetas();
+  }
+
+  // Getter para saber si el menú está colapsado (igual que en el Header)
+  get collapsed() {
+    return Shell.isCollapsed();
+  }
+
+  // Función para abrir/cerrar el menú (lógica copiada del Header)
+  toggleMenu() {
+    if (window.innerWidth >= 992) {
+      // Escritorio: Colapsar/Expandir
+      Shell.isCollapsed.set(!Shell.isCollapsed());
+    } else {
+      // Móvil: Abrir/Cerrar menú lateral
+      this.menuCtrl.toggle('main-menu');
+    }
   }
 
   async cargarRecetas() {

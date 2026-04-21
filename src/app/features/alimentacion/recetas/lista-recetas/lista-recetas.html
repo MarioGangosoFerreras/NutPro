@@ -1,6 +1,17 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <div class="hamburger-container" (click)="toggleMenu()">
+        <div class="hamburger" [class.is-active]="!collapsed">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </div>
+      </div>
+    </ion-buttons>
+
     <ion-title>Recetas</ion-title>
+    
     <ion-buttons slot="end">
       <ion-button routerLink="/alimentacion/recetas/nueva">
         <ion-icon slot="icon-only" name="add"></ion-icon>
@@ -18,9 +29,9 @@
   <ion-toolbar>
     <ion-segment [value]="filtroActivo()" (ionChange)="onFiltro($event)" scrollable>
       @for (filtro of filtros; track filtro.valor) {
-      <ion-segment-button [value]="filtro.valor">
-        <ion-label>{{ filtro.label }}</ion-label>
-      </ion-segment-button>
+        <ion-segment-button [value]="filtro.valor">
+          <ion-label>{{ filtro.label }}</ion-label>
+        </ion-segment-button>
       }
     </ion-segment>
   </ion-toolbar>

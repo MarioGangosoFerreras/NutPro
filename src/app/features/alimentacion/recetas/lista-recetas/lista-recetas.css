@@ -199,3 +199,53 @@ ion-card:active { transform: scale(0.985); }
   margin-bottom: 24px;
   display: block;
 }
+
+/* src/app/features/alimentacion/recetas/lista-recetas/lista-recetas.css */
+
+/* Estilos para el botón hamburguesa (copiados de header.css) */
+.hamburger-container {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 8px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.hamburger-container:hover { background: #f0f4f2; }
+
+.hamburger {
+  width: 20px;
+  height: 14px;
+  position: relative;
+}
+
+.hamburger .line {
+  display: block;
+  position: absolute;
+  height: 2px;
+  background: #2d6a4f;
+  border-radius: 2px;
+  left: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+}
+
+.hamburger .line:nth-child(1) { top: 0px; width: 100%; }
+.hamburger .line:nth-child(2) { top: 6px; width: 100%; }
+.hamburger .line:nth-child(3) { top: 12px; width: 100%; }
+
+.hamburger.is-active .line:nth-child(1) {
+  top: 6px;
+  transform: rotate(-45deg);
+  width: 10px;
+}
+.hamburger.is-active .line:nth-child(2) { width: 100%; }
+.hamburger.is-active .line:nth-child(3) {
+  top: 6px;
+  transform: rotate(45deg);
+  width: 10px;
+}

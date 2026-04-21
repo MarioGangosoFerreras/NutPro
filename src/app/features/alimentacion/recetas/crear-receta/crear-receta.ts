@@ -124,7 +124,7 @@ export class CrearReceta {
   manualFibra = signal(0);
   guardandoManual = signal(false);
 
-  readonly tiposComida = ['desayuno', 'almuerzo', 'comida', 'merienda', 'cena', 'snack'];
+  readonly tiposComida = ['desayuno', 'comida', 'cena', 'snacks'];
   readonly etiquetas = [
     'sin_gluten',
     'sin_lactosa',
