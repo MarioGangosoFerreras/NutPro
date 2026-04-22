@@ -29,13 +29,6 @@
   padding: 16px 0;
 }
 
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50vh;
-}
-
 .nutricionista-item {
   --border-radius: 12px;
   margin-bottom: 8px;

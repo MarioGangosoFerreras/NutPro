@@ -17,13 +17,6 @@ ion-list {
   padding: 0 !important;
 }
 
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 60vh;
-}
-
 /* ── Tarjeta paciente ── */
 .paciente-item {
   --background: #ffffff;

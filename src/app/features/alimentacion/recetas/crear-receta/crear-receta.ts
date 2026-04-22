@@ -353,7 +353,11 @@ export class CrearReceta {
 
   async guardarReceta() {
     if (!this.formularioValido()) return;
-    const loading = await this.loadingCtrl.create({ message: 'Guardando receta...' });
+    const loading = await this.loadingCtrl.create({
+      spinner: null, // Quitamos el spinner nativo
+      message: '<div class="avocado-spinner" style="font-size: 40px; margin-bottom: 10px;">🥑</div><br>Guardando receta...',
+      cssClass: 'aguacate-loading-overlay' // Le aplicamos nuestros estilos chulos
+    });
     await loading.present();
     try {
       const receta = await this.recetaService.crearReceta({

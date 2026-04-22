@@ -4,13 +4,6 @@
   --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 40vh;
-}
-
 .mediciones-header {
   display: flex;
   justify-content: space-between;
