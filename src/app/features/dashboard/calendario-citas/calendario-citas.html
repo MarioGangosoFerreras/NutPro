@@ -14,5 +14,12 @@
 </ion-header>
 
 <ion-content color="light">
-  <app-universal-calendar mode="full"></app-universal-calendar>
+  @if (cargandoPagina()) {
+    <div class="loading-container">
+      <div class="avocado-spinner">🥑</div>
+      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px;">Cargando tu agenda...</p>
+    </div>
+  } @else {
+    <app-universal-calendar mode="full"></app-universal-calendar>
+  }
 </ion-content>

@@ -3,19 +3,17 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 import { Header } from '../../../shared/components/header/header';
 import {
-  IonContent, IonList, IonItem, IonLabel, IonButton,
-  IonSpinner, IonBadge, IonAvatar, IonIcon
+  IonContent, IonList, IonItem, IonLabel, IonButton, IonBadge, IonAvatar, IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { banOutline, checkmarkCircleOutline, closeCircleOutline, personCircleOutline, refreshOutline, trashOutline } from 'ionicons/icons';
+import { banOutline, checkmarkCircleOutline, closeCircleOutline, personCircleOutline, refreshOutline } from 'ionicons/icons';
 import { AdminService } from '../../../core/services/admin';
 
 @Component({
   selector: 'app-panel-admin',
   imports: [
     Header,
-    IonContent, IonList, IonItem, IonLabel, IonButton,
-    IonSpinner, IonBadge, IonAvatar, IonIcon
+    IonContent, IonList, IonItem, IonLabel, IonButton, IonBadge, IonAvatar, IonIcon
   ],
   templateUrl: './panel-admin.html',
   styleUrl: './panel-admin.css'

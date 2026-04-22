@@ -60,12 +60,10 @@ import { Shell } from '../../../../shared/components/shell/shell';
     IonButton,
     IonIcon,
     IonSearchbar,
-    IonChip,
     IonLabel,
     IonCard,
     IonCardTitle,
     IonCardSubtitle,
-    IonSkeletonText,
     IonRefresher,
     IonRefresherContent,
     IonFab,
@@ -129,7 +127,13 @@ export class ListaRecetas implements OnInit {
   async cargarRecetas() {
     try {
       this.cargando.set(true);
-      const data = await this.recetaService.getRecetas();
+      
+      // Ejecutamos la petición y el delay (800ms) en paralelo
+      const [data] = await Promise.all([
+        this.recetaService.getRecetas(),
+        new Promise(resolve => setTimeout(resolve, 800))
+      ]);
+      
       this.recetas.set(data);
       this.aplicarFiltros();
     } catch (e) {

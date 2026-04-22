@@ -52,51 +52,51 @@
         </ion-col>
 
         @if (paciente.dni) {
-          <ion-col size="12" size-md="6" size-lg="4">
-            <ion-item class="info-item" lines="none">
-              <ion-icon name="card-outline" slot="start"></ion-icon>
-              <ion-label>
-                <span class="info-label">DNI</span>
-                <span class="info-value">{{ paciente.dni }}</span>
-              </ion-label>
-            </ion-item>
-          </ion-col>
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-item class="info-item" lines="none">
+            <ion-icon name="card-outline" slot="start"></ion-icon>
+            <ion-label>
+              <span class="info-label">DNI</span>
+              <span class="info-value">{{ paciente.dni }}</span>
+            </ion-label>
+          </ion-item>
+        </ion-col>
         }
 
         @if (paciente.ocupacion) {
-          <ion-col size="12" size-md="6" size-lg="4">
-            <ion-item class="info-item" lines="none">
-              <ion-icon name="briefcase-outline" slot="start"></ion-icon>
-              <ion-label>
-                <span class="info-label">Ocupación</span>
-                <span class="info-value">{{ paciente.ocupacion }}</span>
-              </ion-label>
-            </ion-item>
-          </ion-col>
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-item class="info-item" lines="none">
+            <ion-icon name="briefcase-outline" slot="start"></ion-icon>
+            <ion-label>
+              <span class="info-label">Ocupación</span>
+              <span class="info-value">{{ paciente.ocupacion }}</span>
+            </ion-label>
+          </ion-item>
+        </ion-col>
         }
 
         @if (paciente.estado_civil) {
-          <ion-col size="12" size-md="6" size-lg="4">
-            <ion-item class="info-item" lines="none">
-              <ion-icon name="heart-outline" slot="start"></ion-icon>
-              <ion-label>
-                <span class="info-label">Estado civil</span>
-                <span class="info-value">{{ paciente.estado_civil }}</span>
-              </ion-label>
-            </ion-item>
-          </ion-col>
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-item class="info-item" lines="none">
+            <ion-icon name="heart-outline" slot="start"></ion-icon>
+            <ion-label>
+              <span class="info-label">Estado civil</span>
+              <span class="info-value">{{ paciente.estado_civil }}</span>
+            </ion-label>
+          </ion-item>
+        </ion-col>
         }
 
         @if (paciente.nacionalidad) {
-          <ion-col size="12" size-md="6" size-lg="4">
-            <ion-item class="info-item" lines="none">
-              <ion-icon name="flag-outline" slot="start"></ion-icon>
-              <ion-label>
-                <span class="info-label">Nacionalidad</span>
-                <span class="info-value">{{ paciente.nacionalidad }}</span>
-              </ion-label>
-            </ion-item>
-          </ion-col>
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-item class="info-item" lines="none">
+            <ion-icon name="flag-outline" slot="start"></ion-icon>
+            <ion-label>
+              <span class="info-label">Nacionalidad</span>
+              <span class="info-value">{{ paciente.nacionalidad }}</span>
+            </ion-label>
+          </ion-item>
+        </ion-col>
         }
 
       </ion-row>
@@ -115,15 +115,15 @@
 
   <ion-card-content>
     @if (paciente.alergias?.length > 0) {
-      <div class="tags">
-        @for (a of paciente.alergias; track a) {
-          <ion-chip color="danger">
-            <ion-label>{{ a }}</ion-label>
-          </ion-chip>
-        }
-      </div>
+    <div class="tags">
+      @for (a of paciente.alergias; track a) {
+      <ion-chip color="danger">
+        <ion-label>{{ a }}</ion-label>
+      </ion-chip>
+      }
+    </div>
     } @else {
-      <p>No hay alergias registradas</p>
+    <p>No hay alergias registradas</p>
     }
   </ion-card-content>
 </ion-card>
@@ -138,15 +138,15 @@
 
   <ion-card-content>
     @if (paciente.intolerancias?.length > 0) {
-      <div class="tags">
-        @for (i of paciente.intolerancias; track i) {
-          <ion-chip color="warning">
-            <ion-label>{{ i }}</ion-label>
-          </ion-chip>
-        }
-      </div>
+    <div class="tags">
+      @for (i of paciente.intolerancias; track i) {
+      <ion-chip color="warning">
+        <ion-label>{{ i }}</ion-label>
+      </ion-chip>
+      }
+    </div>
     } @else {
-      <p>No hay intolerancias registradas</p>
+    <p>No hay intolerancias registradas</p>
     }
   </ion-card-content>
 </ion-card>

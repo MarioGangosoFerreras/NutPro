@@ -59,7 +59,6 @@ import { RecetaService, Receta } from '../../../../core/services/receta';
     IonCardContent,
     IonCardHeader,
     IonCardTitle,
-    IonSpinner,
     IonBadge,
   ],
 })

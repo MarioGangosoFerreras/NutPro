@@ -59,16 +59,18 @@ export class ListaPacientes implements OnInit {
       const nutricionistaId = await this.authService.getNutricionistaId();
       if (!nutricionistaId) { this.loading.set(false); return; }
 
-      const data = await this.pacientesService.getPacientes(nutricionistaId);
+      // Ejecutamos la petición y el delay en paralelo
+      const [data] = await Promise.all([
+        this.pacientesService.getPacientes(nutricionistaId),
+        new Promise(resolve => setTimeout(resolve, 800))
+      ]);
 
-      Promise.resolve().then(() => {
-        this.pacientes.set(data || []);
-        this.pacientesFiltrados.set(data || []);
-        this.loading.set(false);
-        this.cdr.detectChanges();
-      });
+      this.pacientes.set(data || []);
+      this.pacientesFiltrados.set(data || []);
+      
     } catch (error) {
       console.error('Error cargando:', error);
+    } finally {
       this.loading.set(false);
       this.cdr.detectChanges();
     }

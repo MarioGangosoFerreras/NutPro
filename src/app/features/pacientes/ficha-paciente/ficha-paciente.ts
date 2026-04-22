@@ -34,7 +34,6 @@ import {
     IonContent,
     IonButton,
     IonIcon,
-    IonSpinner,
     IonBadge,
     IonSegment,
     IonSegmentButton,
@@ -85,8 +84,17 @@ export class FichaPaciente implements OnInit {
       this.router.navigate(['/pacientes']);
       return;
     }
+
     try {
-      this.paciente = await this.pacientesService.getPacienteById(id);
+      this.loading = true; // Asegurarnos de que empiece en true
+
+      // Promise.all para garantizar que el aguacate se vea un poco
+      const [data] = await Promise.all([
+        this.pacientesService.getPacienteById(id),
+        new Promise(resolve => setTimeout(resolve, 800))
+      ]);
+
+      this.paciente = data;
     } catch (e) {
       console.error(e);
     } finally {

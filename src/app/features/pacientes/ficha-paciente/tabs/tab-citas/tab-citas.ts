@@ -37,7 +37,6 @@ import { UniversalCalendar } from "../../../../../shared/components/universal-ca
     IonLabel,
     IonIcon,
     IonButton,
-    IonSpinner,
     CitasLista,
     UniversalCalendar
 ],

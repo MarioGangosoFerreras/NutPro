@@ -1,11 +1,6 @@
 <div class="tab-citas">
   <div class="tab-citas__toolbar">
-    <ion-segment
-      value="lista"
-      (ionChange)="onVistaChange($event)"
-      mode="md"
-      class="citas-vista-segment"
-    >
+    <ion-segment value="lista" (ionChange)="onVistaChange($event)" mode="md" class="citas-vista-segment">
       <ion-segment-button value="lista">
         <ion-icon name="list-outline"></ion-icon>
         <ion-label>Lista</ion-label>
@@ -21,29 +16,14 @@
     </ion-button>
   </div>
 
-  @if (cargando) {
-    <div class="citas-loading">
-      <div class="avocado-spinner">🥑</div>
-    </div>
-  }
-
   @if (!cargando && vistaActiva === 'lista') {
-    <app-citas-lista
-      [citas]="citas"
-      (editarCita)="abrirModal($event)"
-      (confirmarCita)="confirmar($event)"
-      (cancelarCita)="cancelar($event)"
-      (eliminarCita)="eliminar($event)"
-    >
-    </app-citas-lista>
+  <app-citas-lista [citas]="citas" (editarCita)="abrirModal($event)" (confirmarCita)="confirmar($event)"
+    (cancelarCita)="cancelar($event)" (eliminarCita)="eliminar($event)">
+  </app-citas-lista>
   }
 
   @if (!cargando && vistaActiva === 'calendario') {
-    <app-universal-calendar
-      mode="patient"
-      [citasInput]="citas"
-      (nuevaCita)="abrirModal()"
-      (editarCita)="abrirModal($event)"
-    ></app-universal-calendar>
+  <app-universal-calendar mode="patient" [citasInput]="citas" (nuevaCita)="abrirModal()"
+    (editarCita)="abrirModal($event)"></app-universal-calendar>
   }
 </div>

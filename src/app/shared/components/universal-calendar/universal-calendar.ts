@@ -33,7 +33,7 @@ interface DiaCal {
 @Component({
   selector: 'app-universal-calendar',
   standalone: true,
-  imports: [CommonModule, IonButton, IonIcon, IonBadge, IonSpinner, CitaCard],
+  imports: [CommonModule, IonButton, IonIcon, IonBadge, CitaCard],
   templateUrl: './universal-calendar.html',
   styleUrls: ['./universal-calendar.css'],
 })
