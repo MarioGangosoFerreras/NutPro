@@ -402,7 +402,7 @@ ion-action-sheet {
   to   { transform: rotate(360deg); }
 }
 
-/* ─── ANIMACIÓN DEL ICONO HAMBURGUESA A FLECHA ─── */
+/* ─── ANIMACIÓN HAMBURGUESA ESCALONADA (De menor a mayor) ─── */
 .hamburger-container {
   width: 40px;
   height: 40px;
@@ -412,7 +412,7 @@ ion-action-sheet {
   cursor: pointer;
   margin-right: 8px;
   border-radius: 50%;
-  transition: background 0.2s ease;
+  transition: background 0.3s ease;
 }
 
 .hamburger-container:hover {
@@ -433,23 +433,23 @@ ion-action-sheet {
   border-radius: 2px;
   left: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: left center;
 }
 
+/* Estado normal (3 líneas del mismo tamaño) */
 .hamburger .line:nth-child(1) { top: 0px; width: 100%; }
 .hamburger .line:nth-child(2) { top: 6px; width: 100%; }
 .hamburger .line:nth-child(3) { top: 12px; width: 100%; }
 
+/* Estado activo: Escalonado (Arriba pequeña, medio media, abajo original) */
 .hamburger.is-active .line:nth-child(1) {
-  top: 6px;
-  transform: rotate(-45deg);
-  width: 10px;
+  width: 10px; /* Pequeña (50% del tamaño original) */
 }
+
 .hamburger.is-active .line:nth-child(2) {
-  width: 100%;
+  width: 15px; /* Media (75% del tamaño original) */
+  background: #40916c; /* Le damos un toque de luz al verde para más dinamismo */
 }
+
 .hamburger.is-active .line:nth-child(3) {
-  top: 6px;
-  transform: rotate(45deg);
-  width: 10px;
+  width: 100%; /* Original (100%) */
 }
