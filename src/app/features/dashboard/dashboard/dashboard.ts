@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef  } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, signal  } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonButton } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
@@ -17,6 +17,7 @@ imports: [CommonModule, IonContent, IonButton, Header, RouterLink, UniversalCale
 })
 export class Dashboard implements OnInit {
   nombreUsuario = '';
+  cargandoPagina = signal(true);
 
   constructor(
     private authService: AuthService,
@@ -32,14 +33,12 @@ export class Dashboard implements OnInit {
     try {
       const usuario = await this.authService.getUsuario();
 
-      if (usuario?.nombre) {
-        this.nombreUsuario = usuario.nombre;
-        return;
-      }
-
-      // Si no hay nombre en la tabla usuarios, usamos el email como fallback
-      const { data } = await this.authService.getSession();
-      this.nombreUsuario = data.session?.user?.email || 'usuario';
+      // Simulamos un pequeño delay de 1 segundo para que los componentes 
+      // hijos tengan tiempo de iniciar sus peticiones en segundo plano
+      setTimeout(() => {
+        this.cargandoPagina.set(false);
+        this.cdr.detectChanges();
+      }, 1000);
 
     } catch (error) {
       const { data } = await this.authService.getSession();

@@ -1,19 +1,26 @@
 <app-header></app-header>
 
 <ion-content class="ion-padding" color="light">
-  <h2>Bienvenido, {{ nombreUsuario }} 👋</h2>
-
-  <app-estadisticas-dashboard/>
-
-  <div class="dashboard-main">
-    <div class="dashboard-main__pacientes">
-      <app-lista-pacientes-preview/>
+  
+  @if (cargandoPagina()) {
+    <div class="loading-container">
+      <div class="avocado-spinner">🥑</div>
+      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px;">
+        Preparando tu panel nutricional...
+      </p>
     </div>
-    <div class="dashboard-main__calendario">
-      <app-universal-calendar
-        mode="dashboard"
-      ></app-universal-calendar>
+  } @else {
+    
+    <app-estadisticas-dashboard/>
+
+    <div class="dashboard-main">
+      <div class="dashboard-main__pacientes">
+        <app-lista-pacientes-preview/>
+      </div>
+      <div class="dashboard-main__calendario">
+        <app-universal-calendar mode="dashboard"></app-universal-calendar>
+      </div>
     </div>
-  </div>
+  }
 
 </ion-content>

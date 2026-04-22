@@ -3,6 +3,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .stat-card {
