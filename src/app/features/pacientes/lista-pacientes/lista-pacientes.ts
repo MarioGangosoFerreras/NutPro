@@ -12,7 +12,6 @@ import { addOutline, personOutline, callOutline, mailOutline, searchOutline } fr
   imports: [
     Header, IonContent, IonList, IonItem, IonLabel, IonButton,
     IonIcon, IonAvatar, IonBadge, IonFab, IonFabButton,
-    IonHeader,
     IonToolbar,
     IonSearchbar
 ],
@@ -30,7 +29,7 @@ export class ListaPacientes implements OnInit {
     private pacientesService: PacientesService,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute,  // 👈
+    private route: ActivatedRoute, 
     private cdr: ChangeDetectorRef,
   ) {
     addIcons({ addOutline, personOutline, callOutline, mailOutline, searchOutline });

@@ -183,3 +183,16 @@ ion-avatar ion-icon { font-size: 36px; color: #2d6a4f; }
 
 .logout-btn { color: #ef4444; }
 .logout-btn:hover { background: #fef2f2; color: #dc2626; }
+
+/* Estilo para el nombre de la marca en el menú */
+.brand-text {
+  font-weight: 800; /* Negrita intensa como en el login */
+}
+
+.nut {
+  color: #a4752b; /* El color naranja/marrón del login */
+}
+
+.pro {
+  color: #738a64; /* El color verde del login */
+}
