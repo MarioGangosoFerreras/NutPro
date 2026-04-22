@@ -68,7 +68,7 @@ export class Shell implements OnInit {
   });
 
   navItems: NavItem[] = [
-    { label: 'Dashboard', icon: 'grid-outline', route: '/dashboard' },
+    { label: 'Inicio', icon: 'grid-outline', route: '/dashboard' },
     { label: 'Pacientes', icon: 'people-outline', route: '/pacientes' },
     { label: 'Citas', icon: 'calendar-outline', route: '/citas' },
     { label: 'Recetas', icon: 'restaurant-outline', route: '/alimentacion/recetas'},

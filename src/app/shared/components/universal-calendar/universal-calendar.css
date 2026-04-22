@@ -115,7 +115,7 @@ ion-button[fill="clear"]:hover {
 
 /* ── MODO PANTALLA COMPLETA (FULL) ── */
 .ucal--full {
-  height: 100%;
+  min-height: 100%; /* Cambiamos height: 100% por min-height */
   border-radius: 0;
   box-shadow: none;
   border: none;

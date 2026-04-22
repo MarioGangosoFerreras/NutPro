@@ -1,9 +1,7 @@
 :host {
-  height: 100%;
   display: block;
 }
 
 app-universal-calendar {
-  height: 100%;
   display: block;
 }
