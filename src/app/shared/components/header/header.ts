@@ -1,32 +1,29 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, inject, Input } from '@angular/core'; // Añadido Input
 import { AuthService } from '../../../core/services/auth';
 import {
   IonHeader, IonToolbar, IonButton, IonIcon,
-  IonSearchbar, IonAvatar, IonBadge, IonButtons, MenuController
+  IonAvatar, IonBadge, IonButtons, MenuController, IonTitle // Añadido IonTitle
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { notificationsOutline, personCircleOutline } from 'ionicons/icons';
 import { Shell } from '../shell/shell';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [FormsModule, IonHeader, IonToolbar, IonButton, IonIcon, IonSearchbar, IonAvatar, IonBadge, IonButtons],
+  imports: [CommonModule, IonHeader, IonToolbar, IonButton, IonIcon, IonAvatar, IonBadge, IonButtons, IonTitle],
   templateUrl: './header.html',
   styleUrl: './header.css'
 })
 export class Header implements OnInit {
-  searchQuery = '';
+  @Input() titulo: string = ''; // 👈 Nuevo Input para el nombre de la pantalla
   avatarUrl: string | null = null;
   notificaciones = 0;
 
   private menuCtrl = inject(MenuController);
   private authService = inject(AuthService);
-  private router = inject(Router);
 
-  // Leemos el estado desde el Shell
   get collapsed() {
     return Shell.isCollapsed();
   }
@@ -42,19 +39,9 @@ export class Header implements OnInit {
 
   toggleMenu() {
     if (window.innerWidth >= 992) {
-      // Escritorio: Animamos el ancho
       Shell.isCollapsed.set(!Shell.isCollapsed());
     } else {
-      // Móvil: Abrimos/cerramos el menú lateral normal
       this.menuCtrl.toggle('main-menu');
-    }
-  }
-
-  buscarPaciente() {
-    if (this.searchQuery.trim()) {
-      this.router.navigate(['/pacientes'], {
-        queryParams: { q: this.searchQuery }
-      });
     }
   }
 }

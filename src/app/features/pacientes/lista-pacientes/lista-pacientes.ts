@@ -3,10 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PacientesService } from '../../../core/services/pacientes';
 import { AuthService } from '../../../core/services/auth';
 import { Header } from '../../../shared/components/header/header';
-import {
-  IonContent, IonList, IonItem, IonLabel, IonButton,
-  IonIcon, IonSpinner, IonAvatar, IonBadge, IonFab, IonFabButton,
-} from '@ionic/angular/standalone';
+import { IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonSpinner, IonAvatar, IonBadge, IonFab, IonFabButton, IonHeader, IonToolbar, IonSearchbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline, personOutline, callOutline, mailOutline, searchOutline } from 'ionicons/icons';
 
@@ -15,7 +12,10 @@ import { addOutline, personOutline, callOutline, mailOutline, searchOutline } fr
   imports: [
     Header, IonContent, IonList, IonItem, IonLabel, IonButton,
     IonIcon, IonAvatar, IonBadge, IonFab, IonFabButton,
-  ],
+    IonHeader,
+    IonToolbar,
+    IonSearchbar
+],
   templateUrl: './lista-pacientes.html',
   styleUrl: './lista-pacientes.css',
 })
@@ -74,6 +74,13 @@ export class ListaPacientes implements OnInit {
       this.loading.set(false);
       this.cdr.detectChanges();
     }
+  }
+
+  // Nuevo método para que el searchbar filtre en tiempo real
+  onBusqueda(event: any) {
+    const query = event.detail.value ?? '';
+    this.busquedaActiva.set(query);
+    this.aplicarFiltro(query);
   }
 
   private aplicarFiltro(query: string) {

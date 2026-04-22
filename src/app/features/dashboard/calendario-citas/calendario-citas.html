@@ -1,17 +1,4 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <div class="hamburger-container" (click)="toggleMenu()">
-        <div class="hamburger" [class.is-active]="!collapsed">
-          <span class="line"></span>
-          <span class="line"></span>
-          <span class="line"></span>
-        </div>
-      </div>
-    </ion-buttons>
-    <ion-title>Calendario</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header titulo="Agenda de Citas"></app-header>
 
 <ion-content color="light">
   @if (cargandoPagina()) {

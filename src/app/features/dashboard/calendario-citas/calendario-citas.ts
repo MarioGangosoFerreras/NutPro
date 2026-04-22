@@ -3,11 +3,12 @@ import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton } fr
 import { MenuController } from '@ionic/angular/standalone';
 import { UniversalCalendar } from "../../../shared/components/universal-calendar/universal-calendar";
 import { Shell } from '../../../shared/components/shell/shell';
+import { Header } from "../../../shared/components/header/header";
 
 @Component({
   selector: 'app-calendario-citas',
   standalone: true,
-  imports: [IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, UniversalCalendar],
+  imports: [IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, UniversalCalendar, Header],
   templateUrl: './calendario-citas.html',
 })
 export class CalendarioCitas implements OnInit {

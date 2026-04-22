@@ -1,43 +1,26 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <div class="hamburger-container" (click)="toggleMenu()">
-        <div class="hamburger" [class.is-active]="!collapsed">
-          <span class="line"></span>
-          <span class="line"></span>
-          <span class="line"></span>
-        </div>
-      </div>
-    </ion-buttons>
-
-    <ion-title>Recetas</ion-title>
-    
-    <ion-buttons slot="end">
-      <ion-button routerLink="/alimentacion/recetas/nueva">
-        <ion-icon slot="icon-only" name="add"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-
-  <!-- Buscador -->
-  <ion-toolbar>
-    <ion-searchbar placeholder="Buscar receta..." (ionInput)="onBusqueda($event)" [debounce]="300">
-    </ion-searchbar>
-  </ion-toolbar>
-
-  <!-- Filtros por tipo de comida -->
-  <ion-toolbar>
-    <ion-segment [value]="filtroActivo()" (ionChange)="onFiltro($event)" scrollable>
-      @for (filtro of filtros; track filtro.valor) {
-        <ion-segment-button [value]="filtro.valor">
-          <ion-label>{{ filtro.label }}</ion-label>
-        </ion-segment-button>
-      }
-    </ion-segment>
-  </ion-toolbar>
-</ion-header>
+<app-header titulo="Recetas"></app-header> 
 
 <ion-content>
+  <div style="position: sticky; top: 0; z-index: 100; background: white; border-bottom: 0.5px solid var(--ion-border-color);">
+    <ion-toolbar>
+      <ion-searchbar 
+        placeholder="Buscar receta..." 
+        (ionInput)="onBusqueda($event)" 
+        [debounce]="300">
+      </ion-searchbar>
+    </ion-toolbar>
+
+    <ion-toolbar>
+      <ion-segment [value]="filtroActivo()" (ionChange)="onFiltro($event)" scrollable>
+        @for (filtro of filtros; track filtro.valor) {
+          <ion-segment-button [value]="filtro.valor">
+            <ion-label>{{ filtro.label }}</ion-label>
+          </ion-segment-button>
+        }
+      </ion-segment>
+    </ion-toolbar>
+  </div>
+
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -50,6 +33,7 @@
       </p>
     </div>
   } @else {
+    
     @if (recetasFiltradas().length === 0) {
       <div class="empty-state">
         <div class="empty-state-icon-wrapper">

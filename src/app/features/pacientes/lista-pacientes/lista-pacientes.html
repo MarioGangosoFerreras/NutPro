@@ -1,4 +1,14 @@
-<app-header></app-header>
+<app-header titulo="Mis Pacientes"></app-header>
+
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-searchbar 
+      placeholder="Buscar paciente..." 
+      (ionInput)="onBusqueda($event)" 
+      [debounce]="300">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
 
 <ion-content class="ion-padding" color="light">
   @if (loading()) {

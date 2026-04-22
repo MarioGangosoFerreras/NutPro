@@ -70,6 +70,7 @@ import { Shell } from '../../../../shared/components/shell/shell';
     IonFabButton,
     IonSegment,
     IonSegmentButton,
+    Header
 ],
 })
 export class ListaRecetas implements OnInit {

@@ -11,15 +11,7 @@
       </div>
     </ion-buttons>
 
-    <ion-searchbar
-      slot="start"
-      class="header-search"
-      placeholder="Buscar paciente..."
-      [(ngModel)]="searchQuery"
-      (keyup.enter)="buscarPaciente()"
-      animated
-    >
-    </ion-searchbar>
+    <ion-title>{{ titulo }}</ion-title>
 
     <div class="header-actions" slot="end">
       <ion-button fill="clear" class="action-btn">

@@ -1,4 +1,3 @@
-/* ─── ANIMACIÓN DEL ICONO HAMBURGUESA A FLECHA ─── */
 .hamburger-container {
   width: 40px;
   height: 40px;
@@ -8,11 +7,7 @@
   cursor: pointer;
   margin-right: 8px;
   border-radius: 50%;
-  transition: background 0.2s ease;
-}
-
-.hamburger-container:hover {
-  background: #f0f4f2;
+  transition: background 0.3s ease;
 }
 
 .hamburger {
@@ -29,26 +24,13 @@
   border-radius: 2px;
   left: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: left center; /* El eje de rotación se queda a la izquierda */
 }
 
-/* Posiciones iniciales (Hamburguesa normal) */
 .hamburger .line:nth-child(1) { top: 0px; width: 100%; }
 .hamburger .line:nth-child(2) { top: 6px; width: 100%; }
 .hamburger .line:nth-child(3) { top: 12px; width: 100%; }
 
-/* Animación a "Flecha izquierda" cuando el menú está desplegado */
-.hamburger.is-active .line:nth-child(1) {
-  top: 6px; /* Baja al nivel de la línea central */
-  transform: rotate(-45deg);
-  width: 10px; /* Se acorta para formar la punta de arriba */
-}
-.hamburger.is-active .line:nth-child(2) {
-  /* La línea central se queda como el 'palo' de la flecha */
-  width: 100%; 
-}
-.hamburger.is-active .line:nth-child(3) {
-  top: 6px; /* Sube al nivel de la línea central */
-  transform: rotate(45deg);
-  width: 10px; /* Se acorta para formar la punta de abajo */
-}
+/* Estado escalonado */
+.hamburger.is-active .line:nth-child(1) { width: 10px; }
+.hamburger.is-active .line:nth-child(2) { width: 15px; background: #40916c; }
+.hamburger.is-active .line:nth-child(3) { width: 100%; }
