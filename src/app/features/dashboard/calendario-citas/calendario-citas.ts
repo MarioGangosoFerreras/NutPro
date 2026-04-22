@@ -8,7 +8,7 @@ import { Header } from "../../../shared/components/header/header";
 @Component({
   selector: 'app-calendario-citas',
   standalone: true,
-  imports: [IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, UniversalCalendar, Header],
+  imports: [IonContent, UniversalCalendar, Header],
   templateUrl: './calendario-citas.html',
 })
 export class CalendarioCitas implements OnInit {
