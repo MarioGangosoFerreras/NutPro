@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PacientesService } from '../../../core/services/pacientes';
 import { FichaClinicaService } from '../../../core/services/ficha-clinica';
@@ -8,9 +8,11 @@ import { TabResumen } from './tabs/tab-resumen/tab-resumen';
 import { TabClinica } from './tabs/tab-clinica/tab-clinica';
 import { TabAlimentacion } from './tabs/tab-alimentacion/tab-alimentacion';
 import { TabMediciones } from './tabs/tab-mediciones/tab-mediciones';
-import { IonContent, IonButton, IonIcon, IonSpinner, IonBadge, IonSegment, IonSegmentButton, IonLabel, ToastController, AlertController, IonCard, IonCardContent, IonAvatar, IonItem } from '@ionic/angular/standalone';
+import { TabPlan } from './tabs/tab-plan/tab-plan';
+import { IonContent, IonButton, IonIcon, IonBadge, IonSegment, IonSegmentButton, IonLabel, ToastController, AlertController, IonCard, IonCardContent, IonAvatar, IonItem } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { TabCitas } from './tabs/tab-citas/tab-citas';
+import { SupabaseService } from '../../../core/services/supabase';
 import {
   arrowBackOutline,
   personCircleOutline,
@@ -20,7 +22,9 @@ import {
   createOutline,
   trashOutline,
   calendarOutline,
+  nutritionOutline,
 } from 'ionicons/icons';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-ficha-paciente',
@@ -30,6 +34,7 @@ import {
     TabClinica,
     TabAlimentacion,
     TabMediciones,
+    TabPlan,
     TabCitas,
     IonContent,
     IonButton,
@@ -50,6 +55,9 @@ export class FichaPaciente implements OnInit {
   paciente: any = null;
   loading = true;
   tabActiva = 'resumen';
+  private authService = inject(AuthService);
+  private supabaseService = inject(SupabaseService);
+  private supabase = this.supabaseService.client;
 
   menuAbierto = false;
 
@@ -75,6 +83,7 @@ export class FichaPaciente implements OnInit {
       scaleOutline,
       createOutline,
       trashOutline,
+      nutritionOutline
     });
   }
 
@@ -153,5 +162,71 @@ export class FichaPaciente implements OnInit {
       position: 'bottom',
     });
     await toast.present();
+  }
+
+  // 1. Obtener o crear el menú base para un plan
+  async getOrCreateMenuParaPlan(planId: string, pacienteId: string) {
+    // Buscar si ya existe un menú para este plan
+    let { data: menu, error } = await this.supabase
+      .from('menus_semanales')
+      .select('*')
+      .eq('plan_id', planId)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    // Si no existe, lo creamos
+    if (!menu) {
+      const nutricionistaId = await this.authService.getNutricionistaId();
+      const { data: nuevoMenu, error: insertError } = await this.supabase
+        .from('menus_semanales')
+        .insert({
+          plan_id: planId,
+          paciente_id: pacienteId,
+          nutricionista_id: nutricionistaId,
+          semana_inicio: new Date().toISOString().split('T')[0],
+          titulo: 'Menú Semanal del Plan'
+        })
+        .select()
+        .single();
+        
+      if (insertError) throw insertError;
+      menu = nuevoMenu;
+    }
+
+    return menu;
+  }
+
+  // 2. Obtener las recetas guardadas en el menú
+  async getEntradasMenu(menuId: string) {
+    const { data, error } = await this.supabase
+      .from('menu_entradas')
+      .select('*, receta:recetas(id, titulo)') // Hacemos join con recetas
+      .eq('menu_id', menuId);
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  // 3. Añadir una receta a un día/comida
+  async addEntradaMenu(entrada: any) {
+    const { data, error } = await this.supabase
+      .from('menu_entradas')
+      .insert(entrada)
+      .select('*, receta:recetas(id, titulo)')
+      .single();
+      
+    if (error) throw error;
+    return data;
+  }
+
+  // 4. Eliminar una receta del menú
+  async deleteEntradaMenu(id: string) {
+    const { error } = await this.supabase
+      .from('menu_entradas')
+      .delete()
+      .eq('id', id);
+      
+    if (error) throw error;
   }
 }

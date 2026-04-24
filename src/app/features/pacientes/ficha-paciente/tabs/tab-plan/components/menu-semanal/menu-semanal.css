@@ -1,0 +1,119 @@
+.menu-grid {
+  display: grid;
+  /* Grid responsivo: 1 columna en móvil, 2 en tablet, 3-4 en PC grande */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding-bottom: 20px;
+}
+
+.dia-card {
+  margin: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  background: white;
+}
+
+.dia-header {
+  background: var(--primary-medical, #2d6a4f);
+  padding: 12px 16px;
+  color: white;
+}
+
+.dia-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dia-content {
+  padding: 8px 16px 16px !important;
+}
+
+.comida-seccion {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 8px 0;
+}
+.comida-seccion:last-child {
+  border-bottom: none;
+}
+
+.comida-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comida-titulo {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.btn-add {
+  --padding-start: 4px;
+  --padding-end: 4px;
+  margin: 0;
+  height: 24px;
+}
+
+.comida-entradas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: #cbd5e1;
+  margin: 0;
+  font-style: italic;
+}
+
+.entrada-item {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  gap: 8px;
+}
+
+.entrada-icon {
+  color: var(--primary-medical, #2d6a4f);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.entrada-titulo {
+  font-size: 13px;
+  color: #334155;
+  font-weight: 500;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 16px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.btn-delete:hover {
+  opacity: 1;
+}

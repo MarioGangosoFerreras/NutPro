@@ -83,6 +83,11 @@
         <ion-label>Mediciones</ion-label>
       </ion-segment-button>
 
+      <ion-segment-button value="plan">
+        <ion-icon name="nutrition-outline"></ion-icon>
+        <ion-label>Plan</ion-label>
+      </ion-segment-button>
+
       <ion-segment-button value="citas">
         <ion-icon name="calendar-outline"></ion-icon>
         <ion-label>Citas</ion-label>
@@ -106,6 +111,10 @@
 
     @if (tabActiva === 'mediciones') {
     <app-tab-mediciones [paciente]="paciente"></app-tab-mediciones>
+    }
+
+    @if (tabActiva === 'plan') {
+    <app-tab-plan [paciente]="paciente"></app-tab-plan>
     }
 
     @if (tabActiva === 'citas') {

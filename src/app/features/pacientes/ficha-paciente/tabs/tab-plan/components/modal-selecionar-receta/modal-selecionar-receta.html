@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Seleccionar Receta</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar placeholder="Buscar receta..." (ionInput)="buscar($event)" [debounce]="250"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (cargando) {
+    <div style="display: flex; justify-content: center; padding: 40px;">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else {
+    @if (recetasFiltradas.length === 0) {
+      <div style="text-align: center; padding: 30px; color: gray;">
+        <p>No se encontraron recetas.</p>
+      </div>
+    }
+    
+    <ion-list>
+      @for (receta of recetasFiltradas; track receta.id) {
+        <ion-item button (click)="seleccionar(receta)">
+          <ion-label>
+            <h3>{{ receta.nombre }}</h3>
+            <p>{{ receta.calorias_kcal || 0 }} kcal</p>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>
