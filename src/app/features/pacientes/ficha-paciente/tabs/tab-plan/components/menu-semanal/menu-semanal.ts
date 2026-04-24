@@ -33,8 +33,8 @@ export class MenuSemanalComponent implements OnInit {
   // Basado en tu enum 'tipo_comida'
   tiposComida = [
     { id: 'desayuno', label: 'Desayuno' },
-    { id: 'almuerzo', label: 'Almuerzo' },
-    { id: 'snack', label: 'Snack' },
+    { id: 'comida', label: 'Comida' },
+    { id: 'snack', label: 'Snacks' },
     { id: 'cena', label: 'Cena' }
   ];
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core'; // <-- 1. Importar ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonSearchbar, IonList, IonItem, IonLabel, IonSpinner, ModalController } from '@ionic/angular/standalone';
@@ -15,6 +15,7 @@ import { closeOutline } from 'ionicons/icons';
 export class ModalSeleccionarReceta implements OnInit {
   private recetaService = inject(RecetaService);
   private modalCtrl = inject(ModalController);
+  private cdr = inject(ChangeDetectorRef); // <-- 2. Inyectar ChangeDetectorRef
   
   recetas: any[] = [];
   recetasFiltradas: any[] = [];
@@ -32,6 +33,7 @@ export class ModalSeleccionarReceta implements OnInit {
       console.error('Error cargando recetas:', e);
     } finally {
       this.cargando = false;
+      this.cdr.detectChanges(); // <-- 3. Forzar actualización de la vista al quitar el spinner
     }
   }
 
@@ -40,6 +42,7 @@ export class ModalSeleccionarReceta implements OnInit {
     this.recetasFiltradas = this.recetas.filter(r => 
       r.nombre?.toLowerCase().includes(query)
     );
+    this.cdr.detectChanges(); // <-- Opcional, pero asegura la fluidez al buscar
   }
 
   seleccionar(receta: any) {
