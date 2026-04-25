@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
+  IonButton,
   IonContent, IonItem, IonLabel, IonInput, IonSelect,
   IonSelectOption, IonTextarea, IonSpinner,
   ModalController, IonSearchbar, IonList, IonAvatar, IonIcon
@@ -16,8 +16,7 @@ import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionico
   selector: 'app-modal-cita',
   standalone: true,
   imports: [
-    CommonModule, FormsModule,
-    IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
+    CommonModule, FormsModule, IonButton,
     IonContent, IonItem, IonLabel, IonInput, IonSelect,
     IonSelectOption, IonTextarea, IonSpinner,
     IonSearchbar, IonList, IonAvatar, IonIcon

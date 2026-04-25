@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectorRef, ViewCh
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router'; // <-- Añadido RouterLink
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonFooter, IonItem, IonInput, IonButton, IonIcon, IonButtons, IonBackButton, IonAvatar } from '@ionic/angular/standalone'; // <-- Añadido IonAvatar
+import { IonHeader, IonToolbar, IonContent, IonFooter, IonInput, IonButton, IonIcon, IonButtons, IonBackButton, IonAvatar } from '@ionic/angular/standalone'; // <-- Añadido IonAvatar
 import { addIcons } from 'ionicons';
 import { sendOutline, personCircleOutline } from 'ionicons/icons'; // <-- Añadido icono
 import { ChatService, Mensaje } from '../../../core/services/chat';
@@ -12,7 +12,7 @@ import { PacientesService } from '../../../core/services/pacientes'; // <-- Aña
 @Component({
   selector: 'app-chat-paciente',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonFooter, IonItem, IonInput, IonButton, IonIcon, IonButtons, IonBackButton, IonAvatar, RouterLink], // <-- Añadidos al array
+  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonContent, IonFooter, IonInput, IonButton, IonIcon, IonButtons, IonBackButton, IonAvatar, RouterLink], // <-- Añadidos al array
   templateUrl: './chat-paciente.html',
   styleUrls: ['./chat-paciente.css']
 })
