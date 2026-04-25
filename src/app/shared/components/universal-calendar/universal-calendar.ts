@@ -245,11 +245,8 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     return { pendiente: 'warning', confirmada: 'success', cancelada: 'danger' }[estado] ?? 'medium';
   }
 
-  // ... busca el getter al final del archivo y cámbialo por este:
   get mostrarBotonNueva() { 
-    // Ahora solo devolvemos true si el modo es 'patient'
-    // En 'full' (menú lateral) y 'dashboard' ya no aparecerá
-    return this.mode === 'patient'; 
+    return this.mode === 'patient' || this.mode === 'full';
   }
 
   // El panel de detalle de cita usa CitaCard en 'patient', filas simples en el resto

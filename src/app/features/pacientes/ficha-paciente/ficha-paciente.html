@@ -52,11 +52,20 @@
           <h1>{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</h1>
           <p class="email-text">{{ paciente.usuario?.email }}</p>
 
-          @if (paciente.motivo_consulta) {
-          <ion-badge color="primary" class="badge-motivo">
-            {{ paciente.motivo_consulta }}
-          </ion-badge>
-          }
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+            <ion-button size="small" fill="outline" color="primary" 
+                        [routerLink]="['/pacientes', paciente.id, 'chat']"
+                        style="margin: 0;">
+              <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
+              Chat directo
+            </ion-button>
+
+            @if (paciente.motivo_consulta) {
+            <ion-badge color="primary" class="badge-motivo" style="margin: 0;">
+              {{ paciente.motivo_consulta }}
+            </ion-badge>
+            }
+          </div>
         </ion-label>
       </ion-item>
     </ion-card>

@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { PacientesService } from '../../../core/services/pacientes';
 import { FichaClinicaService } from '../../../core/services/ficha-clinica';
 import { CloudinaryService } from '../../../core/services/cloudinary';
@@ -23,6 +24,7 @@ import {
   trashOutline,
   calendarOutline,
   nutritionOutline,
+  chatbubblesOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 
@@ -45,7 +47,8 @@ import { AuthService } from '../../../core/services/auth';
     IonLabel,
     IonCard,
     IonAvatar,
-    IonItem
+    IonItem,
+    RouterLink
   ],
   templateUrl: './ficha-paciente.html',
   styleUrls: ['./ficha-paciente.css'],
@@ -83,7 +86,9 @@ export class FichaPaciente implements OnInit {
       scaleOutline,
       createOutline,
       trashOutline,
-      nutritionOutline
+      nutritionOutline,
+      calendarOutline,
+      chatbubblesOutline,
     });
   }
 

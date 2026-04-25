@@ -31,7 +31,7 @@ export class ChatService {
         .insert({ nutricionista_id: nutricionistaId, paciente_id: pacienteId })
         .select()
         .single();
-      
+
       if (insertError) throw insertError;
       chat = nuevoChat;
     }
@@ -76,31 +76,31 @@ export class ChatService {
       )
       .subscribe();
   }
-  
-  async getChatsNutricionista(nutricionistaId: string) {
-  const { data, error } = await this.supabase
-    .from('chats')
-    .select(`
-      id,
-      paciente:paciente_id (
-        id,
-        usuario:usuario_id (
-          nombre,
-          apellidos,
-          avatar_url
-        )
-      ),
-      ultimo_mensaje:mensajes (
-        contenido,
-        enviado_at,
-        leido
-      )
-    `)
-    .eq('nutricionista_id', nutricionistaId)
-    .order('created_at', { foreignTable: 'mensajes', ascending: false })
-    .limit(1, { foreignTable: 'mensajes' });
 
-  if (error) throw error;
-  return data;
-}
+  async getChatsNutricionista(nutricionistaId: string) {
+    const { data, error } = await this.supabase
+      .from('chats')
+      .select(`
+        id,
+        paciente:paciente_id (
+          id,
+          usuario:usuario_id (
+            nombre,
+            apellidos,
+            avatar_url
+          )
+        ),
+        ultimo_mensaje:mensajes (
+          contenido,
+          enviado_at,
+          leido
+        )
+      `)
+      .eq('nutricionista_id', nutricionistaId)
+      .order('enviado_at', { referencedTable: 'mensajes', ascending: false })
+      .limit(1, { referencedTable: 'mensajes' });
+
+    if (error) throw error;
+    return data;
+  }
 }

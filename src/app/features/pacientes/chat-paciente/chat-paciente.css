@@ -1,71 +1,155 @@
-.chat-content {
-  --background: #f8fafc;
+/* ─── CABECERA DEL CHAT ─── */
+.chat-header ion-toolbar {
+  --padding-top: 4px;
+  --padding-bottom: 4px;
 }
 
+.header-paciente {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: opacity 0.2s;
+}
+
+.header-paciente:active {
+  opacity: 0.6;
+}
+
+.header-avatar {
+  width: 40px;
+  height: 40px;
+  background: #e8f5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-placeholder {
+  font-size: 40px;
+  color: #2d6a4f;
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.header-nombre {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.header-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ─── FONDO DEL CHAT (Estilo WhatsApp) ─── */
+.chat-content {
+  --background: #efeae2; /* Un tono beige/gris muy sutil */
+}
+
+/* ─── CONTENEDOR DE MENSAJES (Con más márgenes) ─── */
 .mensajes-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-bottom: 20px;
+  gap: 12px; /* Más separación entre mensajes */
+  padding: 16px 14px 30px 14px; /* Más espacio a los lados y abajo */
 }
 
+/* ─── BURBUJAS DE MENSAJE ─── */
 .mensaje-bubble {
-  max-width: 75%;
-  padding: 10px 14px;
-  border-radius: 16px;
+  max-width: 85%; /* Las hacemos un pelín más anchas */
+  padding: 8px 12px 22px 12px; /* Dejamos un hueco abajo para la hora */
+  border-radius: 12px;
   position: relative;
   word-wrap: break-word;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  display: inline-block;
 }
 
 .mensaje-bubble p {
-  margin: 0 0 4px 0;
-  font-size: 14px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #111b21; /* Texto oscuro para máxima legibilidad */
 }
 
+/* La hora abajo a la derecha */
 .mensaje-bubble .hora {
-  font-size: 10px;
-  opacity: 0.7;
-  display: block;
-  text-align: right;
+  font-size: 11px;
+  color: #667781;
+  position: absolute;
+  bottom: 4px;
+  right: 10px;
+  white-space: nowrap;
 }
 
-/* Mensajes del otro (Izquierda, blanco/gris) */
+/* Mensajes del PACIENTE (Izquierda, fondo blanco) */
 .mensaje-bubble:not(.mio) {
   align-self: flex-start;
   background: #ffffff;
-  color: #334155;
-  border-bottom-left-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  border: 1px solid #e2e8f0;
+  border-top-left-radius: 0; /* El "piquito" característico de WhatsApp */
 }
 
-/* Mis mensajes (Derecha, verde NutPro) */
+/* Mensajes MÍOS - Nutricionista (Derecha, fondo verde claro) */
 .mensaje-bubble.mio {
   align-self: flex-end;
-  background: var(--np-green-400, #1DB954);
-  color: #ffffff;
-  border-bottom-right-radius: 4px;
+  background: #dcf8c6; /* Verde clásico de chat */
+  border-top-right-radius: 0; /* El "piquito" a la derecha */
 }
 
+/* Para la hora en mis mensajes, a veces necesita un color ligeramente distinto */
+.mensaje-bubble.mio .hora {
+  color: #556a58;
+}
+
+
+/* ─── BARRA DE ENTRADA DE TEXTO ─── */
 .input-toolbar {
-  padding: 8px;
-  --background: #ffffff;
-  border-top: 1px solid #e2e8f0;
+  padding: 10px;
+  --background: #f0f2f5; /* Fondo gris claro detrás del input */
+  border-top: none;
 }
 
 .chat-input-wrapper {
   display: flex;
   align-items: center;
-  background: #f1f5f9;
-  border-radius: 20px;
-  padding-left: 14px;
+  background: #ffffff;
+  border-radius: 24px; /* Bien redondeado */
+  padding-left: 16px;
+  padding-right: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .chat-input {
   --background: transparent;
   flex: 1;
+  font-size: 15px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
 }
 
+/* Botón de enviar circular */
 ion-button[fill="clear"] {
-  --color: var(--np-green-600, #0D8A3C);
+  background: var(--np-green-600, #0D8A3C);
+  --color: #ffffff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin: 4px;
+  transition: all 0.2s ease;
+}
+
+/* Cuando el input está vacío, el botón se ve gris/desactivado */
+ion-button[fill="clear"][disabled] {
+  background: transparent;
+  --color: #aebac1;
 }

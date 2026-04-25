@@ -1,13 +1,46 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ titulo }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="cancelar()">Cancelar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content class="ion-padding">
+
+  @if (!pacienteId && !esEdicion) {
+  <div class="selector-paciente-container">
+    <span class="selector-label">Seleccionar Paciente *</span>
+
+    @if (pacienteSeleccionadoId) {
+    <ion-item lines="none" class="paciente-seleccionado">
+      <ion-icon name="checkmark-circle" slot="start" color="success"></ion-icon>
+      <ion-label>
+        <h2>{{ pacienteSeleccionadoNombre }}</h2>
+      </ion-label>
+      <ion-button fill="clear" color="medium" (click)="quitarPaciente()">
+        <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+    } @else {
+    <ion-searchbar placeholder="Buscar paciente por nombre..." (ionInput)="filtrarPacientes($event)" [debounce]="250"
+      class="custom-searchbar">
+    </ion-searchbar>
+
+    <ion-list class="lista-pacientes-buscador">
+      @for (p of pacientesFiltrados(); track p.id) {
+      <ion-item button (click)="seleccionarPaciente(p)" lines="full">
+        <ion-avatar slot="start" class="avatar-pequeno">
+          @if (p.usuario?.avatar_url) {
+          <img [src]="p.usuario.avatar_url" />
+          } @else {
+          <ion-icon name="person-circle-outline"></ion-icon>
+          }
+        </ion-avatar>
+        <ion-label>{{ p.usuario?.nombre }} {{ p.usuario?.apellidos }}</ion-label>
+      </ion-item>
+      }
+      @if (pacientesFiltrados().length === 0) {
+      <ion-item lines="none">
+        <ion-label color="medium" class="ion-text-center">No se encontraron pacientes</ion-label>
+      </ion-item>
+      }
+    </ion-list>
+    }
+  </div>
+  }
 
   <ion-item>
     <ion-label position="stacked">Fecha</ion-label>
@@ -38,10 +71,10 @@
   </ion-item>
 
   @if (tipo === 'videollamada') {
-    <ion-item>
-      <ion-label position="stacked">URL videollamada</ion-label>
-      <ion-input type="url" [(ngModel)]="urlVideo" placeholder="https://meet.google.com/..."></ion-input>
-    </ion-item>
+  <ion-item>
+    <ion-label position="stacked">URL videollamada</ion-label>
+    <ion-input type="url" [(ngModel)]="urlVideo" placeholder="https://meet.google.com/..."></ion-input>
+  </ion-item>
   }
 
   <ion-item>
@@ -58,16 +91,11 @@
     <ion-textarea [(ngModel)]="notas" rows="3" placeholder="Observaciones..."></ion-textarea>
   </ion-item>
 
-  <ion-button
-    expand="block"
-    class="ion-margin-top"
-    (click)="guardar()"
-    [disabled]="guardando || !fecha || !hora"
-  >
+  <ion-button expand="block" class="ion-margin-top" (click)="guardar()" [disabled]="guardando || !fecha || !hora">
     @if (guardando) {
-      <ion-spinner name="crescent"></ion-spinner>
+    <ion-spinner name="crescent"></ion-spinner>
     } @else {
-      {{ esEdicion ? 'Guardar cambios' : 'Crear cita' }}
+    {{ esEdicion ? 'Guardar cambios' : 'Crear cita' }}
     }
   </ion-button>
 

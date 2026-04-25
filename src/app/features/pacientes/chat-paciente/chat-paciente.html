@@ -1,9 +1,24 @@
-<ion-header>
+<ion-header class="chat-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/pacientes"></ion-back-button>
     </ion-buttons>
-    <ion-title>Chat con Paciente</ion-title>
+    
+    @if (paciente()) {
+      <div class="header-paciente" [routerLink]="['/pacientes', pacienteId]">
+        <ion-avatar class="header-avatar">
+          @if (paciente().usuario?.avatar_url) {
+            <img [src]="paciente().usuario.avatar_url" />
+          } @else {
+            <ion-icon name="person-circle-outline" class="avatar-placeholder"></ion-icon>
+          }
+        </ion-avatar>
+        <div class="header-info">
+          <span class="header-nombre">{{ paciente().usuario?.nombre }} {{ paciente().usuario?.apellidos }}</span>
+          <span class="header-sub">Ver ficha del paciente</span>
+        </div>
+      </div>
+    }
   </ion-toolbar>
 </ion-header>
 

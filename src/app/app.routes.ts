@@ -94,8 +94,7 @@ export const routes: Routes = [
       },
       {
         path: 'pacientes/:id/chat',
-        loadComponent: () =>
-          import('./features/pacientes/chat-paciente/chat-paciente').then((m) => m.ChatPaciente),
+        loadComponent: () => import('./features/pacientes/chat-paciente/chat-paciente').then(m => m.ChatPaciente),
       },
     ],
   },

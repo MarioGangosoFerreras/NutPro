@@ -98,19 +98,25 @@ ion-button[fill="clear"]:hover {
 }
 
 /* Hoy */
+.ucal__dia.hoy {
+  background: rgba(29, 185, 84, 0.06) !important; /* Fondo verde súper transparente */
+}
+
 .ucal__dia.hoy .ucal__num {
-  background: var(--cal-primary-soft);
   color: var(--cal-primary);
+  font-weight: 800; /* Lo hacemos más gordito para que destaque que es hoy */
 }
 
 /* Seleccionado */
 .ucal__dia.seleccionado {
-  background: var(--cal-primary);
-  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.25);
+  background: var(--cal-primary-soft) !important; /* Fondo verde claro (e8f5e9) */
+  border-color: var(--cal-primary) !important; /* Le ponemos un borde verde oscuro para enmarcarlo */
+  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.15) !important; /* Sombra más suave */
 }
 
 .ucal__dia.seleccionado .ucal__num {
-  color: var(--cal-selected-text);
+  background: var(--cal-primary) !important; /* El circulito del número sí va en verde oscuro */
+  color: var(--cal-selected-text) !important; /* Número en blanco */
 }
 
 /* ── MODO PANTALLA COMPLETA (FULL) ── */
@@ -165,8 +171,8 @@ ion-button[fill="clear"]:hover {
 }
 
 .ucal--full .ucal__dia.seleccionado .ucal__num {
-  background: var(--cal-primary);
-  color: white;
+  background: var(--cal-primary) !important;
+  color: white !important;
 }
 
 /* ── PUNTOS DE ESTADO (DOTS) ── */
@@ -200,11 +206,6 @@ ion-button[fill="clear"]:hover {
 .ucal__dot--confirmada { background: #10b981; }
 .ucal__dot--pendiente  { background: #f59e0b; }
 .ucal__dot--cancelada  { background: #ef4444; }
-
-.ucal:not(.ucal--full) .ucal__dia.seleccionado .ucal__dot {
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: none;
-}
 
 /* ── DETALLE INFERIOR ── */
 .ucal__detalle {
