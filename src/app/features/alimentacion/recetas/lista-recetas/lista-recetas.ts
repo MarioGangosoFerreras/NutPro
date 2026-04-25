@@ -78,7 +78,7 @@ export class ListaRecetas implements OnInit {
     { valor: 'desayuno', label: 'Desayuno' },
     { valor: 'comida', label: 'Comida' },
     { valor: 'cena', label: 'Cena' },
-    { valor: 'snacks', label: 'Snacks' },
+    { valor: 'snack', label: 'Snacks' },
   ];
 
   constructor() {

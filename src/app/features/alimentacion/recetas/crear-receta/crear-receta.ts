@@ -93,7 +93,6 @@ export class CrearReceta {
   router = inject(Router);
 
   nombre = signal('');
-  descripcion = signal('');
   instrucciones = signal('');
   raciones = signal(1);
   tiempo_prep_min = signal<number | null>(null);
@@ -124,7 +123,7 @@ export class CrearReceta {
   manualFibra = signal(0);
   guardandoManual = signal(false);
 
-  readonly tiposComida = ['desayuno', 'comida', 'cena', 'snacks'];
+  readonly tiposComida = ['desayuno', 'comida', 'cena', 'snack'];
   readonly etiquetas = [
     'sin_gluten',
     'sin_lactosa',
@@ -362,7 +361,6 @@ export class CrearReceta {
     try {
       const receta = await this.recetaService.crearReceta({
         nombre: this.nombre().trim(),
-        descripcion: this.descripcion().trim() || undefined,
         instrucciones: this.instrucciones().trim() || undefined,
         raciones: this.raciones(),
         tiempo_prep_min: this.tiempo_prep_min() ?? undefined,
@@ -406,7 +404,6 @@ export class CrearReceta {
 
   ionViewWillEnter() {
     this.nombre.set('');
-    this.descripcion.set('');
     this.instrucciones.set('');
     this.raciones.set(1);
     this.tiempo_prep_min.set(null);

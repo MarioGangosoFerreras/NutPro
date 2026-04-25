@@ -69,17 +69,6 @@
         </ion-input>
       </ion-item>
 
-      <ion-item>
-        <ion-label position="stacked">Descripción</ion-label>
-        <ion-textarea
-          placeholder="Breve descripción de la receta..."
-          [value]="descripcion()"
-          (ionInput)="descripcion.set($event.detail.value ?? '')"
-          [autoGrow]="true"
-        >
-        </ion-textarea>
-      </ion-item>
-
       <div class="row-dos-columnas">
         <ion-item>
           <ion-label position="stacked">Raciones</ion-label>

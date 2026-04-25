@@ -24,7 +24,6 @@ export interface Receta {
   id: string;
   creado_por?: string;
   nombre: string;
-  descripcion?: string;
   visibilidad: 'publica' | 'privada';
   tipo_comida?: string[];
   etiquetas?: string[];
