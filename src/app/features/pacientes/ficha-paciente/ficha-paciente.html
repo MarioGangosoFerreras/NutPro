@@ -62,7 +62,7 @@
     </ion-card>
 
     <!-- ✅ TABS -->
-    <ion-segment [value]="tabActiva" (ionChange)="onTabChange($event)" class="ficha-tabs">
+    <ion-segment [value]="tabActiva" (ionChange)="onTabChange($event)" class="ficha-tabs" scrollable="true">
       <ion-segment-button value="resumen">
         <ion-icon name="person-circle-outline"></ion-icon>
         <ion-label>Resumen</ion-label>
@@ -81,6 +81,11 @@
       <ion-segment-button value="mediciones">
         <ion-icon name="scale-outline"></ion-icon>
         <ion-label>Mediciones</ion-label>
+      </ion-segment-button>
+
+      <ion-segment-button value="plan">
+        <ion-icon name="nutrition-outline"></ion-icon>
+        <ion-label>Plan</ion-label>
       </ion-segment-button>
 
       <ion-segment-button value="citas">
@@ -106,6 +111,10 @@
 
     @if (tabActiva === 'mediciones') {
     <app-tab-mediciones [paciente]="paciente"></app-tab-mediciones>
+    }
+
+    @if (tabActiva === 'plan') {
+    <app-tab-plan [paciente]="paciente"></app-tab-plan>
     }
 
     @if (tabActiva === 'citas') {

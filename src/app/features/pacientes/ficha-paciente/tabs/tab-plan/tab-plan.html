@@ -1,0 +1,53 @@
+<div class="tab-header">
+  <ion-segment [(ngModel)]="vistaActiva" mode="ios">
+    <ion-segment-button value="configuracion">
+      <ion-label>Configuración</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="menu" [disabled]="!planActivo">
+      <ion-label>Menú Semanal</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="historial">
+      <ion-label>Historial</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+</div>
+
+<div class="tab-content" style="margin-top: 16px;">
+  
+  @if (vistaActiva === 'configuracion') {
+    <app-plan-configurador 
+      [paciente]="paciente" 
+      [planActivo]="planActivo"
+      (guardado)="onPlanGuardado($event)">
+    </app-plan-configurador>
+  }
+
+  @if (vistaActiva === 'menu' && planActivo) {
+    <app-menu-semanal 
+      [planId]="planActivo.id" 
+      [pacienteId]="paciente.id">
+    </app-menu-semanal>
+  }
+
+  @if (vistaActiva === 'historial') {
+    <ion-list>
+      @if (historialPlanes.length === 0) {
+        <div style="text-align: center; padding: 30px; color: var(--ion-color-medium);">
+          <p>No hay historial de planes anteriores.</p>
+        </div>
+      }
+
+      @for (plan of historialPlanes; track plan.id) {
+        <ion-item button (click)="restaurarPlan(plan)">
+          <ion-label>
+            <h3>{{ plan.created_at | date:'dd MMM yyyy' }}</h3>
+            <p>{{ plan.tipo === 'cuantitativo' ? plan.calorias_objetivo + ' kcal' : 'Cualitativo' }} - Objetivo: {{ plan.objetivo }}</p>
+          </ion-label>
+          @if (plan.activo) {
+            <ion-badge color="success" slot="end">Activo</ion-badge>
+          }
+        </ion-item>
+      }
+    </ion-list>
+  }
+</div>
