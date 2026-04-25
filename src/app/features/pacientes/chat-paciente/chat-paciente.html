@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/pacientes"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Chat con Paciente</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding chat-content">
+  <div class="mensajes-container">
+    @for (msg of mensajes(); track msg.id) {
+      <div class="mensaje-bubble" [class.mio]="msg.sender_id === miUsuarioId">
+        <p>{{ msg.contenido }}</p>
+        <span class="hora">{{ msg.enviado_at | date:'HH:mm' }}</span>
+      </div>
+    }
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar class="input-toolbar">
+    <div class="chat-input-wrapper">
+      <ion-input
+        [(ngModel)]="nuevoMensaje"
+        (keyup.enter)="enviar()"
+        placeholder="Escribe un mensaje..."
+        class="chat-input">
+      </ion-input>
+      <ion-button fill="clear" (click)="enviar()" [disabled]="!nuevoMensaje.trim()">
+        <ion-icon slot="icon-only" name="send-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

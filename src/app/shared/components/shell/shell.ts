@@ -26,6 +26,7 @@ import {
   restaurantOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
+import { ChatService } from '../../../core/services/chat';
 
 interface NavItem {
   label: string;
@@ -52,6 +53,9 @@ export class Shell implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
   private menuCtrl = inject(MenuController);
+  private chatService = inject(ChatService);
+
+  chats = signal<any[]>([]);
 
   // Signal estático: permite al Header cambiar el estado sin usar un servicio
   static isCollapsed = signal(false);
@@ -71,8 +75,9 @@ export class Shell implements OnInit {
     { label: 'Inicio', icon: 'grid-outline', route: '/dashboard' },
     { label: 'Pacientes', icon: 'people-outline', route: '/pacientes' },
     { label: 'Citas', icon: 'calendar-outline', route: '/citas' },
-    { label: 'Recetas', icon: 'restaurant-outline', route: '/alimentacion/recetas'},
+    { label: 'Recetas', icon: 'restaurant-outline', route: '/alimentacion/recetas' },
     { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
+
   ];
 
   constructor() {
@@ -103,6 +108,10 @@ export class Shell implements OnInit {
         rol: user.rol === 'admin' ? 'Administrador' : 'Nutricionista',
         avatar: user.avatar_url || null,
       });
+      const nutriId = await this.authService.getNutricionistaId();
+      if (nutriId) {
+        this.chats.set(await this.chatService.getChatsNutricionista(nutriId));
+      }
     }
   }
 

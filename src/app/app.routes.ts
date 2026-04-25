@@ -92,6 +92,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/auth/oauth-callback.page').then((m) => m.OAuthCallbackPage),
       },
+      {
+        path: 'pacientes/:id/chat',
+        loadComponent: () =>
+          import('./features/pacientes/chat-paciente/chat-paciente').then((m) => m.ChatPaciente),
+      },
     ],
   },
 ];

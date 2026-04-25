@@ -196,3 +196,59 @@ ion-avatar ion-icon { font-size: 36px; color: #2d6a4f; }
 .pro {
   color: #738a64; /* El color verde del login */
 }
+
+/* ─── 7. LISTA DE CHATS EN EL SIDEBAR ─── */
+.chats-list {
+  padding-top: 0;
+  max-height: 250px; /* Para que si tienes muchos pacientes, se pueda scrollear solo esa parte */
+}
+
+.chat-item {
+  gap: 12px;
+  padding: 8px 14px;
+}
+
+ion-split-pane.menu-collapsed .chat-item {
+  padding: 8px 0;
+  justify-content: center;
+}
+
+.chat-avatar {
+  width: 26px;
+  height: 26px;
+  background: #e8f5e9;
+  flex-shrink: 0;
+}
+
+.chat-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0; /* Para que el text-overflow funcione */
+}
+
+.chat-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: left;
+}
+
+.chat-preview {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: left;
+}
+
+.chat-item:hover .chat-name {
+  color: #1e293b;
+}
