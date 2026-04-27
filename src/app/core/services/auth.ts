@@ -81,6 +81,9 @@ export class AuthService {
       especialidad?: string;
       nombre_empresa?: string;
       avatar_url?: string | null;
+      dni_fiscal?: string;
+      direccion_fiscal?: string;
+      centros?: any[];
     },
   ) {
     return await this.supabase.auth.signUp({

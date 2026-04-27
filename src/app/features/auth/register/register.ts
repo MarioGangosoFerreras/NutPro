@@ -2,8 +2,13 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent, IonInput, IonSelect, IonSelectOption,
-  IonButton, IonSpinner, IonIcon
+  IonContent,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+  IonButton,
+  IonSpinner,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { cameraOutline, personCircleOutline, addOutline, trashOutline } from 'ionicons/icons';
@@ -19,12 +24,18 @@ interface CentroConsulta {
 @Component({
   selector: 'app-register',
   imports: [
-    FormsModule, RouterLink,
-    IonContent, IonInput, IonSelect, IonSelectOption,
-    IonButton, IonSpinner, IonIcon
+    FormsModule,
+    RouterLink,
+    IonContent,
+    IonInput,
+    IonSelect,
+    IonSelectOption,
+    IonButton,
+    IonSpinner,
+    IonIcon,
   ],
   templateUrl: './register.html',
-  styleUrl: './register.css'
+  styleUrl: './register.css',
 })
 export class Register {
   // Datos personales
@@ -61,7 +72,7 @@ export class Register {
     private cloudinaryService: CloudinaryService,
     private supabase: SupabaseService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     addIcons({ cameraOutline, personCircleOutline, addOutline, trashOutline });
   }
@@ -71,7 +82,9 @@ export class Register {
     if (!file) return;
     this.avatarFile = file;
     const reader = new FileReader();
-    reader.onload = (e: any) => { this.avatarPreview = e.target.result; };
+    reader.onload = (e: any) => {
+      this.avatarPreview = e.target.result;
+    };
     reader.readAsDataURL(file);
   }
 
@@ -120,21 +133,17 @@ export class Register {
           titulacion: this.titulacion,
           especialidad: this.especialidad,
           nombre_empresa: this.nombreEmpresa,
-          avatar_url: avatarUrl
-          // Nota: El 'estado' no lo enviamos, lo pone el trigger por defecto
-        }
+          avatar_url: avatarUrl,
+          // 👇 Ahora estos ya no saldrán en rojo
+          dni_fiscal: this.dniFiscal,
+          direccion_fiscal: this.direccionFiscal,
+          centros: this.centros,
+        },
       );
 
       if (error) throw error;
 
-      // ELIMINA EL PASO DE: await this.supabase.client.from('nutricionistas').insert(...)
-      // El trigger ya lo hizo automáticamente.
-
-      // 4. Centros de consulta (Esto sí puedes hacerlo aquí si necesitas el ID)
-      // Pero ojo: necesitas buscar el nutricionista_id que el trigger acaba de crear
-
       this.router.navigate(['/pendiente-verificacion']);
-
     } catch (err: any) {
       this.errorMessage = err.message;
     } finally {
