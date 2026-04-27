@@ -1,4 +1,4 @@
-// src/app/core/services/pdf.service.ts
+// src/app/core/services/pdf.ts
 import { Injectable } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -6,65 +6,64 @@ import autoTable from 'jspdf-autotable';
 @Injectable({ providedIn: 'root' })
 export class PdfService {
   async exportarMenuSemanal(paciente: any, plan: any, entradas: any[]) {
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
+    // 1. CONFIGURACIÓN: 'l' para Landscape (Horizontal)
+    const doc = new jsPDF('l', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth(); // 297mm
+    const pageHeight = doc.internal.pageSize.getHeight(); // 210mm
 
-    // 1. ENCABEZADO Y LOGO
+    // 2. ENCABEZADO Y FOTO DEL NUTRICIONISTA
     doc.setFillColor(45, 106, 79);
     doc.rect(0, 0, pageWidth, 40, 'F');
 
-    try {
-      const logoBase64 = await this.getBase64ImageFromUrl('img/Logo_app.png');
-      doc.addImage(logoBase64, 'PNG', 15, 8, 24, 24);
-    } catch (e) {}
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Plan Nutricional NutPro', 45, 18);
-
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Generado: ${new Date().toLocaleDateString()}`, 45, 24);
-
-    // ─── NUEVO: INFORMACIÓN DEL NUTRICIONISTA EN EL HEADER ───
     const nutri = paciente?.nutricionista?.usuario;
-    if (nutri) {
-      doc.setFontSize(10);
-      doc.text(`Nutricionista: ${nutri.nombre} ${nutri.apellidos}`, 45, 30);
+    const nombrePaciente = paciente?.usuario?.nombre
+      ? `${paciente.usuario.nombre} ${paciente.usuario.apellidos || ''}`.trim()
+      : 'Paciente';
 
-      // Si el nutricionista tiene foto, la ponemos a la derecha
-      if (nutri.avatar_url) {
-        try {
-          const nutriImg = await this.getBase64ImageFromUrl(nutri.avatar_url);
-          doc.addImage(nutriImg, 'JPEG', pageWidth - 35, 8, 24, 24);
-        } catch (e) {}
+    // Imagen del nutricionista como icono principal a la izquierda
+    if (nutri?.avatar_url) {
+      try {
+        const nutriImg = await this.getBase64ImageFromUrl(nutri.avatar_url);
+        // Dibujamos la imagen (circular por CSS no es posible aquí, pero se ve profesional)
+        doc.addImage(nutriImg, 'JPEG', 15, 8, 24, 24);
+      } catch (e) {
+        console.error('Error cargando avatar del nutricionista para el PDF', e);
       }
     }
 
-    // 2. DATOS DEL PACIENTE Y OBJETIVOS
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Plan Nutricional de ${nombrePaciente}`, 45, 18);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 45, 25);
+
+    if (nutri) {
+      doc.text(`Nutricionista: ${nutri.nombre} ${nutri.apellidos}`, 45, 31);
+    }
+
+    // 3. DETALLES DEL PLAN (Sin nombre del paciente)
     doc.setTextColor(40, 40, 40);
     doc.setFontSize(14);
-    doc.text('Detalles del Plan', 15, 50);
+    doc.text('Estructura del Plan', 15, 52);
     doc.setDrawColor(220, 220, 220);
-    doc.line(15, 52, pageWidth - 15, 52);
+    doc.line(15, 54, pageWidth - 15, 54);
 
     doc.setFontSize(11);
-    doc.text(`Paciente: ${paciente?.usuario?.nombre} ${paciente?.usuario?.apellidos}`, 15, 60);
-    doc.text(`Objetivo: ${plan?.objetivo || 'Personalizado'}`, 15, 66);
-
-    // 👈 AQUÍ SE FIJA EL PROBLEMA DE LAS CALORÍAS
-    const kcal = plan?.calorias_objetivo || 0;
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Calorías Diarias: ${kcal} kcal`, 15, 72);
     doc.setFont('helvetica', 'normal');
+    doc.text(`Objetivo: ${plan?.objetivo || 'Personalizado'}`, 15, 62);
 
-    // 3. TABLA DEL MENÚ
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Calorías Diarias Objetivo: ${plan?.calorias_objetivo || 0} kcal`, 15, 68);
+
+    // 4. TABLA DEL MENÚ (En horizontal cabe mucho mejor)
     const diasLabels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
     const tiposComida = [
       { id: 'desayuno', label: 'Desayuno' },
       { id: 'comida', label: 'Comida' },
-      { id: 'snack', label: 'Snack' },
+      { id: 'snack', label: 'Snacks' },
       { id: 'cena', label: 'Cena' },
     ];
 
@@ -72,31 +71,50 @@ export class PdfService {
       const fila: any[] = [tipo.label];
       for (let i = 1; i <= 7; i++) {
         const entrada = entradas.find((e) => e.dia_semana === i && e.tipo_comida === tipo.id);
-        const nombreR = entrada?.receta?.nombre || entrada?.receta?.titulo;
-        fila.push(entrada ? `${nombreR}\n(${entrada.receta?.calorias_kcal || 0} kcal)` : '-');
+        const nombreReceta = entrada?.receta?.nombre || '';
+        fila.push(entrada ? `${nombreReceta}\n(${entrada.receta?.calorias_kcal || 0} kcal)` : '-');
       }
       return fila;
     });
 
     autoTable(doc, {
-      startY: 80,
+      startY: 75,
       head: [['Comida', ...diasLabels]],
       body: body,
       theme: 'grid',
-      headStyles: { fillColor: [29, 185, 84], textColor: 255, fontStyle: 'bold' },
+      headStyles: { fillColor: [45, 106, 79], textColor: 255, fontStyle: 'bold', halign: 'center' },
       styles: {
-        fontSize: 8,
-        cellPadding: 3,
+        fontSize: 9,
+        cellPadding: 4,
         valign: 'middle',
         halign: 'center',
         overflow: 'linebreak',
       },
       columnStyles: {
-        0: { fontStyle: 'bold', fillColor: [245, 245, 245], halign: 'left', cellWidth: 22 },
+        0: { fontStyle: 'bold', fillColor: [245, 245, 245], halign: 'left', cellWidth: 30 },
       },
     });
 
-    const filename = `Plan_${paciente?.usuario?.nombre || 'NutPro'}_${new Date().getTime()}.pdf`;
+    // 5. PIE DE PÁGINA Y MARCA DE AGUA
+    try {
+      const logoNutPro = await this.getBase64ImageFromUrl('img/Logo_app.png');
+      // Marca de agua sutil abajo a la derecha
+      doc.setGState(new (doc as any).GState({ opacity: 0.12 }));
+      doc.addImage(logoNutPro, 'PNG', pageWidth - 50, pageHeight - 50, 35, 35);
+      doc.setGState(new (doc as any).GState({ opacity: 1.0 }));
+    } catch (e) {}
+
+    doc.setTextColor(150, 150, 150);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'italic');
+    doc.text(
+      'Este plan ha sido generado por un profesional de la salud utilizando la plataforma NutPro.',
+      pageWidth / 2,
+      pageHeight - 12,
+      { align: 'center' },
+    );
+
+    const filename = `Plan_${nombrePaciente.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`;
     doc.save(filename);
   }
 

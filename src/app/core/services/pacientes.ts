@@ -120,6 +120,8 @@ export class PacientesService {
     }
   }
 
+  // src/app/core/services/pacientes.ts
+
   async getPacienteById(id: string) {
     const { data, error } = await this.supabase
       .from('pacientes')
@@ -137,7 +139,8 @@ export class PacientesService {
         especialidad,
         usuario:usuario_id (
           nombre,
-          apellidos
+          apellidos,
+          avatar_url
         )
       )
     `,
