@@ -62,6 +62,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'alimentacion/recetas/editar/:id',
+        loadComponent: () =>
+          import('./features/alimentacion/recetas/crear-receta/crear-receta').then(
+            (m) => m.CrearReceta,
+          ),
+      },
+      {
         path: 'alimentacion/recetas/:id',
         loadComponent: () =>
           import('./features/alimentacion/recetas/detalle-receta/detalle-receta').then(
@@ -98,7 +105,8 @@ export const routes: Routes = [
       },
       {
         path: 'pacientes/:id/chat',
-        loadComponent: () => import('./features/pacientes/chat-paciente/chat-paciente').then(m => m.ChatPaciente),
+        loadComponent: () =>
+          import('./features/pacientes/chat-paciente/chat-paciente').then((m) => m.ChatPaciente),
       },
     ],
   },

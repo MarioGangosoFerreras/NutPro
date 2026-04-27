@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -50,6 +51,7 @@ import { RecetaService } from '../../../../core/services/receta';
 import { FoodItem, FoodService, IngredienteLocal } from '../../../../core/services/food';
 import { CloudinaryService } from '../../../../core/services/cloudinary';
 import { IonicSafeString } from '@ionic/core';
+import { Header } from "../../../../shared/components/header/header";
 
 @Component({
   selector: 'app-crear-receta',
@@ -82,7 +84,8 @@ import { IonicSafeString } from '@ionic/core';
     IonNote,
     IonCheckbox,
     IonBadge,
-  ],
+    Header
+],
   templateUrl: './crear-receta.html',
 })
 export class CrearReceta {
@@ -91,6 +94,8 @@ export class CrearReceta {
   private cloudinaryService = inject(CloudinaryService);
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
+  private route = inject(ActivatedRoute);
+
   router = inject(Router);
 
   nombre = signal('');
@@ -123,6 +128,10 @@ export class CrearReceta {
   manualGrasa = signal(0);
   manualFibra = signal(0);
   guardandoManual = signal(false);
+
+  modoEdicion = signal(false);
+  recetaId = signal<string | null>(null);
+  cargandoDatos = signal(false);
 
   readonly tiposComida = ['desayuno', 'comida', 'cena', 'snack'];
   readonly etiquetas = [
@@ -194,6 +203,52 @@ export class CrearReceta {
       createOutline,
       searchOutline,
     });
+  }
+
+  async ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.modoEdicion.set(true);
+      this.recetaId.set(id);
+      await this.cargarRecetaParaEditar(id);
+    }
+  }
+
+  async cargarRecetaParaEditar(id: string) {
+    try {
+      this.cargandoDatos.set(true);
+      const receta = await this.recetaService.getRecetaById(id);
+
+      this.nombre.set(receta.nombre);
+      this.instrucciones.set(receta.instrucciones || '');
+      this.raciones.set(receta.raciones);
+      this.tiempo_prep_min.set(receta.tiempo_prep_min || null);
+      this.visibilidad.set(receta.visibilidad);
+      this.tiposComidaSeleccionados.set(receta.tipo_comida || []);
+      this.etiquetasSeleccionadas.set(receta.etiquetas || []);
+      this.imagenUrl.set(receta.imagen_url || null);
+
+      // Adaptamos los ingredientes para que el formulario los entienda igual
+      if (receta.receta_ingredientes) {
+        const ingredientesFormato = receta.receta_ingredientes.map((ing) => ({
+          food_item_id: ing.food_item_id,
+          cantidad_g: ing.cantidad_g,
+          cantidad_texto: ing.cantidad_texto || '',
+          es_opcional: ing.es_opcional || false,
+          nombre: ing.food_items?.nombre || 'Ingrediente',
+          calorias_kcal: ing.food_items?.calorias_kcal || 0,
+          proteina_g: ing.food_items?.proteina_g || 0,
+          carbohidratos_g: ing.food_items?.carbohidratos_g || 0,
+          grasa_g: ing.food_items?.grasa_g || 0,
+        }));
+        this.ingredientes.set(ingredientesFormato as any);
+      }
+    } catch (e) {
+      await this.mostrarToast('Error cargando la receta para editar', 'danger');
+      this.router.navigate(['/alimentacion/recetas']);
+    } finally {
+      this.cargandoDatos.set(false);
+    }
   }
 
   async onSeleccionarImagen(event: Event) {
@@ -351,18 +406,17 @@ export class CrearReceta {
     );
   }
 
-  // 1. Añade esta señal con las demás
-  guardandoReceta = signal(false);
-
-  // 2. Reemplaza la función guardarReceta entera por esta:
   async guardarReceta() {
     if (!this.formularioValido()) return;
 
-    // Mostramos la capa de carga del HTML
-    this.guardandoReceta.set(true);
+    const loading = await this.loadingCtrl.create({
+      message: this.modoEdicion() ? 'Actualizando receta...' : 'Guardando receta...',
+      spinner: 'crescent',
+    });
+    await loading.present();
 
     try {
-      const receta = await this.recetaService.crearReceta({
+      const datosReceta = {
         nombre: this.nombre().trim(),
         instrucciones: this.instrucciones().trim() || undefined,
         raciones: this.raciones(),
@@ -371,12 +425,26 @@ export class CrearReceta {
         tipo_comida: this.tiposComidaSeleccionados(),
         etiquetas: this.etiquetasSeleccionadas(),
         imagen_url: this.imagenUrl() ?? undefined,
-      });
+      };
 
+      let idRecetaActual = '';
+
+      if (this.modoEdicion() && this.recetaId()) {
+        // ACTUALIZAR
+        idRecetaActual = this.recetaId()!;
+        await this.recetaService.actualizarReceta(idRecetaActual, datosReceta);
+        await this.recetaService.eliminarIngredientesDeReceta(idRecetaActual); // Limpieza
+      } else {
+        // CREAR
+        const recetaNueva = await this.recetaService.crearReceta(datosReceta);
+        idRecetaActual = recetaNueva.id;
+      }
+
+      // Insertamos los ingredientes de la lista actual (sean nuevos o editados)
       await Promise.all(
         this.ingredientes().map((ing, index) =>
           this.recetaService.addIngrediente({
-            receta_id: receta.id,
+            receta_id: idRecetaActual,
             food_item_id: ing.food_item_id,
             cantidad_g: ing.cantidad_g,
             cantidad_texto: ing.cantidad_texto || undefined,
@@ -386,13 +454,21 @@ export class CrearReceta {
         ),
       );
 
-      await this.mostrarToast('Receta guardada correctamente', 'success');
-      this.router.navigate(['/alimentacion/recetas']);
+      await loading.dismiss();
+      await this.mostrarToast(
+        this.modoEdicion() ? 'Receta actualizada' : 'Receta guardada',
+        'success',
+      );
+
+      // Volvemos al detalle si editamos, o a la lista general si creamos
+      if (this.modoEdicion()) {
+        this.router.navigate(['/alimentacion/recetas', idRecetaActual]);
+      } else {
+        this.router.navigate(['/alimentacion/recetas']);
+      }
     } catch {
-      await this.mostrarToast('Error guardando la receta', 'danger');
-    } finally {
-      // Ocultamos la capa de carga
-      this.guardandoReceta.set(false);
+      await loading.dismiss();
+      await this.mostrarToast('Error al guardar la receta', 'danger');
     }
   }
 

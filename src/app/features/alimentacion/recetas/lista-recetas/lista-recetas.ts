@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
@@ -19,6 +19,7 @@ import {
   IonSegmentButton,
   ToastController,
   AlertController,
+  MenuController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -29,10 +30,12 @@ import {
   restaurantOutline,
   lockClosedOutline,
   globeOutline,
+  eyeOffOutline,
+  refreshOutline,
 } from 'ionicons/icons';
 import { Receta, RecetaService } from '../../../../core/services/receta';
-import { Header } from "../../../../shared/components/header/header";
-import { MenuController } from '@ionic/angular/standalone';
+import { AuthService } from '../../../../core/services/auth';
+import { Header } from '../../../../shared/components/header/header';
 import { Shell } from '../../../../shared/components/shell/shell';
 
 @Component({
@@ -58,20 +61,29 @@ import { Shell } from '../../../../shared/components/shell/shell';
     IonFabButton,
     IonSegment,
     IonSegmentButton,
-    Header
-],
+    Header,
+  ],
 })
 export class ListaRecetas implements OnInit {
   private recetaService = inject(RecetaService);
+  private authService = inject(AuthService);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private menuCtrl = inject(MenuController);
+  private cdr = inject(ChangeDetectorRef);
 
+  // Estados de carga y datos
   recetas = signal<Receta[]>([]);
   recetasFiltradas = signal<Receta[]>([]);
+  recetasOcultas = signal<Receta[]>([]);
   cargando = signal(true);
+
+  // Filtros y UI
   filtroActivo = signal('todas');
   busqueda = signal('');
+  verOcultas = signal(false);
+  miUsuarioId = '';
+  version = 0;
 
   readonly filtros = [
     { valor: 'todas', label: 'Todas' },
@@ -90,6 +102,8 @@ export class ListaRecetas implements OnInit {
       restaurantOutline,
       lockClosedOutline,
       globeOutline,
+      eyeOffOutline,
+      refreshOutline,
     });
   }
 
@@ -97,18 +111,14 @@ export class ListaRecetas implements OnInit {
     await this.cargarRecetas();
   }
 
-  // Getter para saber si el menú está colapsado (igual que en el Header)
   get collapsed() {
     return Shell.isCollapsed();
   }
 
-  // Función para abrir/cerrar el menú (lógica copiada del Header)
   toggleMenu() {
     if (window.innerWidth >= 992) {
-      // Escritorio: Colapsar/Expandir
       Shell.isCollapsed.set(!Shell.isCollapsed());
     } else {
-      // Móvil: Abrir/Cerrar menú lateral
       this.menuCtrl.toggle('main-menu');
     }
   }
@@ -116,19 +126,25 @@ export class ListaRecetas implements OnInit {
   async cargarRecetas() {
     try {
       this.cargando.set(true);
-      
-      // Ejecutamos la petición y el delay (800ms) en paralelo
-      const [data] = await Promise.all([
+      this.miUsuarioId = await this.authService.getUsuarioId();
+
+      // Cargamos todas las recetas y la lista de IDs ocultos en paralelo
+      const [todas, idsOcultos] = await Promise.all([
         this.recetaService.getRecetas(),
-        new Promise(resolve => setTimeout(resolve, 800))
+        this.recetaService.getIdsRecetasOcultas(this.miUsuarioId),
+        new Promise((resolve) => setTimeout(resolve, 600)), // Delay visual mínimo
       ]);
-      
-      this.recetas.set(data);
+
+      // Separamos las recetas visibles de las ocultas basándonos en la tabla de relación
+      this.recetas.set(todas.filter((r) => !idsOcultos.includes(r.id)));
+      this.recetasOcultas.set(todas.filter((r) => idsOcultos.includes(r.id)));
+
       this.aplicarFiltros();
     } catch (e) {
       await this.mostrarToast('Error cargando recetas', 'danger');
     } finally {
       this.cargando.set(false);
+      this.cdr.detectChanges();
     }
   }
 
@@ -150,12 +166,10 @@ export class ListaRecetas implements OnInit {
   aplicarFiltros() {
     let resultado = this.recetas();
 
-    // Filtro por tipo de comida
     if (this.filtroActivo() !== 'todas') {
       resultado = resultado.filter((r) => r.tipo_comida?.includes(this.filtroActivo()));
     }
 
-    // Filtro por búsqueda de texto
     if (this.busqueda()) {
       resultado = resultado.filter((r) => r.nombre.toLowerCase().includes(this.busqueda()));
     }
@@ -163,44 +177,68 @@ export class ListaRecetas implements OnInit {
     this.recetasFiltradas.set(resultado);
   }
 
-  async confirmarEliminar(receta: Receta) {
+  /**
+   * Determina si la receta se borra (privada) o se oculta (pública)
+   */
+  async gestionarAccionEliminar(receta: Receta) {
+    const esPublica = receta.visibilidad === 'publica';
+    const titulo = esPublica ? 'Ocultar receta' : 'Eliminar receta';
+    const mensaje = esPublica
+      ? 'Esta receta es pública. No se puede borrar de la base de datos global, pero puedes ocultarla de tu lista personal.'
+      : `¿Seguro que quieres eliminar "${receta.nombre}"? Esta acción no se puede deshacer.`;
+
     const alert = await this.alertCtrl.create({
-      header: 'Eliminar receta',
-      message: `¿Seguro que quieres eliminar "${receta.nombre}"?`,
+      header: titulo,
+      message: mensaje,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Eliminar',
+          text: esPublica ? 'Ocultar' : 'Eliminar',
           role: 'destructive',
-          handler: () => this.eliminarReceta(receta.id),
+          handler: () => (esPublica ? this.ocultar(receta.id) : this.eliminarReceta(receta.id)),
         },
       ],
     });
     await alert.present();
   }
 
+  async ocultar(id: string) {
+    try {
+      await this.recetaService.ocultarReceta(id, this.miUsuarioId);
+      await this.cargarRecetas();
+      await this.mostrarToast('Receta ocultada con éxito', 'success');
+    } catch {
+      await this.mostrarToast('Error al ocultar la receta', 'danger');
+    }
+  }
+
+  async desocultar(id: string) {
+    try {
+      await this.recetaService.desocultarReceta(id, this.miUsuarioId);
+      await this.cargarRecetas();
+      await this.mostrarToast('Receta restaurada', 'success');
+    } catch {
+      await this.mostrarToast('Error al restaurar', 'danger');
+    }
+  }
+
   async eliminarReceta(id: string) {
     try {
       await this.recetaService.eliminarReceta(id);
-      this.recetas.update((rs) => rs.filter((r) => r.id !== id));
-      this.aplicarFiltros();
-      await this.mostrarToast('Receta eliminada', 'success');
+      await this.cargarRecetas();
+      await this.mostrarToast('Receta eliminada permanentemente', 'success');
     } catch {
       await this.mostrarToast('Error al eliminar', 'danger');
     }
   }
 
-  // Helpers para la UI
-  getSkeletons() {
-    return Array(4);
-  }
-
   getMacrosPorRacion(receta: Receta) {
+    const r = receta.raciones || 1;
     return {
-      kcal: Math.round(receta.calorias_kcal / receta.raciones),
-      prot: Math.round(receta.proteina_g / receta.raciones),
-      carbs: Math.round(receta.carbohidratos_g / receta.raciones),
-      grasa: Math.round(receta.grasa_g / receta.raciones),
+      kcal: Math.round(receta.calorias_kcal / r),
+      prot: Math.round(receta.proteina_g / r),
+      carbs: Math.round(receta.carbohidratos_g / r),
+      grasa: Math.round(receta.grasa_g / r),
     };
   }
 

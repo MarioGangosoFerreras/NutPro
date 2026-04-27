@@ -10,7 +10,6 @@ export interface Ingrediente {
   cantidad_texto?: string;
   es_opcional?: boolean;
   orden?: number;
-  // Join con food_items para mostrar en UI
   food_items?: {
     nombre: string;
     calorias_kcal: number;
@@ -37,7 +36,6 @@ export interface Receta {
   grasa_g: number;
   fibra_g: number;
   created_at?: string;
-  // Join con ingredientes (opcional, solo cuando se carga el detalle)
   receta_ingredientes?: Ingrediente[];
 }
 
@@ -45,94 +43,104 @@ export interface Receta {
 export class RecetaService {
   private supabase = inject(SupabaseService).client;
 
-  // ─── Listar recetas (propias + públicas) ───────────────────────────────────
   async getRecetas(): Promise<Receta[]> {
-    // 1. Comprobamos si hay sesión activa
-    const { data: { session } } = await this.supabase.auth.getSession();
-    console.log('Sesión activa:', session?.user?.email ?? 'SIN SESIÓN');
-
     const { data, error } = await this.supabase
       .from('recetas')
       .select('*')
       .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error Supabase:', error.code, error.message, error.hint);
-      throw error;
-    }
+    if (error) throw error;
     return data ?? [];
   }
 
-  // ─── Receta por ID con sus ingredientes ────────────────────────────────────
+  // Corregido con "as Receta" para evitar errores de tipado
   async getRecetaById(id: string): Promise<Receta> {
     const { data, error } = await this.supabase
       .from('recetas')
-      .select(`
+      .select(
+        `
         *,
         receta_ingredientes (
           *,
           food_items ( nombre, calorias_kcal, proteina_g, carbohidratos_g, grasa_g )
         )
-      `)
+      `,
+      )
       .eq('id', id)
       .single();
-
     if (error) throw error;
-    return data;
+    return data as Receta;
   }
 
-  // ─── Crear receta ──────────────────────────────────────────────────────────
-  async crearReceta(receta: Omit<Receta, 'id' | 'calorias_kcal' | 'proteina_g' | 'carbohidratos_g' | 'grasa_g' | 'fibra_g'>): Promise<Receta> {
-    const { data: { user } } = await this.supabase.auth.getUser();
-
+  async crearReceta(
+    receta: Omit<
+      Receta,
+      'id' | 'calorias_kcal' | 'proteina_g' | 'carbohidratos_g' | 'grasa_g' | 'fibra_g'
+    >,
+  ): Promise<Receta> {
+    const {
+      data: { user },
+    } = await this.supabase.auth.getUser();
     const { data, error } = await this.supabase
       .from('recetas')
       .insert({ ...receta, creado_por: user?.id })
       .select()
       .single();
-
     if (error) throw error;
-    return data;
+    return data as Receta;
   }
 
-  // ─── Añadir ingrediente (el trigger recalcula macros automáticamente) ───────
-  async addIngrediente(ingrediente: Omit<Ingrediente, 'id'>): Promise<void> {
-    const { error } = await this.supabase
-      .from('receta_ingredientes')
-      .insert(ingrediente);
-
-    if (error) throw error;
-  }
-
-  // ─── Eliminar ingrediente ──────────────────────────────────────────────────
-  async removeIngrediente(ingredienteId: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('receta_ingredientes')
-      .delete()
-      .eq('id', ingredienteId);
-
-    if (error) throw error;
-  }
-
-  // ─── Eliminar receta ───────────────────────────────────────────────────────
-  async eliminarReceta(id: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('recetas')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  }
-
-  // ─── Filtrar por tipo de comida ────────────────────────────────────────────
-  async getRecetasPorTipo(tipo: string): Promise<Receta[]> {
+  async actualizarReceta(id: string, receta: Partial<Receta>): Promise<Receta> {
     const { data, error } = await this.supabase
       .from('recetas')
-      .select('*')
-      .contains('tipo_comida', [tipo])
-      .order('created_at', { ascending: false });
-
+      .update(receta)
+      .eq('id', id)
+      .select()
+      .single();
     if (error) throw error;
-    return data ?? [];
+    return data as Receta;
+  }
+
+  async eliminarIngredientesDeReceta(recetaId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('receta_ingredientes')
+      .delete()
+      .eq('receta_id', recetaId);
+    if (error) throw error;
+  }
+
+  async addIngrediente(ingrediente: Omit<Ingrediente, 'id'>): Promise<void> {
+    const { error } = await this.supabase.from('receta_ingredientes').insert(ingrediente);
+    if (error) throw error;
+  }
+
+  async eliminarReceta(id: string): Promise<void> {
+    const { error } = await this.supabase.from('recetas').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  // Métodos para la gestión de recetas ocultas
+  async getIdsRecetasOcultas(usuarioId: string): Promise<string[]> {
+    const { data, error } = await this.supabase
+      .from('recetas_ocultas')
+      .select('receta_id')
+      .eq('usuario_id', usuarioId);
+    if (error) return [];
+    return data.map((d) => d.receta_id);
+  }
+
+  async ocultarReceta(recetaId: string, usuarioId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('recetas_ocultas')
+      .insert({ receta_id: recetaId, usuario_id: usuarioId });
+    if (error) throw error;
+  }
+
+  async desocultarReceta(recetaId: string, usuarioId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('recetas_ocultas')
+      .delete()
+      .eq('receta_id', recetaId)
+      .eq('usuario_id', usuarioId);
+    if (error) throw error;
   }
 }

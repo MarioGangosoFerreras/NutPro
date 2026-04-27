@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -15,12 +15,7 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
-  IonSpinner,
   IonBadge,
-  IonItem,
-  IonList,
-  IonNote,
-  IonAlert,
   AlertController,
   ToastController,
   LoadingController,
@@ -35,10 +30,9 @@ import {
   peopleOutline,
   nutritionOutline,
   checkmarkCircleOutline,
-  ellipsisVerticalOutline,
 } from 'ionicons/icons';
 import { RecetaService, Receta } from '../../../../core/services/receta';
-import { IonicSafeString } from '@ionic/core';
+import { AuthService } from '../../../../core/services/auth';
 
 @Component({
   selector: 'app-detalle-receta',
@@ -47,6 +41,7 @@ import { IonicSafeString } from '@ionic/core';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -67,15 +62,16 @@ export class DetalleReceta implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private recetaService = inject(RecetaService);
+  private authService = inject(AuthService);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
 
   receta = signal<Receta | null>(null);
+  miUsuarioId = signal<string>(''); // Almacenará el UUID de Auth
   cargando = signal(true);
   error = signal<string | null>(null);
 
-  // Macros por ración calculados
   macrosPorRacion = computed(() => {
     const r = this.receta();
     if (!r) return null;
@@ -98,24 +94,19 @@ export class DetalleReceta implements OnInit {
       peopleOutline,
       nutritionOutline,
       checkmarkCircleOutline,
-      ellipsisVerticalOutline,
     });
   }
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
+    // IMPORTANTE: Usamos getUserId() para obtener el UUID de Auth
+    this.miUsuarioId.set(await this.authService.getUserId());
+
     if (!id) {
       this.router.navigate(['/alimentacion/recetas']);
       return;
     }
     await this.cargarReceta(id);
-  }
-
-  async ionViewWillEnter() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id && !this.receta()) {
-      await this.cargarReceta(id);
-    }
   }
 
   private async cargarReceta(id: string) {
@@ -132,41 +123,54 @@ export class DetalleReceta implements OnInit {
   }
 
   async confirmarEliminar() {
+    const receta = this.receta();
+    if (!receta) return;
+
+    const esPublica = receta.visibilidad === 'publica';
     const alert = await this.alertCtrl.create({
-      header: 'Eliminar receta',
-      message:
-        '¿Estás seguro de que quieres eliminar esta receta? Esta acción no se puede deshacer.',
+      header: esPublica ? 'Ocultar receta' : 'Eliminar receta',
+      message: esPublica
+        ? 'Esta receta es pública. Se ocultará de tu lista pero seguirá disponible para otros.'
+        : '¿Estás seguro de eliminar esta receta privada? No se puede deshacer.',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Eliminar',
+          text: esPublica ? 'Ocultar' : 'Eliminar',
           role: 'destructive',
-          handler: () => this.eliminarReceta(),
+          handler: () =>
+            esPublica ? this.ocultarReceta(receta.id) : this.eliminarReceta(receta.id),
         },
       ],
     });
     await alert.present();
   }
 
-  private async eliminarReceta() {
-    const id = this.receta()?.id;
-    if (!id) return;
-
-    // Volvemos al spinner estándar de Ionic
-    const loading = await this.loadingCtrl.create({
-      message: 'Eliminando receta...',
-      spinner: 'crescent',
-    });
+  private async ocultarReceta(id: string) {
+    const loading = await this.loadingCtrl.create({ message: 'Ocultando...', spinner: 'crescent' });
     await loading.present();
-
     try {
-      await this.recetaService.eliminarReceta(id);
+      await this.recetaService.ocultarReceta(id, this.miUsuarioId());
       await loading.dismiss();
-      await this.mostrarToast('Receta eliminada', 'success');
       this.router.navigate(['/alimentacion/recetas']);
     } catch {
       await loading.dismiss();
-      await this.mostrarToast('Error al eliminar la receta', 'danger');
+      this.mostrarToast('Error al ocultar', 'danger');
+    }
+  }
+
+  private async eliminarReceta(id: string) {
+    const loading = await this.loadingCtrl.create({
+      message: 'Eliminando...',
+      spinner: 'crescent',
+    });
+    await loading.present();
+    try {
+      await this.recetaService.eliminarReceta(id);
+      await loading.dismiss();
+      this.router.navigate(['/alimentacion/recetas']);
+    } catch {
+      await loading.dismiss();
+      this.mostrarToast('Error al eliminar', 'danger');
     }
   }
 
@@ -174,7 +178,6 @@ export class DetalleReceta implements OnInit {
     this.router.navigate(['/alimentacion/recetas']);
   }
 
-  // Calcula macros de un ingrediente según cantidad
   calcularMacrosIngrediente(macro: number, cantidad_g: number): number {
     return Math.round(((macro * cantidad_g) / 100) * 10) / 10;
   }

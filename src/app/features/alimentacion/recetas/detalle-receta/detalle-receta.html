@@ -5,180 +5,166 @@
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
+
     <ion-title>{{ receta()?.nombre ?? 'Detalle receta' }}</ion-title>
-    <ion-buttons slot="end" *ngIf="receta()">
-      <ion-button color="danger" (click)="confirmarEliminar()">
-        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-      </ion-button>
+
+    <ion-buttons slot="end">
+      @if (receta()) {
+        @if (receta()?.creado_por === miUsuarioId()) {
+          <ion-button color="primary" [routerLink]="['/alimentacion/recetas/editar', receta()?.id]">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          </ion-button>
+        }
+        <ion-button color="danger" (click)="confirmarEliminar()">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      }
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
-  <!-- Estado: cargando -->
-  <div *ngIf="cargando()" class="estado-centro">
-    <div class="avocado-spinner">🥑</div>
-    <p>Cargando receta...</p>
-  </div>
-
-  <!-- Estado: error -->
-  <div *ngIf="!cargando() && error()" class="estado-centro">
-    <ion-icon name="nutrition-outline" class="icono-error"></ion-icon>
-    <p>{{ error() }}</p>
-    <ion-button fill="outline" (click)="volver()">Volver</ion-button>
-  </div>
-
-  <!-- Contenido -->
-  <div *ngIf="!cargando() && receta() as r" class="detalle-contenido">
-
-    <!-- Imagen destacada -->
-    <div *ngIf="r.imagen_url" class="imagen-detalle-wrapper">
-      <img [src]="r.imagen_url" alt="{{ r.nombre }}" class="imagen-detalle" />
+  @if (cargando()) {
+    <div class="estado-centro">
+      <div class="avocado-spinner">🥑</div>
+      <p>Cargando receta...</p>
     </div>
+  }
 
-    <!-- Cabecera info general -->
-    <div class="cabecera-receta">
-      <div class="chips-tipo">
-        <ion-chip *ngFor="let tipo of r.tipo_comida" color="primary" outline>
-          <ion-label>{{ tipo }}</ion-label>
-        </ion-chip>
-        <ion-chip [color]="r.visibilidad === 'publica' ? 'success' : 'medium'" outline>
-          <ion-label>{{ r.visibilidad }}</ion-label>
-        </ion-chip>
+  @if (!cargando() && error()) {
+    <div class="estado-centro">
+      <ion-icon name="nutrition-outline" class="icono-error"></ion-icon>
+      <p>{{ error() }}</p>
+      <ion-button fill="outline" (click)="volver()">Volver</ion-button>
+    </div>
+  }
+
+  @if (!cargando() && receta(); as r) {
+    <div class="detalle-contenido">
+      @if (r.imagen_url) {
+        <div class="imagen-detalle-wrapper">
+          <img [src]="r.imagen_url" alt="{{ r.nombre }}" class="imagen-detalle" />
+        </div>
+      }
+
+      <div class="cabecera-receta">
+        <div class="chips-tipo">
+          @for (tipo of r.tipo_comida; track tipo) {
+            <ion-chip color="primary" outline>
+              <ion-label>{{ tipo }}</ion-label>
+            </ion-chip>
+          }
+          <ion-chip [color]="r.visibilidad === 'publica' ? 'success' : 'medium'" outline>
+            <ion-label>{{ r.visibilidad }}</ion-label>
+          </ion-chip>
+        </div>
+
+        <div class="info-rapida">
+          @if (r.tiempo_prep_min) {
+            <div class="info-item">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>{{ r.tiempo_prep_min }} min</span>
+            </div>
+          }
+          <div class="info-item">
+            <ion-icon name="people-outline"></ion-icon>
+            <span>{{ r.raciones }} {{ r.raciones === 1 ? 'ración' : 'raciones' }}</span>
+          </div>
+        </div>
       </div>
 
-      <div class="info-rapida">
-        <div class="info-item" *ngIf="r.tiempo_prep_min">
-          <ion-icon name="time-outline"></ion-icon>
-          <span>{{ r.tiempo_prep_min }} min</span>
-        </div>
-        <div class="info-item">
-          <ion-icon name="people-outline"></ion-icon>
-          <span>{{ r.raciones }} {{ r.raciones === 1 ? 'ración' : 'raciones' }}</span>
-        </div>
-      </div>
+      <ion-card class="card-macros-total">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="nutrition-outline"></ion-icon>
+            Macros totales
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="macros-tabs">
+            <div class="macro-tab">
+              <span class="macro-titulo">Energía y proteína</span>
+              <div class="macro-fila">
+                <span>Calorías</span>
+                <strong>{{ r.calorias_kcal }} kcal</strong>
+              </div>
+              <div class="macro-fila">
+                <span>Proteína</span>
+                <strong>{{ r.proteina_g }}g</strong>
+              </div>
+            </div>
+            <div class="separador-macros"></div>
+            <div class="macro-tab">
+              <span class="macro-titulo">Carbos y grasas</span>
+              <div class="macro-fila">
+                <span>Carbohidratos</span>
+                <strong>{{ r.carbohidratos_g }}g</strong>
+              </div>
+              <div class="macro-fila">
+                <span>Grasa</span>
+                <strong>{{ r.grasa_g }}g</strong>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      @if (r.receta_ingredientes && r.receta_ingredientes.length > 0) {
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="nutrition-outline"></ion-icon>
+              Ingredientes
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content class="card-content-ingredientes">
+            @for (ing of r.receta_ingredientes; track ing.food_items?.nombre) {
+              <div class="ingrediente-row">
+                <div class="ingrediente-info">
+                  <span class="ingrediente-nombre">{{ ing.food_items?.nombre }}</span>
+                  <span class="ingrediente-cantidad">
+                    {{ ing.cantidad_g }}g
+                    @if (ing.cantidad_texto) {
+                      <span class="cantidad-texto"> · {{ ing.cantidad_texto }}</span>
+                    }
+                  </span>
+                </div>
+                <div class="ingrediente-macros">
+                  <span
+                    >{{
+                      calcularMacrosIngrediente(ing.food_items?.calorias_kcal ?? 0, ing.cantidad_g)
+                    }}
+                    kcal</span
+                  >
+                  <span
+                    >P:
+                    {{
+                      calcularMacrosIngrediente(ing.food_items?.proteina_g ?? 0, ing.cantidad_g)
+                    }}g</span
+                  >
+                </div>
+                @if (ing.es_opcional) {
+                  <ion-badge color="medium">Opcional</ion-badge>
+                }
+              </div>
+            }
+          </ion-card-content>
+        </ion-card>
+      }
+
+      @if (r.instrucciones) {
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="restaurant-outline"></ion-icon>
+              Elaboración
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p class="instrucciones-texto">{{ r.instrucciones }}</p>
+          </ion-card-content>
+        </ion-card>
+      }
     </div>
-
-    <!-- Macros totales — fondo primary igual que en crear-receta -->
-    <ion-card class="card-macros-total">
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="nutrition-outline"></ion-icon>
-          Macros totales
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="macros-tabs">
-          <!-- Columna izquierda -->
-          <div class="macro-tab">
-            <span class="macro-titulo">Energía y proteína</span>
-            <div class="macro-fila">
-              <span>Calorías</span>
-              <strong>{{ r.calorias_kcal }} kcal</strong>
-            </div>
-            <div class="macro-fila">
-              <span>Proteína</span>
-              <strong>{{ r.proteina_g }}g</strong>
-            </div>
-          </div>
-
-          <!-- Separador -->
-          <div class="separador-macros"></div>
-
-          <!-- Columna derecha -->
-          <div class="macro-tab">
-            <span class="macro-titulo">Carbos y grasas</span>
-            <div class="macro-fila">
-              <span>Carbohidratos</span>
-              <strong>{{ r.carbohidratos_g }}g</strong>
-            </div>
-            <div class="macro-fila">
-              <span>Grasa</span>
-              <strong>{{ r.grasa_g }}g</strong>
-            </div>
-            <div class="macro-fila" *ngIf="r.fibra_g">
-              <span>Fibra</span>
-              <strong>{{ r.fibra_g }}g</strong>
-            </div>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Macros por ración -->
-    <ion-card class="card-macros-racion" *ngIf="r.raciones > 1 && macrosPorRacion() as mp">
-      <ion-card-header>
-        <ion-card-title>Por ración ({{ r.raciones }} raciones)</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="macros-row">
-          <div class="macro">
-            <span class="macro-valor">{{ mp.calorias }}</span>
-            <span class="macro-label">kcal</span>
-          </div>
-          <div class="macro">
-            <span class="macro-valor">{{ mp.proteina }}g</span>
-            <span class="macro-label">Proteína</span>
-          </div>
-          <div class="macro">
-            <span class="macro-valor">{{ mp.carbohidratos }}g</span>
-            <span class="macro-label">Carbos</span>
-          </div>
-          <div class="macro">
-            <span class="macro-valor">{{ mp.grasa }}g</span>
-            <span class="macro-label">Grasa</span>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Ingredientes -->
-    <ion-card *ngIf="r.receta_ingredientes && r.receta_ingredientes.length > 0">
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="nutrition-outline"></ion-icon>
-          Ingredientes
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="card-content-ingredientes">
-        <div class="ingrediente-row" *ngFor="let ing of r.receta_ingredientes">
-          <div class="ingrediente-info">
-            <span class="ingrediente-nombre">{{ ing.food_items?.nombre }}</span>
-            <span class="ingrediente-cantidad">
-              {{ ing.cantidad_g }}g
-              <span *ngIf="ing.cantidad_texto" class="cantidad-texto"> · {{ ing.cantidad_texto }}</span>
-            </span>
-          </div>
-          <div class="ingrediente-macros">
-            <span>{{ calcularMacrosIngrediente(ing.food_items?.calorias_kcal ?? 0, ing.cantidad_g) }} kcal</span>
-            <span>P: {{ calcularMacrosIngrediente(ing.food_items?.proteina_g ?? 0, ing.cantidad_g) }}g</span>
-          </div>
-          <ion-badge *ngIf="ing.es_opcional" color="medium">Opcional</ion-badge>
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Instrucciones -->
-    <ion-card *ngIf="r.instrucciones">
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="restaurant-outline"></ion-icon>
-          Elaboración
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <p class="instrucciones-texto">{{ r.instrucciones }}</p>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Etiquetas -->
-    <div class="etiquetas-section" *ngIf="r.etiquetas && r.etiquetas.length > 0">
-      <ion-chip *ngFor="let etiqueta of r.etiquetas" color="tertiary" outline>
-        <ion-icon name="checkmark-circle-outline"></ion-icon>
-        <ion-label>{{ etiqueta }}</ion-label>
-      </ion-chip>
-    </div>
-
-  </div>
+  }
 </ion-content>
