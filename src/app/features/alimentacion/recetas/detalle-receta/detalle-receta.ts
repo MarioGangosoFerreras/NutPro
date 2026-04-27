@@ -38,6 +38,7 @@ import {
   ellipsisVerticalOutline,
 } from 'ionicons/icons';
 import { RecetaService, Receta } from '../../../../core/services/receta';
+import { IonicSafeString } from '@ionic/core';
 
 @Component({
   selector: 'app-detalle-receta',
@@ -151,10 +152,10 @@ export class DetalleReceta implements OnInit {
     const id = this.receta()?.id;
     if (!id) return;
 
+    // Volvemos al spinner estándar de Ionic
     const loading = await this.loadingCtrl.create({
-      spinner: null, // Quitamos el spinner nativo
-      message: '<div class="avocado-spinner" style="font-size: 40px; margin-bottom: 10px;">🥑</div><br>Guardando receta...',
-      cssClass: 'aguacate-loading-overlay' // Le aplicamos nuestros estilos chulos
+      message: 'Eliminando receta...',
+      spinner: 'crescent',
     });
     await loading.present();
 

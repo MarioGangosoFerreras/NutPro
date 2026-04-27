@@ -49,6 +49,7 @@ import {
 import { RecetaService } from '../../../../core/services/receta';
 import { FoodItem, FoodService, IngredienteLocal } from '../../../../core/services/food';
 import { CloudinaryService } from '../../../../core/services/cloudinary';
+import { IonicSafeString } from '@ionic/core';
 
 @Component({
   selector: 'app-crear-receta',
@@ -350,14 +351,16 @@ export class CrearReceta {
     );
   }
 
+  // 1. Añade esta señal con las demás
+  guardandoReceta = signal(false);
+
+  // 2. Reemplaza la función guardarReceta entera por esta:
   async guardarReceta() {
     if (!this.formularioValido()) return;
-    const loading = await this.loadingCtrl.create({
-      spinner: null, // Quitamos el spinner nativo
-      message: '<div class="avocado-spinner" style="font-size: 40px; margin-bottom: 10px;">🥑</div><br>Guardando receta...',
-      cssClass: 'aguacate-loading-overlay' // Le aplicamos nuestros estilos chulos
-    });
-    await loading.present();
+
+    // Mostramos la capa de carga del HTML
+    this.guardandoReceta.set(true);
+
     try {
       const receta = await this.recetaService.crearReceta({
         nombre: this.nombre().trim(),
@@ -383,12 +386,13 @@ export class CrearReceta {
         ),
       );
 
-      await loading.dismiss();
       await this.mostrarToast('Receta guardada correctamente', 'success');
       this.router.navigate(['/alimentacion/recetas']);
     } catch {
-      await loading.dismiss();
       await this.mostrarToast('Error guardando la receta', 'danger');
+    } finally {
+      // Ocultamos la capa de carga
+      this.guardandoReceta.set(false);
     }
   }
 
