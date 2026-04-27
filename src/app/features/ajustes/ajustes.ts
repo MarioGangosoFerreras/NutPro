@@ -74,7 +74,6 @@ interface CentroConsulta {
     IonCardContent,
     IonInput,
     IonSpinner,
-    IonAvatar,
     IonSelect,
     IonSelectOption,
   ],

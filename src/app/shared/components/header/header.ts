@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, IonHeader, IonToolbar, IonButton, IonIcon, IonAvatar, IonBadge, IonButtons, IonTitle],
+  imports: [CommonModule, IonHeader, IonToolbar, IonButton, IonIcon, IonBadge, IonButtons, IonTitle],
   templateUrl: './header.html',
   styleUrl: './header.css'
 })

@@ -42,7 +42,6 @@ import {
     FormsModule,
     IonList,
     IonItem,
-    IonBadge,
     IonButton,
     IonIcon,
     IonModal,
