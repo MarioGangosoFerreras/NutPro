@@ -1,15 +1,16 @@
-import { Component, inject, signal, HostListener, OnInit } from '@angular/core';
+// src/app/shared/components/shell/shell.ts
+import { Component, inject, signal, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import {
   IonMenu,
-  IonContent,
   IonIcon,
   IonRouterOutlet,
   IonSplitPane,
   IonAvatar,
   MenuController,
+  IonBadge,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -24,6 +25,7 @@ import {
   giftOutline,
   personCircleOutline,
   restaurantOutline,
+  chatbubblesOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 import { ChatService } from '../../../core/services/chat';
@@ -45,6 +47,7 @@ interface NavItem {
     IonRouterOutlet,
     IonSplitPane,
     IonAvatar,
+    IonBadge,
   ],
   templateUrl: './shell.html',
   styleUrls: ['./shell.css'],
@@ -54,10 +57,8 @@ export class Shell implements OnInit {
   private authService = inject(AuthService);
   private menuCtrl = inject(MenuController);
   private chatService = inject(ChatService);
+  private cdr = inject(ChangeDetectorRef);
 
-  chats = signal<any[]>([]);
-
-  // Signal estático: permite al Header cambiar el estado sin usar un servicio
   static isCollapsed = signal(false);
 
   get collapsed() {
@@ -65,6 +66,8 @@ export class Shell implements OnInit {
   }
 
   rutaActiva = signal('');
+  mensajesSinLeer = signal(0);
+
   usuarioActual = signal({
     nombre: 'Cargando...',
     rol: 'Nutricionista',
@@ -76,8 +79,8 @@ export class Shell implements OnInit {
     { label: 'Pacientes', icon: 'people-outline', route: '/pacientes' },
     { label: 'Citas', icon: 'calendar-outline', route: '/citas' },
     { label: 'Recetas', icon: 'restaurant-outline', route: '/alimentacion/recetas' },
+    { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' },
     { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
-
   ];
 
   constructor() {
@@ -93,6 +96,7 @@ export class Shell implements OnInit {
       giftOutline,
       personCircleOutline,
       restaurantOutline,
+      chatbubblesOutline,
     });
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e: any) => {
       this.rutaActiva.set(e.urlAfterRedirects);
@@ -110,7 +114,7 @@ export class Shell implements OnInit {
       });
       const nutriId = await this.authService.getNutricionistaId();
       if (nutriId) {
-        this.chats.set(await this.chatService.getChatsNutricionista(nutriId));
+        this.mensajesSinLeer.set(await this.chatService.getMensajesSinLeerTotales(nutriId));
       }
     }
   }

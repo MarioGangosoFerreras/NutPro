@@ -1,0 +1,290 @@
+/* src/app/features/mensajes/mensajes.css */
+.mensajes-layout {
+  display: flex;
+  height: 100%;
+  background: #f0f2f5; /* Fondo clásico de WhatsApp Web */
+}
+
+.left-panel {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-right: 1px solid #d1d7db;
+}
+
+.left-header {
+  padding: 10px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #e9edef;
+}
+
+.contacts-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.contact-item:hover {
+  background: #f5f6f6;
+}
+
+.contact-item.active {
+  background: #f0f2f5;
+}
+
+.contact-avatar {
+  width: 48px;
+  height: 48px;
+  margin-right: 14px;
+  background: #dfe5e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-avatar ion-icon {
+  font-size: 48px;
+  color: #94a3b8;
+}
+
+.contact-info {
+  flex: 1;
+  min-width: 0;
+  border-bottom: 1px solid #f2f2f2;
+  padding-bottom: 12px;
+  padding-top: 4px;
+}
+
+.contact-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.contact-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #111b21;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-time {
+  font-size: 12px;
+  color: #667781;
+}
+
+.contact-bottom {
+  display: flex;
+}
+
+.contact-last-msg {
+  font-size: 13px;
+  color: #667781;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #efeae2;
+  position: relative;
+}
+
+.empty-chat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #667781;
+  text-align: center;
+}
+
+.empty-chat ion-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  opacity: 0.3;
+}
+
+.empty-chat h2 {
+  font-size: 24px;
+  font-weight: 300;
+  margin-bottom: 10px;
+  color: #41525d;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  background: #f0f2f5;
+  border-bottom: 1px solid #d1d7db;
+}
+
+.back-btn {
+  display: none;
+  margin-right: 8px;
+  color: #54656f;
+}
+
+.chat-header-avatar {
+  width: 40px;
+  height: 40px;
+  margin-right: 14px;
+  background: #dfe5e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-header-avatar ion-icon {
+  font-size: 40px;
+  color: #94a3b8;
+}
+
+.chat-header-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111b21;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 5%;
+  display: flex;
+  flex-direction: column;
+}
+
+.mensajes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mensaje-bubble {
+  max-width: 65%;
+  padding: 8px 10px 20px 10px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
+  display: inline-block;
+  font-size: 14px;
+  color: #111b21;
+  word-wrap: break-word;
+}
+
+.mensaje-bubble p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.mensaje-bubble.mio {
+  align-self: flex-end;
+  background: #dcf8c6;
+  border-top-right-radius: 0;
+}
+
+.mensaje-bubble:not(.mio) {
+  align-self: flex-start;
+  background: #ffffff;
+  border-top-left-radius: 0;
+}
+
+.hora {
+  font-size: 11px;
+  color: #667781;
+  position: absolute;
+  bottom: 4px;
+  right: 8px;
+}
+
+.chat-input-area {
+  padding: 10px 16px;
+  background: #f0f2f5;
+}
+
+.chat-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 8px 16px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+.native-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  background: transparent;
+  padding: 4px 0;
+  color: #111b21;
+}
+
+.native-input::placeholder {
+  color: #8696a0;
+}
+
+.send-btn {
+  background: transparent;
+  border: none;
+  color: #54656f;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.send-btn:hover:not([disabled]) {
+  color: var(--primary-medical, #2d6a4f);
+}
+
+.send-btn[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ─── RESPONSIVE: MODO MÓVIL ─── */
+@media (max-width: 768px) {
+  .left-panel {
+    width: 100%;
+    display: flex;
+  }
+  .right-panel {
+    display: none;
+  }
+  
+  .mensajes-layout.chat-active .left-panel {
+    display: none;
+  }
+  .mensajes-layout.chat-active .right-panel {
+    display: flex;
+    width: 100%;
+  }
+  
+  .back-btn {
+    display: flex; /* Mostrar el botón de volver en móvil */
+  }
+  
+  .mensaje-bubble {
+    max-width: 85%;
+  }
+}

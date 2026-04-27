@@ -252,3 +252,15 @@ ion-split-pane.menu-collapsed .chat-item {
 .chat-item:hover .chat-name {
   color: #1e293b;
 }
+
+.badge-nav {
+  margin-left: auto;
+}
+
+ion-split-pane.menu-collapsed .badge-nav {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 10px;
+  padding: 3px 5px;
+}

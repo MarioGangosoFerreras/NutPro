@@ -12,42 +12,85 @@
   </ion-segment>
 </div>
 
-<div class="tab-content" style="margin-top: 16px;">
-  
+<div class="tab-content" style="margin-top: 16px">
   @if (vistaActiva === 'configuracion') {
-    <app-plan-configurador 
-      [paciente]="paciente" 
+    <app-plan-configurador
+      [paciente]="paciente"
       [planActivo]="planActivo"
-      (guardado)="onPlanGuardado($event)">
+      (guardado)="onPlanGuardado($event)"
+    >
     </app-plan-configurador>
   }
 
   @if (vistaActiva === 'menu' && planActivo) {
-    <app-menu-semanal 
-      [planId]="planActivo.id" 
-      [pacienteId]="paciente.id">
+    <app-menu-semanal
+      [planId]="planActivo.id"
+      [pacienteId]="paciente.id"
+      [paciente]="paciente"
+      [planActivo]="planActivo"
+      [caloriasObjetivo]="planActivo.calorias_objetivo"
+      [alergias]="paciente.alergias"
+      [intolerancias]="paciente.intolerancias"
+    >
     </app-menu-semanal>
   }
 
   @if (vistaActiva === 'historial') {
-    <ion-list>
-      @if (historialPlanes.length === 0) {
-        <div style="text-align: center; padding: 30px; color: var(--ion-color-medium);">
-          <p>No hay historial de planes anteriores.</p>
+    <div style="padding: 10px 16px">
+      <h3
+        style="
+          color: var(--primary-medical, #2d6a4f);
+          font-size: 15px;
+          font-weight: 700;
+          margin-bottom: 12px;
+          text-transform: uppercase;
+        "
+      >
+        Historial de Menús
+      </h3>
+
+      @if (historialMenus.length === 0) {
+        <div style="text-align: center; padding: 30px; color: var(--ion-color-medium)">
+          <p>No hay historial de menús anteriores.</p>
         </div>
       }
 
-      @for (plan of historialPlanes; track plan.id) {
-        <ion-item button (click)="restaurarPlan(plan)">
-          <ion-label>
-            <h3>{{ plan.created_at | date:'dd MMM yyyy' }}</h3>
-            <p>{{ plan.tipo === 'cuantitativo' ? plan.calorias_objetivo + ' kcal' : 'Cualitativo' }} - Objetivo: {{ plan.objetivo }}</p>
-          </ion-label>
-          @if (plan.activo) {
-            <ion-badge color="success" slot="end">Activo</ion-badge>
-          }
-        </ion-item>
-      }
-    </ion-list>
+      <ion-list style="background: transparent">
+        @for (menu of historialMenus; track menu.id) {
+          <ion-item
+            style="
+              --border-radius: 12px;
+              margin-bottom: 8px;
+              border: 1px solid #f1f5f9;
+              box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            "
+          >
+            <ion-icon
+              name="calendar-outline"
+              slot="start"
+              style="color: var(--primary-medical, #2d6a4f)"
+            ></ion-icon>
+            <ion-label>
+              <h3 style="font-weight: 700; color: #1e293b">
+                Semana del {{ menu.fecha_inicio | date: 'dd MMM yyyy' }}
+              </h3>
+              <p style="font-size: 13px; color: #64748b">
+                Plan: {{ menu.plan?.calorias_objetivo || 'Personalizado' }} kcal
+              </p>
+            </ion-label>
+            <ion-button
+              slot="end"
+              fill="outline"
+              color="primary"
+              size="small"
+              (click)="clonarMenu(menu)"
+            >
+              <ion-icon name="copy-outline" slot="start"></ion-icon>
+              Reutilizar
+            </ion-button>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
   }
 </div>

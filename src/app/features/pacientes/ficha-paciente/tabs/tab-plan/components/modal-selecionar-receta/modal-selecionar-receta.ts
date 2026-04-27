@@ -1,39 +1,59 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core'; // <-- 1. Importar ChangeDetectorRef
+import { Component, OnInit, inject, ChangeDetectorRef, Input } from '@angular/core'; // <-- 1. Importar ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonSearchbar, IonList, IonItem, IonLabel, IonSpinner, ModalController } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonSearchbar, IonList, IonItem, IonLabel, IonSpinner, ModalController, IonThumbnail } from '@ionic/angular/standalone';
 import { RecetaService } from '../../../../../../../core/services/receta';
 import { addIcons } from 'ionicons';
-import { closeOutline } from 'ionicons/icons';
+import { closeOutline, restaurantOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-modal-seleccionar-receta',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonSearchbar, IonList, IonItem, IonLabel, IonSpinner],
+  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonSearchbar, IonList, IonItem, IonLabel, IonSpinner, IonThumbnail],
   templateUrl: './modal-selecionar-receta.html'
 })
 export class ModalSeleccionarReceta implements OnInit {
+  @Input() alergias: string[] = [];
+  @Input() intolerancias: string[] = [];
+
   private recetaService = inject(RecetaService);
   private modalCtrl = inject(ModalController);
-  private cdr = inject(ChangeDetectorRef); // <-- 2. Inyectar ChangeDetectorRef
+  private cdr = inject(ChangeDetectorRef); 
   
   recetas: any[] = [];
   recetasFiltradas: any[] = [];
   cargando = true;
 
   constructor() {
-    addIcons({ closeOutline });
+    addIcons({ closeOutline, restaurantOutline });
   }
 
   async ngOnInit() {
     try {
-      this.recetas = await this.recetaService.getRecetas();
+      const todas = await this.recetaService.getRecetas();
+      
+      // Pasar a minúsculas para comparar más fácil
+      const alergiasLower = (this.alergias || []).map(a => a.toLowerCase());
+      const intolLower = (this.intolerancias || []).map(i => i.toLowerCase());
+
+      // FILTRADO INTELIGENTE
+      this.recetas = todas.filter(r => {
+        const etiquetas = r.etiquetas || [];
+        
+        // Reglas de exclusión (puedes ampliar esto según tus etiquetas)
+        if ((alergiasLower.includes('gluten') || intolLower.includes('gluten')) && !etiquetas.includes('sin_gluten')) return false;
+        if ((alergiasLower.includes('lactosa') || intolLower.includes('lactosa')) && !etiquetas.includes('sin_lactosa')) return false;
+        if (alergiasLower.includes('vegano') && !etiquetas.includes('vegano')) return false;
+        
+        return true;
+      });
+
       this.recetasFiltradas = [...this.recetas];
     } catch (e) {
       console.error('Error cargando recetas:', e);
     } finally {
       this.cargando = false;
-      this.cdr.detectChanges(); // <-- 3. Forzar actualización de la vista al quitar el spinner
+      this.cdr.detectChanges(); 
     }
   }
 

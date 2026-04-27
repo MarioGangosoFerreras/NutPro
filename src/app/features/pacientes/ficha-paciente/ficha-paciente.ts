@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, inject, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
 import { PacientesService } from '../../../core/services/pacientes';
@@ -61,6 +61,7 @@ export class FichaPaciente implements OnInit {
   private authService = inject(AuthService);
   private supabaseService = inject(SupabaseService);
   private supabase = this.supabaseService.client;
+  @ViewChild(TabResumen) tabResumen!: TabResumen; 
 
   menuAbierto = false;
 
@@ -115,6 +116,14 @@ export class FichaPaciente implements OnInit {
       this.loading = false;
       this.cdr.detectChanges();
     }
+  }
+
+  editarDesdeMenu() {
+    this.menuAbierto = false;
+    this.tabActiva = 'resumen'; // Cambiamos a la pestaña de resumen por si acaso
+    setTimeout(() => {
+      this.tabResumen.iniciarEdicion(); // Ejecutamos la edición en el hijo
+    }, 100);
   }
 
   onTabChange(event: any) {

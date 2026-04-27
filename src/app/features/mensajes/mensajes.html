@@ -1,0 +1,88 @@
+<app-header titulo="Mensajes"></app-header>
+
+<ion-content [scrollY]="false">
+  <div class="mensajes-layout" [class.chat-active]="contactoActivo()">
+    
+    <div class="left-panel">
+      <div class="left-header">
+        <ion-searchbar placeholder="Buscar paciente..." (ionInput)="onBuscar($event)"></ion-searchbar>
+      </div>
+      
+      <div class="contacts-list">
+         @for (contacto of contactosFiltrados(); track contacto.paciente.id) {
+           <div class="contact-item" 
+                [class.active]="contactoActivo()?.paciente.id === contacto.paciente.id" 
+                (click)="seleccionarContacto(contacto)">
+                
+             <ion-avatar class="contact-avatar">
+               @if (contacto.paciente.usuario?.avatar_url) {
+                 <img [src]="contacto.paciente.usuario.avatar_url" />
+               } @else {
+                 <ion-icon name="person-circle-outline"></ion-icon>
+               }
+             </ion-avatar>
+
+             <div class="contact-info">
+               <div class="contact-top">
+                 <span class="contact-name">{{ contacto.paciente.usuario?.nombre }} {{ contacto.paciente.usuario?.apellidos }}</span>
+                 <span class="contact-time" *ngIf="contacto.ultimoMensaje">
+                    {{ contacto.ultimoMensaje.enviado_at | date:'HH:mm' }}
+                 </span>
+               </div>
+               <div class="contact-bottom">
+                 <span class="contact-last-msg">{{ contacto.ultimoMensaje?.contenido || 'Toca para iniciar una conversación' }}</span>
+               </div>
+             </div>
+
+           </div>
+         }
+      </div>
+    </div>
+
+    <div class="right-panel">
+      @if (!contactoActivo()) {
+        <div class="empty-chat">
+          <ion-icon name="chatbubbles-outline"></ion-icon>
+          <h2>Tus mensajes</h2>
+          <p>Selecciona un paciente para empezar a chatear.</p>
+        </div>
+      } @else {
+        
+        <div class="chat-header">
+           <ion-button fill="clear" class="back-btn" (click)="contactoActivo.set(null)">
+               <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+           </ion-button>
+           <ion-avatar class="chat-header-avatar">
+             @if (contactoActivo().paciente.usuario?.avatar_url) {
+               <img [src]="contactoActivo().paciente.usuario.avatar_url" />
+             } @else {
+               <ion-icon name="person-circle-outline"></ion-icon>
+             }
+           </ion-avatar>
+           <span class="chat-header-name">{{ contactoActivo().paciente.usuario?.nombre }} {{ contactoActivo().paciente.usuario?.apellidos }}</span>
+        </div>
+
+        <div class="chat-messages" #chatScroll>
+          <div class="mensajes-container">
+            @for (msg of mensajes(); track msg.id) {
+              <div class="mensaje-bubble" [class.mio]="msg.sender_id === miUsuarioId">
+                <p>{{ msg.contenido }}</p>
+                <span class="hora">{{ msg.enviado_at | date:'HH:mm' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <div class="chat-input-wrapper">
+            <input type="text" [(ngModel)]="nuevoMensaje" (keyup.enter)="enviar()" placeholder="Escribe un mensaje..." class="native-input" />
+            <button class="send-btn" (click)="enviar()" [disabled]="!nuevoMensaje.trim()">
+              <ion-icon name="send-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+</ion-content>

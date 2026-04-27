@@ -20,16 +20,26 @@
   } @else {
     @if (recetasFiltradas.length === 0) {
       <div style="text-align: center; padding: 30px; color: gray;">
-        <p>No se encontraron recetas.</p>
+        <p>No se encontraron recetas que cumplan con las restricciones del paciente.</p>
       </div>
     }
     
     <ion-list>
       @for (receta of recetasFiltradas; track receta.id) {
         <ion-item button (click)="seleccionar(receta)">
+          <ion-thumbnail slot="start" style="--border-radius: 8px;">
+            @if (receta.imagen_url) {
+              <img [src]="receta.imagen_url" />
+            } @else {
+              <div style="width:100%; height:100%; background:#e8f5e9; display:flex; align-items:center; justify-content:center; color:#2d6a4f;">
+                <ion-icon name="restaurant-outline"></ion-icon>
+              </div>
+            }
+          </ion-thumbnail>
+          
           <ion-label>
             <h3>{{ receta.nombre }}</h3>
-            <p>{{ receta.calorias_kcal || 0 }} kcal</p>
+            <p>{{ receta.calorias_kcal || 0 }} kcal · P: {{ receta.proteina_g || 0 }}g</p>
           </ion-label>
         </ion-item>
       }

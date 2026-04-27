@@ -1,47 +1,83 @@
-@if (cargando) {
-<div style="display: flex; justify-content: center; padding: 40px;">
-    <ion-spinner name="crescent"></ion-spinner>
+<div style="display: flex; justify-content: flex-end; margin-bottom: 15px">
+  <ion-button fill="outline" color="primary" (click)="exportarPDF()">
+    <ion-icon slot="start" name="download-outline"></ion-icon>
+    Exportar Menú a PDF
+  </ion-button>
 </div>
+
+@if (cargando) {
+  <div style="display: flex; justify-content: center; padding: 40px">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
 } @else {
-<div class="menu-grid">
+  <div class="menu-grid">
     @for (dia of dias; track dia.id) {
-    <ion-card class="dia-card">
-        <div class="dia-header">
+      <ion-card class="dia-card">
+        <div
+          class="dia-header"
+          [class.over-kcal]="getTotalKcalDia(dia.id) > caloriasObjetivo && caloriasObjetivo > 0"
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center">
             <h3>{{ dia.nombre }}</h3>
+            @if (caloriasObjetivo > 0) {
+              <span class="kcal-counter">
+                {{ getTotalKcalDia(dia.id) }} / {{ caloriasObjetivo }} kcal
+              </span>
+            }
+          </div>
         </div>
 
         <ion-card-content class="dia-content">
-            @for (comida of tiposComida; track comida.id) {
+          @for (comida of tiposComida; track comida.id) {
             <div class="comida-seccion">
-                <div class="comida-header">
-                    <span class="comida-titulo">{{ comida.label }}</span>
-                    <ion-button fill="clear" size="small" class="btn-add"
-                        (click)="abrirModalRecetas(dia.id, comida.id)">
-                        <ion-icon name="add-outline" slot="icon-only"></ion-icon>
-                    </ion-button>
-                </div>
+              <div class="comida-header">
+                <span class="comida-titulo">{{ comida.label }}</span>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  class="btn-add"
+                  (click)="abrirModalRecetas(dia.id, comida.id)"
+                >
+                  <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
 
-                <div class="comida-entradas">
-                    @let entradasComida = obtenerEntradas(dia.id, comida.id);
+              <div class="comida-entradas">
+                @let entradasComida = obtenerEntradas(dia.id, comida.id);
 
-                    @if (entradasComida.length === 0) {
-                    <p class="empty-text">Sin asignar</p>
-                    }
+                @if (entradasComida.length === 0) {
+                  <p class="empty-text">Sin asignar</p>
+                }
 
-                    @for (entrada of entradasComida; track entrada.id) {
-                    <div class="entrada-item">
+                @for (entrada of entradasComida; track entrada.id) {
+                  <div class="entrada-item">
+                    @if (entrada.receta?.imagen_url) {
+                      <img [src]="entrada.receta.imagen_url" class="entrada-img" />
+                    } @else {
+                      <div class="entrada-icon-wrapper">
                         <ion-icon name="restaurant-outline" class="entrada-icon"></ion-icon>
-                        <span class="entrada-titulo">{{ entrada.receta?.nombre }}</span>
-                        <button class="btn-delete" (click)="eliminarEntrada(entrada.id)">
-                            <ion-icon name="trash-outline"></ion-icon>
-                        </button>
-                    </div>
+                      </div>
                     }
-                </div>
+
+                    <div class="entrada-info">
+                      <span class="entrada-titulo">{{
+                        entrada.receta?.nombre || entrada.receta?.titulo
+                      }}</span>
+                      <span class="entrada-kcal"
+                        >{{ entrada.receta?.calorias_kcal || 0 }} kcal</span
+                      >
+                    </div>
+
+                    <button class="btn-delete" (click)="eliminarEntrada(entrada.id)">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                  </div>
+                }
+              </div>
             </div>
-            }
+          }
         </ion-card-content>
-    </ion-card>
+      </ion-card>
     }
-</div>
+  </div>
 }

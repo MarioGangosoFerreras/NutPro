@@ -18,42 +18,14 @@
           [title]="collapsed ? item.label : ''">
           <ion-icon [name]="item.icon"></ion-icon>
           @if (!collapsed) {
-          <span>{{ item.label }}</span>
+            <span>{{ item.label }}</span>
+          }
+          @if (item.route === '/mensajes' && mensajesSinLeer() > 0) {
+            <ion-badge color="danger" class="badge-nav">{{ mensajesSinLeer() }}</ion-badge>
           }
         </button>
         }
       </div>
-
-      @if (chats().length > 0) {
-      <div class="nav-title">
-        @if (!collapsed) { Mensajes }
-      </div>
-
-      <div class="nav-container chats-list">
-        @for (chat of chats(); track chat.id) {
-        <button class="nav-btn chat-item"
-          [class.active]="rutaActiva().includes('/chat') && rutaActiva().includes(chat.paciente.id)"
-          (click)="navegar('/pacientes/' + chat.paciente.id + '/chat')"
-          [title]="collapsed ? chat.paciente.usuario.nombre : ''">
-
-          <ion-avatar class="chat-avatar">
-            @if (chat.paciente.usuario.avatar_url) {
-            <img [src]="chat.paciente.usuario.avatar_url" />
-            } @else {
-            <ion-icon name="person-circle-outline" style="font-size: 24px; color: #2d6a4f;"></ion-icon>
-            }
-          </ion-avatar>
-
-          @if (!collapsed) {
-          <div class="chat-info">
-            <span class="chat-name">{{ chat.paciente.usuario.nombre }}</span>
-            <span class="chat-preview">{{ chat.ultimo_mensaje[0]?.contenido || 'Sin mensajes' }}</span>
-          </div>
-          }
-        </button>
-        }
-      </div>
-      }
 
       <div class="spacer"></div>
 
