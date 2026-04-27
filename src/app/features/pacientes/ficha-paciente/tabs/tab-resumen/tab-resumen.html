@@ -1,152 +1,294 @@
-<!-- 🧾 DATOS PERSONALES -->
-<ion-card class="section-block">
-  <ion-card-header>
-    <ion-card-title class="section-title">
-      👤 Datos personales
-    </ion-card-title>
-  </ion-card-header>
+@if (!editando) {
+  <ion-card class="section-block">
+    <ion-card-header>
+      <ion-card-title class="section-title"> 👤 Datos personales </ion-card-title>
+    </ion-card-header>
 
-  <ion-card-content>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-md="6" size-lg="4">
+            <ion-item class="info-item" lines="none">
+              <ion-icon name="mail-outline" slot="start"></ion-icon>
+              <ion-label>
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ paciente.usuario?.email }}</span>
+              </ion-label>
+            </ion-item>
+          </ion-col>
+          <ion-col size="12" size-md="6" size-lg="4">
+            <ion-item class="info-item" lines="none">
+              <ion-icon name="call-outline" slot="start"></ion-icon>
+              <ion-label>
+                <span class="info-label">Teléfono</span>
+                <span class="info-value">{{ paciente.telefono }}</span>
+              </ion-label>
+            </ion-item>
+          </ion-col>
+          <ion-col size="12" size-md="6" size-lg="4">
+            <ion-item class="info-item" lines="none">
+              <ion-icon name="calendar-outline" slot="start"></ion-icon>
+              <ion-label>
+                <span class="info-label">F. nacimiento</span>
+                <span class="info-value">{{ paciente.fecha_nacimiento }}</span>
+              </ion-label>
+            </ion-item>
+          </ion-col>
+          <ion-col size="12" size-md="6" size-lg="4">
+            <ion-item class="info-item" lines="none">
+              <ion-icon name="person-outline" slot="start"></ion-icon>
+              <ion-label>
+                <span class="info-label">Sexo</span>
+                <span class="info-value">{{ paciente.sexo }}</span>
+              </ion-label>
+            </ion-item>
+          </ion-col>
+          @if (paciente.dni) {
+            <ion-col size="12" size-md="6" size-lg="4">
+              <ion-item class="info-item" lines="none">
+                <ion-icon name="card-outline" slot="start"></ion-icon>
+                <ion-label>
+                  <span class="info-label">DNI</span>
+                  <span class="info-value">{{ paciente.dni }}</span>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          }
+          @if (paciente.ocupacion) {
+            <ion-col size="12" size-md="6" size-lg="4">
+              <ion-item class="info-item" lines="none">
+                <ion-icon name="briefcase-outline" slot="start"></ion-icon>
+                <ion-label>
+                  <span class="info-label">Ocupación</span>
+                  <span class="info-value">{{ paciente.ocupacion }}</span>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          }
+          @if (paciente.estado_civil) {
+            <ion-col size="12" size-md="6" size-lg="4">
+              <ion-item class="info-item" lines="none">
+                <ion-icon name="heart-outline" slot="start"></ion-icon>
+                <ion-label>
+                  <span class="info-label">Estado civil</span>
+                  <span class="info-value">{{ paciente.estado_civil }}</span>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          }
+          @if (paciente.nacionalidad) {
+            <ion-col size="12" size-md="6" size-lg="4">
+              <ion-item class="info-item" lines="none">
+                <ion-icon name="flag-outline" slot="start"></ion-icon>
+                <ion-label>
+                  <span class="info-label">Nacionalidad</span>
+                  <span class="info-value">{{ paciente.nacionalidad }}</span>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
 
-    <ion-grid>
-      <ion-row>
-
-        <ion-col size="12" size-md="6" size-lg="4">
-          <ion-item class="info-item" lines="none">
-            <ion-icon name="mail-outline" slot="start"></ion-icon>
-            <ion-label>
-              <span class="info-label">Email</span>
-              <span class="info-value">{{ paciente.usuario?.email }}</span>
-            </ion-label>
-          </ion-item>
-        </ion-col>
-
-        <ion-col size="12" size-md="6" size-lg="4">
-          <ion-item class="info-item" lines="none">
-            <ion-icon name="call-outline" slot="start"></ion-icon>
-            <ion-label>
-              <span class="info-label">Teléfono</span>
-              <span class="info-value">{{ paciente.usuario?.telefono }}</span>
-            </ion-label>
-          </ion-item>
-        </ion-col>
-
-        <ion-col size="12" size-md="6" size-lg="4">
-          <ion-item class="info-item" lines="none">
-            <ion-icon name="calendar-outline" slot="start"></ion-icon>
-            <ion-label>
-              <span class="info-label">F. nacimiento</span>
-              <span class="info-value">{{ paciente.fecha_nacimiento }}</span>
-            </ion-label>
-          </ion-item>
-        </ion-col>
-
-        <ion-col size="12" size-md="6" size-lg="4">
-          <ion-item class="info-item" lines="none">
-            <ion-icon name="person-outline" slot="start"></ion-icon>
-            <ion-label>
-              <span class="info-label">Sexo</span>
-              <span class="info-value">{{ paciente.sexo }}</span>
-            </ion-label>
-          </ion-item>
-        </ion-col>
-
-        @if (paciente.dni) {
-        <ion-col size="12" size-md="6" size-lg="4">
-          <ion-item class="info-item" lines="none">
-            <ion-icon name="card-outline" slot="start"></ion-icon>
-            <ion-label>
-              <span class="info-label">DNI</span>
-              <span class="info-value">{{ paciente.dni }}</span>
-            </ion-label>
-          </ion-item>
-        </ion-col>
-        }
-
-        @if (paciente.ocupacion) {
-        <ion-col size="12" size-md="6" size-lg="4">
-          <ion-item class="info-item" lines="none">
-            <ion-icon name="briefcase-outline" slot="start"></ion-icon>
-            <ion-label>
-              <span class="info-label">Ocupación</span>
-              <span class="info-value">{{ paciente.ocupacion }}</span>
-            </ion-label>
-          </ion-item>
-        </ion-col>
-        }
-
-        @if (paciente.estado_civil) {
-        <ion-col size="12" size-md="6" size-lg="4">
-          <ion-item class="info-item" lines="none">
-            <ion-icon name="heart-outline" slot="start"></ion-icon>
-            <ion-label>
-              <span class="info-label">Estado civil</span>
-              <span class="info-value">{{ paciente.estado_civil }}</span>
-            </ion-label>
-          </ion-item>
-        </ion-col>
-        }
-
-        @if (paciente.nacionalidad) {
-        <ion-col size="12" size-md="6" size-lg="4">
-          <ion-item class="info-item" lines="none">
-            <ion-icon name="flag-outline" slot="start"></ion-icon>
-            <ion-label>
-              <span class="info-label">Nacionalidad</span>
-              <span class="info-value">{{ paciente.nacionalidad }}</span>
-            </ion-label>
-          </ion-item>
-        </ion-col>
-        }
-
-      </ion-row>
-    </ion-grid>
-
-  </ion-card-content>
-</ion-card>
-
-<!-- ⚠️ ALERGIAS -->
-<ion-card class="section-block">
-  <ion-card-header>
-    <ion-card-title class="section-title">
-      ⚠️ Alergias
-    </ion-card-title>
-  </ion-card-header>
-
-  <ion-card-content>
-    @if (paciente.alergias?.length > 0) {
-    <div class="tags">
-      @for (a of paciente.alergias; track a) {
-      <ion-chip color="danger">
-        <ion-label>{{ a }}</ion-label>
-      </ion-chip>
+  <ion-card class="section-block">
+    <ion-card-header>
+      <ion-card-title class="section-title"> ⚠️ Alergias </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if (paciente.alergias?.length > 0) {
+        <div class="tags">
+          @for (a of paciente.alergias; track a) {
+            <ion-chip color="danger">
+              <ion-label>{{ a }}</ion-label>
+            </ion-chip>
+          }
+        </div>
+      } @else {
+        <p>No hay alergias registradas</p>
       }
-    </div>
-    } @else {
-    <p>No hay alergias registradas</p>
-    }
-  </ion-card-content>
-</ion-card>
+    </ion-card-content>
+  </ion-card>
 
-<!-- ⚠️ INTOLERANCIAS -->
-<ion-card class="section-block">
-  <ion-card-header>
-    <ion-card-title class="section-title">
-      ⚠️ Intolerancias
-    </ion-card-title>
-  </ion-card-header>
-
-  <ion-card-content>
-    @if (paciente.intolerancias?.length > 0) {
-    <div class="tags">
-      @for (i of paciente.intolerancias; track i) {
-      <ion-chip color="warning">
-        <ion-label>{{ i }}</ion-label>
-      </ion-chip>
+  <ion-card class="section-block">
+    <ion-card-header>
+      <ion-card-title class="section-title"> ⚠️ Intolerancias </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if (paciente.intolerancias?.length > 0) {
+        <div class="tags">
+          @for (i of paciente.intolerancias; track i) {
+            <ion-chip color="warning">
+              <ion-label>{{ i }}</ion-label>
+            </ion-chip>
+          }
+        </div>
+      } @else {
+        <p>No hay intolerancias registradas</p>
       }
-    </div>
-    } @else {
-    <p>No hay intolerancias registradas</p>
-    }
-  </ion-card-content>
-</ion-card>
+    </ion-card-content>
+  </ion-card>
+} @else {
+  <ion-card class="section-block">
+    <ion-card-header>
+      <ion-card-title class="section-title"> ✏️ Editar Datos del Paciente </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px">
+        <input type="file" #fileInput (change)="onAvatarChange($event)" hidden accept="image/*" />
+        <ion-avatar
+          style="
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            border: 2px solid var(--primary-medical);
+          "
+          (click)="fileInput.click()"
+        >
+          @if (avatarPreview || form.avatar_url) {
+            <img [src]="avatarPreview || form.avatar_url" />
+          } @else {
+            <ion-icon
+              name="camera-outline"
+              style="font-size: 40px; color: var(--primary-medical); margin-top: 18px"
+            ></ion-icon>
+          }
+        </ion-avatar>
+        <span style="font-size: 12px; color: gray; margin-top: 6px">Tocar para cambiar foto</span>
+      </div>
+
+      <div class="edit-grid">
+        <ion-item>
+          <ion-label position="stacked">Nombre</ion-label>
+          <ion-input [(ngModel)]="form.nombre"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Apellidos</ion-label>
+          <ion-input [(ngModel)]="form.apellidos"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input type="email" [(ngModel)]="form.email"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Teléfono</ion-label>
+          <ion-input type="tel" [(ngModel)]="form.telefono"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Fecha de nacimiento</ion-label>
+          <ion-input type="date" [(ngModel)]="form.fecha_nacimiento"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Sexo</ion-label>
+          <ion-select [(ngModel)]="form.sexo">
+            <ion-select-option value="masculino">Masculino</ion-select-option>
+            <ion-select-option value="femenino">Femenino</ion-select-option>
+            <ion-select-option value="otro">Otro</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">DNI</ion-label>
+          <ion-input [(ngModel)]="form.dni"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Ocupación</ion-label>
+          <ion-input [(ngModel)]="form.ocupacion"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Estado civil</ion-label>
+          <ion-select [(ngModel)]="form.estado_civil">
+            <ion-select-option value="soltero">Soltero/a</ion-select-option>
+            <ion-select-option value="casado">Casado/a</ion-select-option>
+            <ion-select-option value="divorciado">Divorciado/a</ion-select-option>
+            <ion-select-option value="viudo">Viudo/a</ion-select-option>
+            <ion-select-option value="pareja_de_hecho">Pareja de hecho</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Nacionalidad</ion-label>
+          <ion-input [(ngModel)]="form.nacionalidad"></ion-input>
+        </ion-item>
+        <ion-item class="full-width">
+          <ion-label position="stacked">Dirección</ion-label>
+          <ion-input [(ngModel)]="form.direccion"></ion-input>
+        </ion-item>
+        <ion-item class="full-width">
+          <ion-label position="stacked">Motivo de consulta</ion-label>
+          <ion-textarea [(ngModel)]="form.motivo_consulta" rows="2"></ion-textarea>
+        </ion-item>
+      </div>
+
+      <div style="margin-top: 20px">
+        <span class="tags-label">Alergias</span>
+        <div class="tags" style="margin-bottom: 10px">
+          @for (a of form.alergias; track a; let i = $index) {
+            <ion-chip color="danger">
+              <ion-label>{{ a }}</ion-label>
+              <ion-icon name="close-outline" (click)="eliminarTag('alergias', i)"></ion-icon>
+            </ion-chip>
+          }
+        </div>
+        <div class="tag-input-row">
+          <ion-input
+            placeholder="Añadir alergia"
+            [(ngModel)]="nuevaAlergia"
+            (keydown)="onTagKeydown($event, 'alergias', nuevaAlergia)"
+          ></ion-input>
+          <ion-button fill="clear" (click)="agregarTag('alergias', nuevaAlergia)"
+            ><ion-icon name="add-outline"></ion-icon
+          ></ion-button>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px">
+        <span class="tags-label">Intolerancias</span>
+        <div class="tags" style="margin-bottom: 10px">
+          @for (into of form.intolerancias; track into; let i = $index) {
+            <ion-chip color="warning">
+              <ion-label>{{ into }}</ion-label>
+              <ion-icon name="close-outline" (click)="eliminarTag('intolerancias', i)"></ion-icon>
+            </ion-chip>
+          }
+        </div>
+        <div class="tag-input-row">
+          <ion-input
+            placeholder="Añadir intolerancia"
+            [(ngModel)]="nuevaIntolerancia"
+            (keydown)="onTagKeydown($event, 'intolerancias', nuevaIntolerancia)"
+          ></ion-input>
+          <ion-button fill="clear" (click)="agregarTag('intolerancias', nuevaIntolerancia)"
+            ><ion-icon name="add-outline"></ion-icon
+          ></ion-button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 24px">
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="medium"
+          (click)="cancelarEdicion()"
+          style="flex: 1"
+        >
+          Cancelar
+        </ion-button>
+        <ion-button
+          expand="block"
+          color="primary"
+          (click)="guardar()"
+          [disabled]="guardando"
+          style="flex: 1"
+        >
+          @if (guardando) {
+            <ion-spinner name="crescent"></ion-spinner>
+          } @else {
+            <ion-icon slot="start" name="save-outline"></ion-icon>
+            Guardar
+          }
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+}

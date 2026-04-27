@@ -2,20 +2,56 @@ import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angu
 import { FormsModule } from '@angular/forms';
 import { PacientesService } from '../../../../../core/services/pacientes';
 import { CloudinaryService } from '../../../../../core/services/cloudinary';
-import { IonButton, IonIcon, IonSpinner, IonBadge, IonAvatar, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonTextarea, ToastController, AlertController, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonChip, IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
+import {
+  IonButton,
+  IonIcon,
+  IonSpinner,
+  IonBadge,
+  IonAvatar,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+  IonTextarea,
+  ToastController,
+  AlertController,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonChip,
+  IonCol,
+  IonGrid,
+  IonRow,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  personCircleOutline, calendarOutline, callOutline, mailOutline,
-  locationOutline, createOutline, closeOutline, saveOutline,
-  cameraOutline, trashOutline, cardOutline, briefcaseOutline,
-  heartOutline, flagOutline, addOutline,
+  personCircleOutline,
+  calendarOutline,
+  callOutline,
+  mailOutline,
+  locationOutline,
+  createOutline,
+  closeOutline,
+  saveOutline,
+  cameraOutline,
+  trashOutline,
+  cardOutline,
+  briefcaseOutline,
+  heartOutline,
+  flagOutline,
+  addOutline,
+  closeCircle,
 } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab-resumen',
   imports: [
-    FormsModule, IonIcon,
-    IonItem, IonLabel,
+    FormsModule,
+    IonIcon,
+    IonItem,
+    IonLabel,
     IonCard,
     IonCardHeader,
     IonCardTitle,
@@ -23,8 +59,19 @@ import {
     IonChip,
     IonCol,
     IonGrid,
-    IonRow
-  ],
+    IonRow,
+    IonSpinner,
+    IonButton,
+    IonSelectOption,
+    IonAvatar, 
+    IonInput,
+    IonTextarea,
+    IonSelect,
+    IonSelectOption,
+    IonButton,
+    IonSpinner,
+    IonAvatar
+],
   templateUrl: './tab-resumen.html',
   styleUrl: './tab-resumen.css',
 })
@@ -52,7 +99,7 @@ export class TabResumen {
       personCircleOutline, calendarOutline, callOutline, mailOutline,
       locationOutline, createOutline, closeOutline, saveOutline,
       cameraOutline, trashOutline, cardOutline, briefcaseOutline,
-      heartOutline, flagOutline, addOutline,
+      heartOutline, flagOutline, addOutline, closeCircle
     });
   }
 
@@ -88,8 +135,6 @@ export class TabResumen {
       alergias: [...(this.paciente.alergias || [])],
       intolerancias: [...(this.paciente.intolerancias || [])],
     };
-    this.avatarPreview = null;
-    this.avatarFile = null;
     this.editando = true;
     this.cdr.detectChanges();
   }
@@ -181,7 +226,12 @@ export class TabResumen {
   }
 
   private async mostrarToast(mensaje: string, color: string) {
-    const toast = await this.toastCtrl.create({ message: mensaje, duration: 2500, color, position: 'bottom' });
+    const toast = await this.toastCtrl.create({
+      message: mensaje,
+      duration: 2500,
+      color,
+      position: 'bottom',
+    });
     await toast.present();
   }
 }

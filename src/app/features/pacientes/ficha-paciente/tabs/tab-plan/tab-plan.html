@@ -78,19 +78,175 @@
                 Plan: {{ menu.plan?.calorias_objetivo || 'Personalizado' }} kcal
               </p>
             </ion-label>
-            <ion-button
-              slot="end"
-              fill="outline"
-              color="primary"
-              size="small"
-              (click)="clonarMenu(menu)"
-            >
-              <ion-icon name="copy-outline" slot="start"></ion-icon>
-              Reutilizar
-            </ion-button>
+            <div slot="end" style="display: flex; gap: 6px">
+              <ion-button fill="clear" color="primary" size="small" (click)="abrirPreview(menu)">
+                <ion-icon name="eye-outline" slot="start"></ion-icon>
+                Ver
+              </ion-button>
+              <ion-button fill="outline" color="primary" size="small" (click)="clonarMenu(menu)">
+                <ion-icon name="copy-outline" slot="start"></ion-icon>
+                Reutilizar
+              </ion-button>
+            </div>
           </ion-item>
         }
       </ion-list>
     </div>
   }
 </div>
+
+<ion-modal [isOpen]="modalPreviewAbierto" (didDismiss)="cerrarPreview()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Vista Previa del Menú</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cerrarPreview()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding" style="--background: #f8fafc">
+      @if (cargandoPreview) {
+        <div style="display: flex; justify-content: center; padding: 40px">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+      } @else {
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+          "
+        >
+          @for (dia of dias; track dia.id) {
+            <div
+              style="
+                background: white;
+                border-radius: 16px;
+                border: 1px solid #e2e8f0;
+                overflow: hidden;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+              "
+            >
+              <div
+                style="
+                  background: var(--primary-medical, #2d6a4f);
+                  color: white;
+                  padding: 12px 16px;
+                  font-weight: 700;
+                  text-transform: uppercase;
+                  font-size: 14px;
+                "
+              >
+                {{ dia.nombre }}
+              </div>
+              <div style="padding: 16px">
+                @for (comida of tiposComida; track comida.id) {
+                  <div
+                    style="
+                      margin-bottom: 12px;
+                      padding-bottom: 12px;
+                      border-bottom: 1px dashed #e2e8f0;
+                    "
+                  >
+                    <div
+                      style="
+                        font-size: 12px;
+                        font-weight: 800;
+                        color: #64748b;
+                        text-transform: uppercase;
+                        margin-bottom: 8px;
+                      "
+                    >
+                      {{ comida.label }}
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px">
+                      @let entradasComida = obtenerEntradasPreview(dia.id, comida.id);
+                      @if (entradasComida.length === 0) {
+                        <span style="font-size: 13px; color: #94a3b8; font-style: italic"
+                          >Sin asignar</span
+                        >
+                      }
+                      @for (entrada of entradasComida; track entrada.id) {
+                        <div
+                          style="
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            background: #f8fafc;
+                            padding: 8px;
+                            border-radius: 8px;
+                            border: 1px solid #f1f5f9;
+                          "
+                        >
+                          @if (entrada.receta?.imagen_url) {
+                            <img
+                              [src]="entrada.receta.imagen_url"
+                              style="
+                                width: 36px;
+                                height: 36px;
+                                border-radius: 8px;
+                                object-fit: cover;
+                              "
+                            />
+                          } @else {
+                            <div
+                              style="
+                                width: 36px;
+                                height: 36px;
+                                border-radius: 8px;
+                                background: #e8f5e9;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: var(--primary-medical, #2d6a4f);
+                              "
+                            >
+                              <ion-icon name="restaurant-outline"></ion-icon>
+                            </div>
+                          }
+                          <div style="display: flex; flex-direction: column; min-width: 0">
+                            <span
+                              style="
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: #1e293b;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                              "
+                            >
+                              {{ entrada.receta?.nombre || entrada.receta?.titulo }}
+                            </span>
+                            <span style="font-size: 11px; color: #64748b">
+                              {{ entrada.receta?.calorias_kcal || 0 }} kcal
+                            </span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <div style="margin-top: 24px; padding-bottom: 24px">
+          <ion-button
+            expand="block"
+            color="primary"
+            style="--border-radius: 12px; height: 50px"
+            (click)="clonarMenu(menuPreview)"
+          >
+            <ion-icon name="copy-outline" slot="start"></ion-icon>
+            Reutilizar este menú
+          </ion-button>
+        </div>
+      }
+    </ion-content>
+  </ng-template>
+</ion-modal>

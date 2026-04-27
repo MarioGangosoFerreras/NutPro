@@ -1,4 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, inject, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+  ViewEncapsulation,
+  inject,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
 import { PacientesService } from '../../../core/services/pacientes';
@@ -10,7 +17,21 @@ import { TabClinica } from './tabs/tab-clinica/tab-clinica';
 import { TabAlimentacion } from './tabs/tab-alimentacion/tab-alimentacion';
 import { TabMediciones } from './tabs/tab-mediciones/tab-mediciones';
 import { TabPlan } from './tabs/tab-plan/tab-plan';
-import { IonContent, IonButton, IonIcon, IonBadge, IonSegment, IonSegmentButton, IonLabel, ToastController, AlertController, IonCard, IonCardContent, IonAvatar, IonItem } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonButton,
+  IonIcon,
+  IonBadge,
+  IonSegment,
+  IonSegmentButton,
+  IonLabel,
+  ToastController,
+  AlertController,
+  IonCard,
+  IonCardContent,
+  IonAvatar,
+  IonItem,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { TabCitas } from './tabs/tab-citas/tab-citas';
 import { SupabaseService } from '../../../core/services/supabase';
@@ -48,7 +69,7 @@ import { AuthService } from '../../../core/services/auth';
     IonCard,
     IonAvatar,
     IonItem,
-    RouterLink
+    RouterLink,
   ],
   templateUrl: './ficha-paciente.html',
   styleUrls: ['./ficha-paciente.css'],
@@ -61,7 +82,7 @@ export class FichaPaciente implements OnInit {
   private authService = inject(AuthService);
   private supabaseService = inject(SupabaseService);
   private supabase = this.supabaseService.client;
-  @ViewChild(TabResumen) tabResumen!: TabResumen; 
+  @ViewChild(TabResumen) tabResumen!: TabResumen;
 
   menuAbierto = false;
 
@@ -106,7 +127,7 @@ export class FichaPaciente implements OnInit {
       // Promise.all para garantizar que el aguacate se vea un poco
       const [data] = await Promise.all([
         this.pacientesService.getPacienteById(id),
-        new Promise(resolve => setTimeout(resolve, 800))
+        new Promise((resolve) => setTimeout(resolve, 800)),
       ]);
 
       this.paciente = data;
@@ -199,11 +220,11 @@ export class FichaPaciente implements OnInit {
           paciente_id: pacienteId,
           nutricionista_id: nutricionistaId,
           semana_inicio: new Date().toISOString().split('T')[0],
-          titulo: 'Menú Semanal del Plan'
+          titulo: 'Menú Semanal del Plan',
         })
         .select()
         .single();
-        
+
       if (insertError) throw insertError;
       menu = nuevoMenu;
     }
@@ -215,9 +236,10 @@ export class FichaPaciente implements OnInit {
   async getEntradasMenu(menuId: string) {
     const { data, error } = await this.supabase
       .from('menu_entradas')
-      .select('*, receta:recetas(id, titulo)') // Hacemos join con recetas
+      // CORRECCIÓN AQUÍ: Usamos 'nombre' en lugar de 'titulo'
+      .select('*, receta:recetas(id, nombre)')
       .eq('menu_id', menuId);
-    
+
     if (error) throw error;
     return data || [];
   }
@@ -227,20 +249,18 @@ export class FichaPaciente implements OnInit {
     const { data, error } = await this.supabase
       .from('menu_entradas')
       .insert(entrada)
-      .select('*, receta:recetas(id, titulo)')
+      // CORRECCIÓN AQUÍ: Usamos 'nombre' en lugar de 'titulo'
+      .select('*, receta:recetas(id, nombre)')
       .single();
-      
+
     if (error) throw error;
     return data;
   }
 
   // 4. Eliminar una receta del menú
   async deleteEntradaMenu(id: string) {
-    const { error } = await this.supabase
-      .from('menu_entradas')
-      .delete()
-      .eq('id', id);
-      
+    const { error } = await this.supabase.from('menu_entradas').delete().eq('id', id);
+
     if (error) throw error;
   }
 }

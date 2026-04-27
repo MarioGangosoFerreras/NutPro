@@ -11,12 +11,25 @@ import {
   IonBadge,
   IonButton,
   ToastController,
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonSpinner,
+  IonContent,
 } from '@ionic/angular/standalone';
 import { PlanConfiguradorComponent } from './components/plan-configurador/plan-configurador';
 import { MenuSemanalComponent } from './components/menu-semanal/menu-semanal';
 import { PlanNutricionalService } from '../../../../../core/services/plan-nutricional';
 import { addIcons } from 'ionicons';
-import { copyOutline, calendarOutline } from 'ionicons/icons';
+import {
+  copyOutline,
+  calendarOutline,
+  eyeOutline,
+  closeOutline,
+  restaurantOutline,
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab-plan',
@@ -32,6 +45,13 @@ import { copyOutline, calendarOutline } from 'ionicons/icons';
     IonBadge,
     IonButton,
     IonIcon,
+    IonModal,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonSpinner,
+    IonContent,
     PlanConfiguradorComponent,
     MenuSemanalComponent,
   ],
@@ -45,12 +65,35 @@ export class TabPlan implements OnInit {
   historialPlanes: any[] = [];
   historialMenus: any[] = [];
 
+  // Variables para la Vista Previa del Menú
+  modalPreviewAbierto = false;
+  cargandoPreview = false;
+  menuPreview: any = null;
+  entradasPreview: any[] = [];
+
+  dias = [
+    { id: 1, nombre: 'Lunes' },
+    { id: 2, nombre: 'Martes' },
+    { id: 3, nombre: 'Miércoles' },
+    { id: 4, nombre: 'Jueves' },
+    { id: 5, nombre: 'Viernes' },
+    { id: 6, nombre: 'Sábado' },
+    { id: 7, nombre: 'Domingo' },
+  ];
+
+  tiposComida = [
+    { id: 'desayuno', label: 'Desayuno' },
+    { id: 'comida', label: 'Comida' },
+    { id: 'snack', label: 'Snacks' },
+    { id: 'cena', label: 'Cena' },
+  ];
+
   private planService = inject(PlanNutricionalService);
   private toastCtrl = inject(ToastController);
   private cdr = inject(ChangeDetectorRef);
 
   constructor() {
-    addIcons({ copyOutline, calendarOutline });
+    addIcons({ copyOutline, calendarOutline, eyeOutline, closeOutline, restaurantOutline });
   }
 
   async ngOnInit() {
@@ -70,6 +113,35 @@ export class TabPlan implements OnInit {
     this.vistaActiva = 'menu';
   }
 
+  // --- MÉTODOS DE VISTA PREVIA ---
+  async abrirPreview(menu: any) {
+    this.menuPreview = menu;
+    this.modalPreviewAbierto = true;
+    this.cargandoPreview = true;
+    this.cdr.detectChanges();
+    try {
+      this.entradasPreview = await this.planService.getEntradasMenu(menu.id);
+    } catch (e) {
+      console.error('Error cargando preview:', e);
+    } finally {
+      this.cargandoPreview = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  cerrarPreview() {
+    this.modalPreviewAbierto = false;
+    this.menuPreview = null;
+    this.entradasPreview = [];
+  }
+
+  obtenerEntradasPreview(diaId: number, tipoComida: string) {
+    return this.entradasPreview.filter(
+      (e) => e.dia_semana === diaId && e.tipo_comida === tipoComida,
+    );
+  }
+
+  // --- MÉTODOS DE CLONACIÓN ---
   async clonarMenu(menuViejo: any) {
     if (!this.planActivo) {
       const toast = await this.toastCtrl.create({
@@ -105,7 +177,10 @@ export class TabPlan implements OnInit {
       });
       toast.present();
 
-      // Forzamos a recargar la pestaña de menú para que vea el nuevo menú clonado
+      // Cerramos modal por si se clonó desde la vista previa
+      this.cerrarPreview();
+
+      // Forzamos a recargar la pestaña de menú
       this.vistaActiva = 'configuracion';
       setTimeout(() => {
         this.vistaActiva = 'menu';

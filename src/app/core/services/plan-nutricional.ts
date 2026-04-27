@@ -77,47 +77,10 @@ export class PlanNutricionalService {
     return menu;
   }
 
-  // NUEVO: Obtener el historial de menús
-  async getHistorialMenus(pacienteId: string) {
-    const { data, error } = await this.supabase
-      .from('menus_semanales')
-      .select('*, plan:planes_nutricionales(*)')
-      .eq('paciente_id', pacienteId)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
-  }
-
-  // NUEVO: Clonar entradas de un menú antiguo al menú destino
-  async copiarEntradasMenu(menuOrigenId: string, menuDestinoId: string) {
-    // 1. Borramos las entradas actuales para un reemplazo limpio
-    await this.supabase.from('menu_entradas').delete().eq('menu_id', menuDestinoId);
-
-    // 2. Obtenemos las entradas del menú original
-    const { data: entradas } = await this.supabase
-      .from('menu_entradas')
-      .select('*')
-      .eq('menu_id', menuOrigenId);
-
-    if (!entradas || entradas.length === 0) return;
-
-    // 3. Preparamos las nuevas entradas y las guardamos
-    const nuevasEntradas = entradas.map((e) => ({
-      menu_id: menuDestinoId,
-      receta_id: e.receta_id,
-      dia_semana: e.dia_semana,
-      tipo_comida: e.tipo_comida,
-      raciones: e.raciones,
-    }));
-
-    const { error } = await this.supabase.from('menu_entradas').insert(nuevasEntradas);
-    if (error) throw error;
-  }
-
   async getEntradasMenu(menuId: string) {
     const { data, error } = await this.supabase
       .from('menu_entradas')
-      .select('*, receta:recetas(id, nombre, titulo, calorias_kcal, proteina_g, imagen_url)')
+      .select('*, receta:recetas(id, nombre, calorias_kcal, proteina_g, imagen_url)')
       .eq('menu_id', menuId);
     if (error) throw error;
     return data || [];
@@ -127,7 +90,7 @@ export class PlanNutricionalService {
     const { data, error } = await this.supabase
       .from('menu_entradas')
       .insert(entrada)
-      .select('*, receta:recetas(id, nombre, titulo, calorias_kcal, proteina_g, imagen_url)')
+      .select('*, receta:recetas(id, nombre, calorias_kcal, proteina_g, imagen_url)')
       .single();
     if (error) throw error;
     return data;
@@ -135,6 +98,43 @@ export class PlanNutricionalService {
 
   async deleteEntradaMenu(id: string) {
     const { error } = await this.supabase.from('menu_entradas').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  // Obtiene todos los menús semanales del paciente
+  async getHistorialMenus(pacienteId: string) {
+    const { data, error } = await this.supabase
+      .from('menus_semanales')
+      .select('*, plan:planes_nutricionales(*)')
+      .eq('paciente_id', pacienteId)
+      .order('fecha_inicio', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  }
+
+  // Copia las recetas de un menú viejo al menú actual
+  async copiarEntradasMenu(menuOrigenId: string, menuDestinoId: string) {
+    // 1. Borramos las recetas que haya en el menú actual para reemplazarlas
+    await this.supabase.from('menu_entradas').delete().eq('menu_id', menuDestinoId);
+
+    // 2. Traemos las recetas del menú antiguo
+    const { data: entradasAntiguas } = await this.supabase
+      .from('menu_entradas')
+      .select('*')
+      .eq('menu_id', menuOrigenId);
+
+    if (!entradasAntiguas || entradasAntiguas.length === 0) return;
+
+    // 3. Las insertamos vinculadas al menú nuevo
+    const nuevasEntradas = entradasAntiguas.map((e) => ({
+      menu_id: menuDestinoId,
+      receta_id: e.receta_id,
+      dia_semana: e.dia_semana,
+      tipo_comida: e.tipo_comida,
+      raciones: e.raciones,
+    }));
+
+    const { error } = await this.supabase.from('menu_entradas').insert(nuevasEntradas);
     if (error) throw error;
   }
 }
