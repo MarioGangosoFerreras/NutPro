@@ -126,7 +126,7 @@ export class ListaRecetas implements OnInit {
   async cargarRecetas() {
     try {
       this.cargando.set(true);
-      this.miUsuarioId = await this.authService.getUsuarioId();
+      this.miUsuarioId = await this.authService.getUserId();
 
       // Cargamos todas las recetas y la lista de IDs ocultos en paralelo
       const [todas, idsOcultos] = await Promise.all([

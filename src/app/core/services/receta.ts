@@ -68,7 +68,7 @@ export class RecetaService {
       .eq('id', id)
       .single();
     if (error) throw error;
-    return data as Receta;
+    return data as Receta; // Esto evita el error de compilación en el detalle
   }
 
   async crearReceta(

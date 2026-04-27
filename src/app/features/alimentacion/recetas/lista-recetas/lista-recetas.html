@@ -106,6 +106,19 @@
                 <ion-icon slot="start" name="eye-outline"></ion-icon>
                 Ver
               </ion-button>
+
+              @if (receta.creado_por === miUsuarioId) {
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  [routerLink]="['/alimentacion/recetas/editar', receta.id]"
+                  color="primary"
+                >
+                  <ion-icon slot="start" name="create-outline"></ion-icon>
+                  Editar
+                </ion-button>
+              }
+
               <ion-button
                 fill="clear"
                 size="small"
