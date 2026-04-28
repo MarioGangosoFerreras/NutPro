@@ -73,17 +73,21 @@ export class DocumentosService {
     return data as Documento;
   }
 
-  // NUEVO: Método para cambiar el estado de pago
+  // Método para cambiar el estado de pago
   async actualizarEstadoPago(docId: string, pagado: boolean) {
-    const { error } = await this.supabase
+    const { data, error } = await this.supabase
       .from('documentos')
-      .update({ pagado }) // Esto envía el cambio a la base de datos
-      .eq('id', docId);
+      .update({ pagado }) 
+      .eq('id', docId)
+      .select() // <-- Pedimos que nos devuelva la fila
+      .single(); // <-- Forzamos a que si no actualiza nada, lance un error
 
     if (error) {
-      console.error('Error en Supabase:', error);
+      console.error('Error en Supabase (probablemente RLS):', error);
       throw error;
     }
+    
+    return data;
   }
 
   async eliminarDocumento(id: string, url: string) {
