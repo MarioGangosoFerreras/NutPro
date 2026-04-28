@@ -76,6 +76,12 @@ export class AuthService {
       apellidos: string;
       rol: string;
       telefono: string;
+      nutricionista_id?: string;
+      dni?: string;
+      fecha_nacimiento?: string;
+      sexo?: string;             
+      direccion?: string;       
+      motivo_consulta?: string;
       numero_colegiado?: string;
       titulacion?: string | null;
       especialidad?: string;
