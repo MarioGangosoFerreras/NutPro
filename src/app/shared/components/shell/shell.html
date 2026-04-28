@@ -13,15 +13,15 @@
       </div>
 
       <div class="nav-container">
-        @for (item of navItems; track item.route) {
+        @for (item of navItems(); track item.route) {
         <button class="nav-btn" [class.active]="isActive(item)" (click)="navegar(item.route)"
           [title]="collapsed ? item.label : ''">
           <ion-icon [name]="item.icon"></ion-icon>
           @if (!collapsed) {
-            <span>{{ item.label }}</span>
+          <span>{{ item.label }}</span>
           }
           @if (item.route === '/mensajes' && mensajesSinLeer() > 0) {
-            <ion-badge color="danger" class="badge-nav">{{ mensajesSinLeer() }}</ion-badge>
+          <ion-badge color="danger" class="badge-nav">{{ mensajesSinLeer() }}</ion-badge>
           }
         </button>
         }

@@ -38,7 +38,7 @@ export class Login {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   async onLogin() {
     this.loading = true;
@@ -51,9 +51,14 @@ export class Login {
     if (error) {
       this.errorMessage = 'Email o contraseña incorrectos';
     } else {
-      this.router.navigate(['/dashboard']);
+      // Verificamos qué tipo de usuario acaba de entrar
+      const usuario = await this.authService.getUsuario();
+
+      if (usuario?.rol === 'paciente') {
+        this.router.navigate(['/portal-paciente']);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
     }
   }
-
-  
 }

@@ -1,0 +1,81 @@
+.welcome-section {
+  margin-bottom: 24px;
+  padding: 10px 8px;
+}
+
+.welcome-section h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+}
+
+.welcome-section p {
+  color: #64748b;
+  font-size: 15px;
+  margin: 0;
+}
+
+.nutricionista-card {
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f1f5f9;
+  background: white;
+}
+
+.nutricionista-card ion-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #2d6a4f;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nutricionista-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --background: transparent;
+}
+
+.nutricionista-item h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.especialidad {
+  color: #2d6a4f !important;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.contacto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.contacto-info span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.btn-contacto {
+  --background: #e8f5e9;
+  --color: #2d6a4f;
+  --border-radius: 12px;
+  font-weight: 600;
+  margin-top: 20px;
+  box-shadow: none;
+}
+
+.btn-contacto:hover {
+  --background: #dcfce7;
+}

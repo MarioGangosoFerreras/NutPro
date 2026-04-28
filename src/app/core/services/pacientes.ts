@@ -280,4 +280,41 @@ export class PacientesService {
   async desuscribirCitas(canal: any) {
     if (canal) await this.supabase.removeChannel(canal);
   }
+
+  // src/app/core/services/pacientes.ts
+
+  async getMiPerfilDePaciente(usuarioId: string) {
+    const { data, error } = await this.supabase
+      .from('pacientes')
+      .select(`
+        *,
+        usuario:usuario_id (
+          nombre,
+          apellidos,
+          email,
+          avatar_url
+        ),
+        nutricionista:nutricionista_id (
+          id,
+          especialidad,
+          nombre_empresa,
+          telefono,
+          usuario:usuario_id (
+            nombre,
+            apellidos,
+            email,
+            avatar_url
+          )
+        )
+      `)
+      .eq('usuario_id', usuarioId)
+      .single();
+
+    if (error) {
+      console.error('Error obteniendo perfil del paciente:', error.message);
+      return null;
+    }
+
+    return data;
+  }
 }

@@ -1,0 +1,57 @@
+<app-header titulo="Mi Portal Nutricional"></app-header>
+
+<ion-content class="ion-padding" color="light">
+    @if (cargando()) {
+    <div class="loading-container">
+        <div class="avocado-spinner">🥑</div>
+        <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px;">Cargando tu perfil...</p>
+    </div>
+    } @else if (paciente()) {
+    <div class="welcome-section">
+        <h2>Hola, {{ paciente().usuario?.nombre }} 👋</h2>
+        <p>Bienvenido a tu área personal como paciente.</p>
+    </div>
+
+    <ion-card class="nutricionista-card">
+        <ion-card-header>
+            <ion-card-title>Tu Nutricionista Asignado</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+            @if (nutricionista()) {
+            <ion-item lines="none" class="nutricionista-item">
+                <ion-avatar slot="start">
+                    @if (nutricionista().usuario?.avatar_url) {
+                    <img [src]="nutricionista().usuario.avatar_url" />
+                    } @else {
+                    <ion-icon name="person-circle-outline"></ion-icon>
+                    }
+                </ion-avatar>
+                <ion-label>
+                    <h3>{{ nutricionista().usuario?.nombre }} {{ nutricionista().usuario?.apellidos }}</h3>
+                    <p class="especialidad">{{ nutricionista().especialidad || 'Especialista en Nutrición' }}</p>
+
+                    <div class="contacto-info">
+                        @if (nutricionista().usuario?.email) {
+                        <span><ion-icon name="mail-outline"></ion-icon> {{ nutricionista().usuario?.email }}</span>
+                        }
+                        @if (nutricionista().telefono) {
+                        <span><ion-icon name="call-outline"></ion-icon> {{ nutricionista().telefono }}</span>
+                        }
+                    </div>
+                </ion-label>
+            </ion-item>
+
+            <ion-button expand="block" class="btn-contacto" [routerLink]="['/mensajes']">
+                <ion-icon slot="start" name="chatbubbles-outline"></ion-icon>
+                Contactar por chat
+            </ion-button>
+            } @else {
+            <div class="empty-state">
+                <ion-icon name="person-circle-outline"></ion-icon>
+                <p>No tienes ningún profesional de la salud asignado actualmente.</p>
+            </div>
+            }
+        </ion-card-content>
+    </ion-card>
+    }
+</ion-content>

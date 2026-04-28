@@ -1,4 +1,3 @@
-// src/app/features/mensajes/mensajes.ts
 import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -29,7 +28,9 @@ export class Mensajes implements OnInit, OnDestroy {
 
   miUsuarioId = '';
   nutricionistaId = '';
-  
+  miPacienteId = '';
+  rol = '';
+
   contactos = signal<any[]>([]);
   contactosFiltrados = signal<any[]>([]);
   busquedaQuery = signal('');
@@ -38,7 +39,7 @@ export class Mensajes implements OnInit, OnDestroy {
   chatIdActivo = '';
   mensajes = signal<Mensaje[]>([]);
   nuevoMensaje = '';
-  
+
   private realtimeChannel: any;
 
   constructor() {
@@ -46,28 +47,41 @@ export class Mensajes implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    this.miUsuarioId = await this.authService.getUsuarioId();
-    this.nutricionistaId = await this.authService.getNutricionistaId() || '';
+    const usuario = await this.authService.getUsuario();
+    if (!usuario) return;
 
-    if (this.nutricionistaId) {
-      await this.cargarContactos();
+    this.miUsuarioId = usuario.id;
+    this.rol = usuario.rol;
+
+    // Detectamos si es Nutricionista o Paciente
+    if (this.rol === 'nutricionista') {
+      this.nutricionistaId = await this.authService.getNutricionistaId() || '';
+      if (this.nutricionistaId) {
+        await this.cargarContactosNutricionista();
+      }
+    } else if (this.rol === 'paciente') {
+      await this.cargarContactoNutricionista();
     }
 
     const pacienteIdParam = this.route.snapshot.queryParamMap.get('pacienteId');
     if (pacienteIdParam) {
-       const contacto = this.contactos().find(c => c.paciente.id === pacienteIdParam);
-       if (contacto) this.seleccionarContacto(contacto);
+      const contacto = this.contactos().find(c => c.pacienteId === pacienteIdParam);
+      if (contacto) this.seleccionarContacto(contacto);
     }
   }
 
-  async cargarContactos() {
+  // Carga MODO NUTRICIONISTA: Lista de todos sus pacientes
+  async cargarContactosNutricionista() {
     const pacientes = await this.pacientesService.getPacientes(this.nutricionistaId);
     const chats = await this.chatService.getChatsNutricionista(this.nutricionistaId);
-    
+
     const contactosMap = pacientes.map((p: any) => {
       const chat = chats.find((c: any) => c.paciente.id === p.id);
       return {
-        paciente: p,
+        idUnico: p.id,
+        pacienteId: p.id,
+        nutricionistaId: this.nutricionistaId,
+        usuario: p.usuario,
         ultimoMensaje: chat?.ultimo_mensaje?.[0] || null,
         chatId: chat?.id || null
       };
@@ -83,6 +97,31 @@ export class Mensajes implements OnInit, OnDestroy {
     this.contactosFiltrados.set(contactosMap);
   }
 
+  // Carga MODO PACIENTE: Único contacto (su nutricionista)
+  async cargarContactoNutricionista() {
+    const miPerfil = await this.pacientesService.getMiPerfilDePaciente(this.miUsuarioId);
+    if (!miPerfil || !miPerfil.nutricionista) return;
+
+    this.miPacienteId = miPerfil.id;
+    this.nutricionistaId = miPerfil.nutricionista.id;
+
+    const chat = await this.chatService.getOrCreateChat(this.nutricionistaId, this.miPacienteId);
+    const historial = await this.chatService.getMensajes(chat.id);
+    const ultimoMensaje = historial.length > 0 ? historial[historial.length - 1] : null;
+
+    const contactoNutri = {
+      idUnico: this.nutricionistaId,
+      pacienteId: this.miPacienteId,
+      nutricionistaId: this.nutricionistaId,
+      usuario: miPerfil.nutricionista.usuario,
+      ultimoMensaje: ultimoMensaje,
+      chatId: chat.id
+    };
+
+    this.contactos.set([contactoNutri]);
+    this.contactosFiltrados.set([contactoNutri]);
+  }
+
   onBuscar(event: any) {
     const query = event.detail.value?.toLowerCase() || '';
     this.busquedaQuery.set(query);
@@ -91,7 +130,7 @@ export class Mensajes implements OnInit, OnDestroy {
       return;
     }
     const filtrados = this.contactos().filter(c => {
-      const nombreCompleto = `${c.paciente.usuario?.nombre} ${c.paciente.usuario?.apellidos}`.toLowerCase();
+      const nombreCompleto = `${c.usuario?.nombre} ${c.usuario?.apellidos}`.toLowerCase();
       return nombreCompleto.includes(query);
     });
     this.contactosFiltrados.set(filtrados);
@@ -104,8 +143,8 @@ export class Mensajes implements OnInit, OnDestroy {
 
     this.contactoActivo.set(contacto);
     this.mensajes.set([]);
-    
-    const chat = await this.chatService.getOrCreateChat(this.nutricionistaId, contacto.paciente.id);
+
+    const chat = await this.chatService.getOrCreateChat(contacto.nutricionistaId, contacto.pacienteId);
     this.chatIdActivo = chat.id;
 
     await this.chatService.marcarComoLeidos(this.chatIdActivo, this.miUsuarioId);
@@ -116,7 +155,7 @@ export class Mensajes implements OnInit, OnDestroy {
     this.realtimeChannel = this.chatService.suscribirMensajes(this.chatIdActivo, (msg) => {
       this.mensajes.update(msgs => [...msgs, msg]);
       if (msg.sender_id !== this.miUsuarioId) {
-         this.chatService.marcarComoLeidos(this.chatIdActivo, this.miUsuarioId);
+        this.chatService.marcarComoLeidos(this.chatIdActivo, this.miUsuarioId);
       }
       this.scrollToBottom();
       this.cdr.detectChanges();
@@ -139,19 +178,19 @@ export class Mensajes implements OnInit, OnDestroy {
       console.error('Error enviando mensaje', e);
     }
   }
-  
+
   actualizarUltimoMensajeLista(texto: string) {
-     const current = this.contactoActivo();
-     if(!current) return;
-     
-     const updated = this.contactos().map(c => {
-        if(c.paciente.id === current.paciente.id) {
-           return { ...c, ultimoMensaje: { contenido: texto, enviado_at: new Date().toISOString() } };
-        }
-        return c;
-     });
-     this.contactos.set(updated);
-     this.onBuscar({ detail: { value: this.busquedaQuery() } });
+    const current = this.contactoActivo();
+    if (!current) return;
+
+    const updated = this.contactos().map(c => {
+      if (c.idUnico === current.idUnico) {
+        return { ...c, ultimoMensaje: { contenido: texto, enviado_at: new Date().toISOString() } };
+      }
+      return c;
+    });
+    this.contactos.set(updated);
+    this.onBuscar({ detail: { value: this.busquedaQuery() } });
   }
 
   scrollToBottom() {

@@ -116,6 +116,10 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/pacientes/chat-paciente/chat-paciente').then((m) => m.ChatPaciente),
       },
+      {
+        path: 'portal-paciente',
+        loadComponent: () => import('./features/portal-paciente/portal-paciente').then((m) => m.PortalPaciente),
+      },
     ],
   },
 ];

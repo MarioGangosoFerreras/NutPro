@@ -1,4 +1,3 @@
-// src/app/shared/components/shell/shell.ts
 import { Component, inject, signal, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
@@ -27,6 +26,7 @@ import {
   restaurantOutline,
   chatbubblesOutline,
   walletOutline,
+  homeOutline
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 import { ChatService } from '../../../core/services/chat';
@@ -75,31 +75,15 @@ export class Shell implements OnInit {
     avatar: null as string | null,
   });
 
-  navItems: NavItem[] = [
-    { label: 'Inicio', icon: 'grid-outline', route: '/dashboard' },
-    { label: 'Pacientes', icon: 'people-outline', route: '/pacientes' },
-    { label: 'Citas', icon: 'calendar-outline', route: '/citas' },
-    { label: 'Recetas', icon: 'restaurant-outline', route: '/alimentacion/recetas' },
-    { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' },
-    { label: 'Facturación', icon: 'wallet-outline', route: '/facturacion' }, 
-    { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
-  ];
+  // 1. Convertimos el menú a Signal para que sea totalmente reactivo
+  navItems = signal<NavItem[]>([]);
 
   constructor() {
     addIcons({
-      peopleOutline,
-      calendarOutline,
-      gridOutline,
-      logOutOutline,
-      menuOutline,
-      closeOutline,
-      chevronForwardOutline,
-      settingsOutline,
-      giftOutline,
-      personCircleOutline,
-      restaurantOutline,
-      chatbubblesOutline,
-      walletOutline,
+      peopleOutline, calendarOutline, gridOutline, logOutOutline,
+      menuOutline, closeOutline, chevronForwardOutline, settingsOutline,
+      giftOutline, personCircleOutline, restaurantOutline, chatbubblesOutline,
+      walletOutline, homeOutline
     });
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e: any) => {
       this.rutaActiva.set(e.urlAfterRedirects);
@@ -112,12 +96,31 @@ export class Shell implements OnInit {
     if (user) {
       this.usuarioActual.set({
         nombre: `${user.nombre} ${user.apellidos}`.trim(),
-        rol: user.rol === 'admin' ? 'Administrador' : 'Nutricionista',
+        rol: user.rol === 'admin' ? 'Administrador' : (user.rol === 'paciente' ? 'Paciente' : 'Nutricionista'),
         avatar: user.avatar_url || null,
       });
-      const nutriId = await this.authService.getNutricionistaId();
-      if (nutriId) {
-        this.mensajesSinLeer.set(await this.chatService.getMensajesSinLeerTotales(nutriId));
+
+      // 2. Setear los items de forma dinámica con .set()
+      if (user.rol === 'paciente') {
+        this.navItems.set([
+          { label: 'Mi Portal', icon: 'home-outline', route: '/portal-paciente' },
+          { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' }
+        ]);
+      } else {
+        this.navItems.set([
+          { label: 'Inicio', icon: 'grid-outline', route: '/dashboard' },
+          { label: 'Pacientes', icon: 'people-outline', route: '/pacientes' },
+          { label: 'Citas', icon: 'calendar-outline', route: '/citas' },
+          { label: 'Recetas', icon: 'restaurant-outline', route: '/alimentacion/recetas' },
+          { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' },
+          { label: 'Facturación', icon: 'wallet-outline', route: '/facturacion' },
+          { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
+        ]);
+
+        const nutriId = await this.authService.getNutricionistaId();
+        if (nutriId) {
+          this.mensajesSinLeer.set(await this.chatService.getMensajesSinLeerTotales(nutriId));
+        }
       }
     }
   }
@@ -133,6 +136,7 @@ export class Shell implements OnInit {
 
   async cerrarSesion() {
     await this.authService.signOut();
-    this.router.navigate(['/login']);
+    // 3. Forzamos recarga dura para limpiar completamente la caché y memoria SPA
+    window.location.href = '/login';
   }
 }
