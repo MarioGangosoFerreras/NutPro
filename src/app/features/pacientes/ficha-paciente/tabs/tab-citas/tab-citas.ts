@@ -23,12 +23,12 @@ import {
   IonSpinner,
   ModalController,
   AlertController,
-  LoadingController, 
+  LoadingController,
   ToastController
 } from '@ionic/angular/standalone';
 import { UniversalCalendar } from "../../../../../shared/components/universal-calendar/universal-calendar";
 import { PdfService } from '../../../../../core/services/pdf';
-import { SupabaseService } from '../../../../../core/services/supabase'; 
+import { SupabaseService } from '../../../../../core/services/supabase';
 import { DocumentosService } from '../../../../../core/services/documentos';
 
 @Component({
@@ -49,7 +49,7 @@ import { DocumentosService } from '../../../../../core/services/documentos';
 })
 export class TabCitas implements OnInit {
   // Cambio principal: ahora recibimos el objeto 'paciente' completo
-  @Input() paciente: any; 
+  @Input() paciente: any;
   @Input() nutricionistaId!: string;
 
   private citasService = inject(CitasService);
@@ -60,7 +60,7 @@ export class TabCitas implements OnInit {
   private ngZone = inject(NgZone);
   private pdfService = inject(PdfService);
   private docsService = inject(DocumentosService);
-  
+
   // Inyecciones que faltaban para generar la factura
   private loadingCtrl = inject(LoadingController);
   private toastCtrl = inject(ToastController);
@@ -86,7 +86,7 @@ export class TabCitas implements OnInit {
   async cargarCitas() {
     this.ngZone.run(async () => {
       this.cargando = true;
-      this.cdr.markForCheck(); 
+      this.cdr.markForCheck();
       try {
         const datos = await this.citasService.getCitasPaciente(
           this.paciente.id, // Actualizado para usar el id del objeto paciente
@@ -95,7 +95,7 @@ export class TabCitas implements OnInit {
         this.citas = [...datos];
       } finally {
         this.cargando = false;
-        this.cdr.markForCheck(); 
+        this.cdr.markForCheck();
       }
     });
   }
@@ -170,7 +170,7 @@ export class TabCitas implements OnInit {
           name: 'importe',
           type: 'number',
           placeholder: 'Ej: 50',
-          value: cita.tipo === 'presencial' ? '60' : '45' 
+          value: cita.tipo === 'presencial' ? '60' : '45'
         }
       ],
       buttons: [
@@ -211,8 +211,13 @@ export class TabCitas implements OnInit {
       const fecha = new Date(cita.fecha_hora).toLocaleDateString().replace(/\//g, '-');
       const fileName = `Factura_${this.paciente.usuario.nombre}_${fecha}.pdf`;
 
-      await this.docsService.subirDocumento(this.paciente.id, pdfBlob, fileName, 'factura');
-
+      await this.docsService.subirDocumento(
+        this.paciente.id,
+        pdfBlob,
+        fileName,
+        'factura',
+        importe
+      );
       await loading.dismiss();
       const successToast = await this.toastCtrl.create({
         message: 'Factura guardada en la sección de Documentos',

@@ -90,6 +90,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/mensajes/mensajes').then((m) => m.Mensajes),
       },
       {
+        path: 'facturacion',
+        loadComponent: () => import('./features/facturacion/facturacion').then((m) => m.Facturacion),
+      },
+      {
         path: 'ajustes',
         loadComponent: () => import('./features/ajustes/ajustes').then((m) => m.AjustesPage),
       },

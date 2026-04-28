@@ -1,0 +1,106 @@
+<app-header titulo="Facturación"></app-header>
+
+<ion-content class="ion-padding" color="light">
+    @if (cargando) {
+    <div class="loading-container">
+        <div class="avocado-spinner">🥑</div>
+        <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px;">Calculando ingresos...</p>
+    </div>
+    } @else {
+
+    <div class="kpis-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #e8f5e9; color: #2d6a4f;"><ion-icon
+                    name="wallet-outline"></ion-icon></div>
+            <div class="kpi-info">
+                <span>Ingresos del Mes</span>
+                <strong>{{ ingresosMes | currency:'EUR':'symbol' }}</strong>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #e0f2fe; color: #0284c7;"><ion-icon
+                    name="trending-up-outline"></ion-icon></div>
+            <div class="kpi-info">
+                <span>Ingresos Anuales</span>
+                <strong>{{ ingresosAnio | currency:'EUR':'symbol' }}</strong>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #fef08a; color: #b45309;"><ion-icon
+                    name="document-text-outline"></ion-icon></div>
+            <div class="kpi-info">
+                <span>Facturas Mes</span>
+                <strong>{{ facturasMes }}</strong>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #f3e8ff; color: #7e22ce;"><ion-icon name="cash-outline"></ion-icon>
+            </div>
+            <div class="kpi-info">
+                <span>Ticket Medio</span>
+                <strong>{{ ticketMedio | currency:'EUR':'symbol' }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <ion-card class="chart-card">
+            <ion-card-header>
+                <ion-card-title>Evolución de Ingresos ({{ facturas.length > 0 ? (facturas[0].created_at | date:'yyyy') :
+                    '' }})</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+                <div class="canvas-wrapper">
+                    <canvas id="ingresosChart"></canvas>
+                </div>
+            </ion-card-content>
+        </ion-card>
+
+        <ion-card class="list-card">
+            <ion-card-header>
+                <ion-card-title>Últimas Facturas Emitidas</ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="no-padding">
+                @if (facturas.length === 0) {
+                <div class="empty-state">
+                    <ion-icon name="document-text-outline"></ion-icon>
+                    <p>No hay facturas emitidas</p>
+                </div>
+                } @else {
+                <div class="facturas-list">
+                    @for (factura of facturas; track factura.id) {
+                    <div class="factura-row">
+                        <div class="factura-info">
+                            <span class="factura-nombre">{{ factura.nombre }}</span>
+                            <span class="factura-paciente">
+                                {{ factura.paciente?.usuario?.nombre }} {{ factura.paciente?.usuario?.apellidos }}
+                                · {{ factura.created_at | date:'dd MMM yyyy' }}
+                            </span>
+                        </div>
+
+                        <div class="factura-derecha">
+                            <ion-button [color]="factura.pagado ? 'success' : 'warning'" fill="outline" size="small"
+                                (click)="togglePago(factura)">
+                                <ion-icon slot="start"
+                                    [name]="factura.pagado ? 'checkmark-circle' : 'time-outline'"></ion-icon>
+                                {{ factura.pagado ? 'Pagado' : 'Pendiente' }}
+                            </ion-button>
+
+                            <ion-badge color="light">{{ factura.importe | currency:'EUR' }}</ion-badge>
+
+                            <ion-button fill="clear" [href]="factura.archivo_url" target="_blank" color="primary">
+                                <ion-icon slot="icon-only" name="download-outline"></ion-icon>
+                            </ion-button>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </ion-card-content>
+        </ion-card>
+    </div>
+    }
+</ion-content>

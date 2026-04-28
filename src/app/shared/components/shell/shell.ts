@@ -26,6 +26,7 @@ import {
   personCircleOutline,
   restaurantOutline,
   chatbubblesOutline,
+  walletOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 import { ChatService } from '../../../core/services/chat';
@@ -80,6 +81,7 @@ export class Shell implements OnInit {
     { label: 'Citas', icon: 'calendar-outline', route: '/citas' },
     { label: 'Recetas', icon: 'restaurant-outline', route: '/alimentacion/recetas' },
     { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' },
+    { label: 'Facturación', icon: 'wallet-outline', route: '/facturacion' }, 
     { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
   ];
 
@@ -97,6 +99,7 @@ export class Shell implements OnInit {
       personCircleOutline,
       restaurantOutline,
       chatbubblesOutline,
+      walletOutline,
     });
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e: any) => {
       this.rutaActiva.set(e.urlAfterRedirects);
