@@ -3,6 +3,13 @@
     <div class="cita-card__tipo">
       <ion-icon [name]="icono"></ion-icon>
       <span>{{ cita.tipo | titlecase }}</span>
+
+      @if (citaPasada() && !cita.facturada && cita.estado === 'confirmada') {
+      <ion-badge color="danger" style="font-size: 10px; margin-left: 8px;">Sin facturar</ion-badge>
+      }
+      @if (cita.facturada) {
+      <ion-badge color="success" style="font-size: 10px; margin-left: 8px;">Facturada</ion-badge>
+      }
     </div>
     <ion-badge [color]="colorEstado">{{ cita.estado }}</ion-badge>
   </div>
@@ -33,10 +40,12 @@
     </ion-button>
     }
 
+    @if (!cita.facturada) {
     <ion-button fill="clear" color="primary" size="small" (click)="facturar.emit(cita)">
       <ion-icon slot="start" name="document-text-outline"></ion-icon>
       Factura
     </ion-button>
+    }
 
     <ion-button fill="clear" color="danger" size="small" (click)="eliminar.emit(cita)">
       <ion-icon slot="icon-only" name="trash-outline"></ion-icon>

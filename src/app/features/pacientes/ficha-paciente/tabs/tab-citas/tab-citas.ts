@@ -207,25 +207,25 @@ export class TabCitas implements OnInit {
       };
 
       const pdfBlob = await this.pdfService.generarFacturaPdfBlob(cita, this.paciente, emisor, importe);
-
       const fecha = new Date(cita.fecha_hora).toLocaleDateString().replace(/\//g, '-');
       const fileName = `Factura_${this.paciente.usuario.nombre}_${fecha}.pdf`;
 
-      await this.docsService.subirDocumento(
-        this.paciente.id,
-        pdfBlob,
-        fileName,
-        'factura',
-        importe
-      );
+      // 1. Subir el documento
+      await this.docsService.subirDocumento(this.paciente.id, pdfBlob, fileName, 'factura', importe);
+
+      // 2. 🔥 CRÍTICO: Actualizar la tabla de citas en la DB
+      await this.supabase.from('citas').update({ facturada: true }).eq('id', cita.id);
+
+      // 3. Recargar localmente para ver el badge "Facturada"
+      await this.cargarCitas();
+
       await loading.dismiss();
       const successToast = await this.toastCtrl.create({
-        message: 'Factura guardada en la sección de Documentos',
+        message: 'Factura generada y cita actualizada.',
         duration: 3000,
         color: 'success'
       });
       successToast.present();
-
     } catch (e) {
       await loading.dismiss();
       console.error(e);

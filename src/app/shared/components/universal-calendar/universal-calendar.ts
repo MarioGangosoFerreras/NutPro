@@ -58,6 +58,8 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   // En mode='patient': no se usa (el padre controla la navegación)
   @Output() citaSeleccionada = new EventEmitter<Cita>();
 
+  @Output() facturarCita = new EventEmitter<Cita>();
+
   // ── Estado interno ───────────────────────────────────────────────────────
   hoy = new Date();
   mesActual = new Date(this.hoy.getFullYear(), this.hoy.getMonth(), 1);
@@ -245,10 +247,19 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     return { pendiente: 'warning', confirmada: 'success', cancelada: 'danger' }[estado] ?? 'medium';
   }
 
-  get mostrarBotonNueva() { 
+  get mostrarBotonNueva() {
     return this.mode === 'patient' || this.mode === 'full';
   }
 
   // El panel de detalle de cita usa CitaCard en 'patient', filas simples en el resto
   get usaCitaCard() { return this.mode === 'patient'; }
+
+  citaPasada(cita: Cita): boolean {
+    return new Date(cita.fecha_hora).getTime() < new Date().getTime();
+  }
+
+  emitirFacturaEvent(event: Event, cita: Cita) {
+    event.stopPropagation(); // Para que no navegue a la ficha
+    this.facturarCita.emit(cita);
+  }
 }

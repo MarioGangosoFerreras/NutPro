@@ -56,8 +56,8 @@
 
     @for (cita of citasDelDia; track cita.id) {
     @if (usaCitaCard) {
-    <app-cita-card [cita]="cita" [mostrarAcciones]="true" (editar)="editarCita.emit($event)"></app-cita-card>
-
+    <app-cita-card [cita]="cita" [mostrarAcciones]="true" (editar)="editarCita.emit($event)"
+      (facturar)="facturarCita.emit($event)"></app-cita-card>
     } @else {
     <div class="ucal__cita-row" (click)="onCitaClick(cita)">
       <div class="ucal__cita-hora">{{ cita.fecha_hora | date: 'HH:mm' }}</div>
@@ -69,7 +69,21 @@
           <ion-icon [name]="cita.tipo === 'videollamada' ? 'videocam-outline' : 'location-outline'"></ion-icon>
           {{ cita.tipo }} · {{ cita.duracion_min }} min
         </span>
+
+        @if (citaPasada(cita) && !cita.facturada && cita.estado === 'confirmada') {
+        <ion-badge color="danger" style="margin-top: 4px; align-self: flex-start;">Sin facturar</ion-badge>
+        }
+        @if (cita.facturada) {
+        <ion-badge color="success" style="margin-top: 4px; align-self: flex-start;">Facturada</ion-badge>
+        }
       </div>
+
+      @if (citaPasada(cita) && !cita.facturada && cita.estado === 'confirmada') {
+      <ion-button fill="clear" color="primary" (click)="emitirFacturaEvent($event, cita)">
+        <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
+      </ion-button>
+      }
+
       <ion-badge [color]="colorEstado(cita.estado)">{{ cita.estado }}</ion-badge>
     </div>
     }

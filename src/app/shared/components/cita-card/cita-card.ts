@@ -2,9 +2,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon, IonBadge, IonButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { 
-  videocamOutline, locationOutline, 
-  checkmarkCircleOutline, closeCircleOutline, timeOutline 
+import {
+  videocamOutline, locationOutline,
+  checkmarkCircleOutline, closeCircleOutline, timeOutline
 } from 'ionicons/icons';
 import { Cita } from '../../../core/services/citas';
 
@@ -13,7 +13,7 @@ import { Cita } from '../../../core/services/citas';
   standalone: true,
   imports: [CommonModule, IonIcon, IonBadge, IonButton],
   templateUrl: './cita-card.html',
-  styleUrls: ['./cita-card.css'],   
+  styleUrls: ['./cita-card.css'],
 })
 export class CitaCard {
   @Input() cita!: Cita;
@@ -21,8 +21,8 @@ export class CitaCard {
   @Input() mostrarAcciones = false;   // confirmar/cancelar rápido
 
   @Output() confirmar = new EventEmitter<Cita>();
-  @Output() cancelar  = new EventEmitter<Cita>();
-  @Output() editar    = new EventEmitter<Cita>();
+  @Output() cancelar = new EventEmitter<Cita>();
+  @Output() editar = new EventEmitter<Cita>();
   @Output() eliminar = new EventEmitter<Cita>();
   @Output() facturar = new EventEmitter<Cita>();
 
@@ -36,5 +36,9 @@ export class CitaCard {
 
   get icono(): string {
     return this.cita.tipo === 'videollamada' ? 'videocam-outline' : 'location-outline';
+  }
+
+  citaPasada(): boolean {
+    return new Date(this.cita.fecha_hora).getTime() < new Date().getTime();
   }
 }

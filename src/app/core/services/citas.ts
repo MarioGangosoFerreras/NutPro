@@ -14,6 +14,7 @@ export interface Cita {
   url_videollamada?: string;
   cancelado_por?: string;
   pacientes?: { usuarios: { nombre: string; apellidos: string; avatar_url: string } };
+  facturada?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
