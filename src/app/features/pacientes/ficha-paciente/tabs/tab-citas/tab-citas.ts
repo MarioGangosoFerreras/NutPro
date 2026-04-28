@@ -213,10 +213,20 @@ export class TabCitas implements OnInit {
       // 1. Subir el documento
       await this.docsService.subirDocumento(this.paciente.id, pdfBlob, fileName, 'factura', importe);
 
-      // 2. 🔥 CRÍTICO: Actualizar la tabla de citas en la DB
-      await this.supabase.from('citas').update({ facturada: true }).eq('id', cita.id);
+      // 2. CRÍTICO: Actualizar la tabla de citas en la DB verificando si hay errores
+      const { error: updateError } = await this.supabase
+        .from('citas')
+        .update({ facturada: true })
+        .eq('id', cita.id);
 
-      // 3. Recargar localmente para ver el badge "Facturada"
+      if (updateError) {
+        throw new Error('Fallo en BD: ' + updateError.message);
+      }
+
+      // 3. Mutación de estado local inmediata
+      cita.facturada = true;
+
+      // 4. Recargar base de datos local
       await this.cargarCitas();
 
       await loading.dismiss();
@@ -226,9 +236,17 @@ export class TabCitas implements OnInit {
         color: 'success'
       });
       successToast.present();
+
+      this.cdr.detectChanges(); // Fuerza a Angular a pintar el cambio
     } catch (e) {
       await loading.dismiss();
       console.error(e);
+      const errToast = await this.toastCtrl.create({
+        message: 'Error al actualizar el estado de la cita.',
+        duration: 3000,
+        color: 'danger'
+      });
+      errToast.present();
     }
   }
 }

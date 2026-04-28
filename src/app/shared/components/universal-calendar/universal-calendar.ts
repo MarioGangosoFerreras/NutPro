@@ -112,6 +112,8 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
       if (this.diaSeleccionado) {
         this.citasDelDia = this.citasEnFecha(this.diaSeleccionado);
       }
+      // Forzar renderizado profundo para atrapar los booleanos cambiados (facturada)
+      this.cdr.detectChanges();
     }
   }
 
