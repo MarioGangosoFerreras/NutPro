@@ -62,7 +62,7 @@ export class AuthService {
       .from('nutricionistas')
       .select('id')
       .eq('usuario_id', (await this.getUsuario())?.id ?? '')
-      .single();
+      .maybeSingle();
 
     if (error) return null;
     return data?.id ?? null;

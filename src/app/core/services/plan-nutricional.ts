@@ -77,6 +77,18 @@ export class PlanNutricionalService {
     return menu;
   }
 
+  // Método de SOLO LECTURA para que lo use el paciente
+  async getMenuParaPlan(planId: string) {
+    const { data, error } = await this.supabase
+      .from('menus_semanales')
+      .select('*')
+      .eq('plan_id', planId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
   async getEntradasMenu(menuId: string) {
     const { data, error } = await this.supabase
       .from('menu_entradas')
