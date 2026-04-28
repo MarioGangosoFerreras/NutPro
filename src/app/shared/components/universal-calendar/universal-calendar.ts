@@ -14,7 +14,8 @@ import { addIcons } from 'ionicons';
 import {
   chevronBackOutline, chevronForwardOutline,
   addCircleOutline, calendarOutline,
-  videocamOutline, locationOutline
+  videocamOutline, locationOutline,
+  documentTextOutline
 } from 'ionicons/icons';
 import { CitasService, Cita } from '../../../core/services/citas';
 import { AuthService } from '../../../core/services/auth';
@@ -83,7 +84,7 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     addIcons({
       chevronBackOutline, chevronForwardOutline,
       addCircleOutline, calendarOutline,
-      videocamOutline, locationOutline
+      videocamOutline, locationOutline, documentTextOutline
     });
   }
 

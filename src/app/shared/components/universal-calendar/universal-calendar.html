@@ -80,7 +80,8 @@
 
       @if (mode === 'full' && citaPasada(cita) && !cita.facturada && cita.estado === 'confirmada') {
       <ion-button fill="clear" color="primary" (click)="emitirFacturaEvent($event, cita)">
-        <ion-icon slot="icon-only" name="document-text-outline"></ion-icon>
+        <ion-icon slot="start" name="document-text-outline"></ion-icon>
+        Facturar
       </ion-button>
       }
 
