@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
@@ -20,6 +20,7 @@ import {
   ToastController,
   AlertController,
   MenuController,
+  ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -64,7 +65,7 @@ import { Shell } from '../../../../shared/components/shell/shell';
     Header,
   ],
 })
-export class ListaRecetas implements OnInit {
+export class ListaRecetas implements ViewWillEnter {
   private recetaService = inject(RecetaService);
   private authService = inject(AuthService);
   private toastCtrl = inject(ToastController);
@@ -107,7 +108,7 @@ export class ListaRecetas implements OnInit {
     });
   }
 
-  async ngOnInit() {
+  async ionViewWillEnter() {
     await this.cargarRecetas();
   }
 

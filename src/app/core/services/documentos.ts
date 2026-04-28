@@ -4,6 +4,7 @@ import { SupabaseService } from './supabase';
 export interface Documento {
   id: string;
   paciente_id: string;
+  cita_id?: string;
   tipo: 'informe' | 'factura';
   nombre: string;
   archivo_url: string;
@@ -47,7 +48,7 @@ export class DocumentosService {
     return data as Documento[];
   }
 
-  async subirDocumento(pacienteId: string, file: File | Blob, nombreArchivo: string, tipo: 'informe' | 'factura', importe: number = 0): Promise<Documento> {
+  async subirDocumento(pacienteId: string, file: File | Blob, nombreArchivo: string, tipo: 'informe' | 'factura', importe: number = 0, citaId?: string): Promise<Documento> {
     const fileExt = nombreArchivo.split('.').pop() || 'pdf';
     const filePath = `${pacienteId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
@@ -60,6 +61,7 @@ export class DocumentosService {
       .from('documentos')
       .insert({
         paciente_id: pacienteId,
+        cita_id: citaId,
         tipo,
         nombre: nombreArchivo,
         archivo_url: urlData.publicUrl,
@@ -77,7 +79,7 @@ export class DocumentosService {
   async actualizarEstadoPago(docId: string, pagado: boolean) {
     const { data, error } = await this.supabase
       .from('documentos')
-      .update({ pagado }) 
+      .update({ pagado })
       .eq('id', docId)
       .select() // <-- Pedimos que nos devuelva la fila
       .single(); // <-- Forzamos a que si no actualiza nada, lance un error
@@ -86,15 +88,25 @@ export class DocumentosService {
       console.error('Error en Supabase (probablemente RLS):', error);
       throw error;
     }
-    
+
     return data;
   }
 
-  async eliminarDocumento(id: string, url: string) {
+  // 3. Modifica eliminarDocumento para que "libere" la cita
+  async eliminarDocumento(id: string, url: string, citaId?: string) {
     const path = url.split('/documentos/')[1];
     if (path) {
       await this.supabase.storage.from('documentos').remove([path]);
     }
+
+    // Si el documento tiene una cita asociada, la ponemos como NO facturada
+    if (citaId) {
+      await this.supabase
+        .from('citas')
+        .update({ facturada: false })
+        .eq('id', citaId);
+    }
+
     const { error } = await this.supabase.from('documentos').delete().eq('id', id);
     if (error) throw error;
   }

@@ -9,6 +9,8 @@ export interface EstadisticasDashboard {
   proximaCita: string | null;
   mensajesSinLeer: number;
   pacientesPendienteSeguimiento: number;
+  ingresosMes: number;
+  cobrosPendientes: number;
 }
 
 @Injectable({
@@ -28,12 +30,16 @@ export class DashboardService {
       citasHoy,
       mensajesSinLeer,
       pacientesPendienteSeguimiento,
+      ingresosMes,
+      cobrosPendientes,
     ] = await Promise.all([
       this.getPacientesActivos(nutricionistaId),
       this.getPacientesNuevosEsteMes(nutricionistaId),
       this.getCitasHoy(nutricionistaId),
       this.getMensajesSinLeer(nutricionistaId),
       this.getPacientesSinSeguimiento(nutricionistaId),
+      this.getIngresosMes(nutricionistaId),
+      this.getCobrosPendientes(nutricionistaId)
     ]);
 
     return {
@@ -43,6 +49,8 @@ export class DashboardService {
       proximaCita: citasHoy.proxima,
       mensajesSinLeer: mensajesSinLeer,
       pacientesPendienteSeguimiento: pacientesPendienteSeguimiento,
+      ingresosMes: ingresosMes,
+      cobrosPendientes: cobrosPendientes
     };
   }
 
@@ -72,6 +80,7 @@ export class DashboardService {
     if (error) console.error('Error pacientes nuevos:', error.message);
     return { count: count ?? 0 };
   }
+
 
   // Citas de hoy no canceladas + hora de la próxima
   private async getCitasHoy(nutricionistaId: string) {
@@ -173,5 +182,42 @@ export class DashboardService {
     );
 
     return pacientes.filter((p: any) => !idsConMedicion.has(p.id)).length;
+  }
+
+  private async getIngresosMes(nutricionistaId: string): Promise<number> {
+    const inicioMes = new Date();
+    inicioMes.setDate(1);
+    inicioMes.setHours(0, 0, 0, 0);
+
+    const { data, error } = await this.supabase
+      .from('documentos')
+      .select('importe, pacientes!inner(nutricionista_id)')
+      .eq('tipo', 'factura')
+      .eq('pagado', true)
+      .eq('pacientes.nutricionista_id', nutricionistaId)
+      .gte('created_at', inicioMes.toISOString());
+
+    if (error) {
+      console.error('Error calculando ingresos:', error.message);
+      return 0;
+    }
+
+    return data.reduce((sum, doc) => sum + (doc.importe || 0), 0);
+  }
+
+  private async getCobrosPendientes(nutricionistaId: string): Promise<number> {
+    const { data, error } = await this.supabase
+      .from('documentos')
+      .select('importe, pacientes!inner(nutricionista_id)')
+      .eq('tipo', 'factura')
+      .eq('pagado', false) // Solo las no pagadas
+      .eq('pacientes.nutricionista_id', nutricionistaId);
+
+    if (error) {
+      console.error('Error calculando cobros pendientes:', error.message);
+      return 0;
+    }
+
+    return data.reduce((sum, doc) => sum + (doc.importe || 0), 0);
   }
 }

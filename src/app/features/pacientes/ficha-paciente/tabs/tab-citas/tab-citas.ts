@@ -211,8 +211,8 @@ export class TabCitas implements OnInit {
       const fileName = `Factura_${this.paciente.usuario.nombre}_${fecha}.pdf`;
 
       // 1. Subir el documento
-      await this.docsService.subirDocumento(this.paciente.id, pdfBlob, fileName, 'factura', importe);
-
+      await this.docsService.subirDocumento(this.paciente.id, pdfBlob, fileName, 'factura', importe, cita.id);
+      
       // 2. CRÍTICO: Actualizar la tabla de citas en la DB verificando si hay errores
       const { error: updateError } = await this.supabase
         .from('citas')

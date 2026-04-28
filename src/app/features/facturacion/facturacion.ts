@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonButton, IonBadge, IonSpinner, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonButton, IonBadge, IonSpinner, ToastController, ViewWillEnter } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { walletOutline, cashOutline, documentTextOutline, downloadOutline, trendingUpOutline, checkmarkCircle, timeOutline } from 'ionicons/icons';
 import { Header } from '../../shared/components/header/header';
@@ -17,7 +17,7 @@ Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
   templateUrl: './facturacion.html',
   styleUrls: ['./facturacion.css']
 })
-export class Facturacion implements OnInit {
+export class Facturacion implements ViewWillEnter {
   private docsService = inject(DocumentosService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
@@ -38,7 +38,8 @@ export class Facturacion implements OnInit {
     addIcons({ walletOutline, cashOutline, documentTextOutline, downloadOutline, trendingUpOutline, checkmarkCircle, timeOutline });
   }
 
-  async ngOnInit() {
+  async ionViewWillEnter() {
+    this.cargando = true;
     try {
       const nutriId = await this.authService.getNutricionistaId();
       if (!nutriId) return;

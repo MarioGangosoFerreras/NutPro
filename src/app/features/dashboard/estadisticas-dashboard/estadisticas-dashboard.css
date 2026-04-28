@@ -14,6 +14,12 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .stat-card__top {
@@ -64,6 +70,7 @@
 .stat-card--teal   .stat-card__icon { background: #E1F5EE; }
 .stat-card--coral  .stat-card__icon { background: #FAECE7; }
 .stat-card--amber  .stat-card__icon { background: #FAEEDA; }
+.stat-card--blue   .stat-card__icon { background: #e0f2fe; }
 
 .stat-card--skeleton {
   height: 110px;
@@ -98,6 +105,6 @@
 
 @media (min-width: 768px) {
   .stats-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 }

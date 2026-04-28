@@ -71,10 +71,14 @@ export class TabDocumentos implements OnInit {
   async eliminar(doc: Documento) {
     this.cargando = true;
     try {
-      await this.docsService.eliminarDocumento(doc.id, doc.archivo_url);
+      // Pasamos el id, la url y el cita_id (si existe)
+      await this.docsService.eliminarDocumento(doc.id, doc.archivo_url, doc.cita_id);
       await this.cargarDocs();
     } catch (e) {
       console.error(e);
+    } finally {
+      this.cargando = false;
+      this.cdr.detectChanges();
     }
   }
 }

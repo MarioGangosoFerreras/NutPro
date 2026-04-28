@@ -109,7 +109,7 @@ export class CitasService {
   // Para el calendario: citas de un mes concreto
   async getCitasMes(nutricionistaId: string, año: number, mes: number): Promise<Cita[]> {
     const inicio = new Date(año, mes, 1).toISOString();
-    const fin    = new Date(año, mes + 1, 0, 23, 59, 59).toISOString();
+    const fin = new Date(año, mes + 1, 0, 23, 59, 59).toISOString();
 
     const { data, error } = await this.supabase
       .from('citas')
@@ -130,5 +130,21 @@ export class CitasService {
         filter: `nutricionista_id=eq.${nutricionistaId}`
       }, payload => callback(payload.new as Cita))
       .subscribe();
+  }
+
+  async getCitasPendientesFacturar(nutricionistaId: string): Promise<Cita[]> {
+    const hoy = new Date().toISOString();
+
+    const { data, error } = await this.supabase
+      .from('citas')
+      .select('*, pacientes(usuarios(nombre, apellidos, avatar_url))')
+      .eq('nutricionista_id', nutricionistaId)
+      .eq('estado', 'confirmada')
+      .eq('facturada', false)
+      .lt('fecha_hora', hoy) // Solo citas que ya han pasado
+      .order('fecha_hora', { ascending: false });
+
+    if (error) throw error;
+    return data as Cita[];
   }
 }
