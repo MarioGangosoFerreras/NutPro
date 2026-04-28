@@ -24,6 +24,7 @@ export class CitasLista {
   @Output() confirmarCita = new EventEmitter<Cita>();
   @Output() cancelarCita  = new EventEmitter<Cita>();
   @Output() eliminarCita  = new EventEmitter<Cita>();
+  @Output() facturarCita = new EventEmitter<Cita>();
 
   _citas: Cita[] = [];
   grupos: GrupoCitas[] = [];

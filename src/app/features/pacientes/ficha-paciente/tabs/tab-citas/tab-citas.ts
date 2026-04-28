@@ -23,8 +23,13 @@ import {
   IonSpinner,
   ModalController,
   AlertController,
+  LoadingController, 
+  ToastController
 } from '@ionic/angular/standalone';
 import { UniversalCalendar } from "../../../../../shared/components/universal-calendar/universal-calendar";
+import { PdfService } from '../../../../../core/services/pdf';
+import { SupabaseService } from '../../../../../core/services/supabase'; 
+import { DocumentosService } from '../../../../../core/services/documentos';
 
 @Component({
   selector: 'app-tab-citas',
@@ -39,11 +44,12 @@ import { UniversalCalendar } from "../../../../../shared/components/universal-ca
     IonButton,
     CitasLista,
     UniversalCalendar
-],
+  ],
   templateUrl: './tab-citas.html',
 })
 export class TabCitas implements OnInit {
-  @Input() pacienteId!: string;
+  // Cambio principal: ahora recibimos el objeto 'paciente' completo
+  @Input() paciente: any; 
   @Input() nutricionistaId!: string;
 
   private citasService = inject(CitasService);
@@ -52,6 +58,13 @@ export class TabCitas implements OnInit {
   private alertCtrl = inject(AlertController);
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
+  private pdfService = inject(PdfService);
+  private docsService = inject(DocumentosService);
+  
+  // Inyecciones que faltaban para generar la factura
+  private loadingCtrl = inject(LoadingController);
+  private toastCtrl = inject(ToastController);
+  private supabase = inject(SupabaseService).client;
 
   vistaActiva: 'lista' | 'calendario' = 'lista';
   citas: Cita[] = [];
@@ -73,16 +86,16 @@ export class TabCitas implements OnInit {
   async cargarCitas() {
     this.ngZone.run(async () => {
       this.cargando = true;
-      this.cdr.markForCheck(); // ← para que muestre el spinner
+      this.cdr.markForCheck(); 
       try {
         const datos = await this.citasService.getCitasPaciente(
-          this.pacienteId,
+          this.paciente.id, // Actualizado para usar el id del objeto paciente
           this.nutricionistaId,
         );
         this.citas = [...datos];
       } finally {
         this.cargando = false;
-        this.cdr.markForCheck(); // ← para que actualice la lista
+        this.cdr.markForCheck(); 
       }
     });
   }
@@ -92,7 +105,7 @@ export class TabCitas implements OnInit {
       component: ModalCitaComponent,
       componentProps: {
         cita,
-        pacienteId: this.pacienteId,
+        pacienteId: this.paciente.id, // Actualizado para usar el id del objeto paciente
         nutricionistaId: this.nutricionistaId,
       },
     });
@@ -118,7 +131,7 @@ export class TabCitas implements OnInit {
           text: 'Sí',
           role: 'confirm',
           handler: async () => {
-            const usuarioId = await this.authService.getUsuarioId(); // ← era getUserId()
+            const usuarioId = await this.authService.getUsuarioId();
             await this.citasService.cancelarCita(cita.id!, usuarioId);
             await this.cargarCitas();
           },
@@ -145,5 +158,72 @@ export class TabCitas implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  async crearFactura(cita: Cita) {
+    const alert = await this.alertCtrl.create({
+      header: 'Generar Factura',
+      subHeader: `Cita: ${cita.tipo}`,
+      message: 'Introduce el importe total de la consulta (IVA incl.):',
+      inputs: [
+        {
+          name: 'importe',
+          type: 'number',
+          placeholder: 'Ej: 50',
+          value: cita.tipo === 'presencial' ? '60' : '45' 
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Generar PDF',
+          handler: (data) => {
+            this.procesarGeneracionFactura(cita, parseFloat(data.importe));
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async procesarGeneracionFactura(cita: Cita, importe: number) {
+    if (isNaN(importe) || importe <= 0) return;
+
+    const loading = await this.loadingCtrl.create({ message: 'Generando factura...' });
+    await loading.present();
+
+    try {
+      const { data: nutriData } = await this.supabase
+        .from('nutricionistas')
+        .select('*, usuario:usuario_id(*)')
+        .eq('usuario_id', await this.authService.getUsuarioId())
+        .single();
+
+      const emisor = {
+        ...nutriData.usuario,
+        dni_fiscal: nutriData.dni_fiscal,
+        direccion_fiscal: nutriData.direccion_fiscal
+      };
+
+      const pdfBlob = await this.pdfService.generarFacturaPdfBlob(cita, this.paciente, emisor, importe);
+
+      const fecha = new Date(cita.fecha_hora).toLocaleDateString().replace(/\//g, '-');
+      const fileName = `Factura_${this.paciente.usuario.nombre}_${fecha}.pdf`;
+
+      await this.docsService.subirDocumento(this.paciente.id, pdfBlob, fileName, 'factura');
+
+      await loading.dismiss();
+      const successToast = await this.toastCtrl.create({
+        message: 'Factura guardada en la sección de Documentos',
+        duration: 3000,
+        color: 'success'
+      });
+      successToast.present();
+
+    } catch (e) {
+      await loading.dismiss();
+      console.error(e);
+    }
   }
 }

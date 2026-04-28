@@ -14,28 +14,33 @@
   </div>
 
   @if (mostrarAcciones) {
-    <div class="cita-card__acciones">
-      @if (cita.estado === 'pendiente') {
-        <ion-button fill="clear" color="success" size="small" (click)="confirmar.emit(cita)">
-          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-          Confirmar
-        </ion-button>
-        <ion-button fill="clear" color="warning" size="small" (click)="cancelar.emit(cita)">
-          <ion-icon slot="start" name="close-circle-outline"></ion-icon>
-          Cancelar
-        </ion-button>
-      }
+  <div class="cita-card__acciones">
+    @if (cita.estado === 'pendiente') {
+    <ion-button fill="clear" color="success" size="small" (click)="confirmar.emit(cita)">
+      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+      Confirmar
+    </ion-button>
+    <ion-button fill="clear" color="warning" size="small" (click)="cancelar.emit(cita)">
+      <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+      Cancelar
+    </ion-button>
+    }
 
-      @if (cita.estado !== 'cancelada') {
-        <ion-button fill="clear" size="small" (click)="editar.emit(cita)">
-          <ion-icon slot="start" name="create-outline"></ion-icon>
-          Editar
-        </ion-button>
-      }
+    @if (cita.estado !== 'cancelada') {
+    <ion-button fill="clear" size="small" (click)="editar.emit(cita)">
+      <ion-icon slot="start" name="create-outline"></ion-icon>
+      Editar
+    </ion-button>
+    }
 
-      <ion-button fill="clear" color="danger" size="small" (click)="eliminar.emit(cita)">
-        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-      </ion-button>
-    </div>
+    <ion-button fill="clear" color="primary" size="small" (click)="facturar.emit(cita)">
+      <ion-icon slot="start" name="document-text-outline"></ion-icon>
+      Factura
+    </ion-button>
+
+    <ion-button fill="clear" color="danger" size="small" (click)="eliminar.emit(cita)">
+      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+    </ion-button>
+  </div>
   }
 </div>

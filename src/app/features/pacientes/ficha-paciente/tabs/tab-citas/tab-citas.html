@@ -18,7 +18,7 @@
 
   @if (!cargando && vistaActiva === 'lista') {
   <app-citas-lista [citas]="citas" (editarCita)="abrirModal($event)" (confirmarCita)="confirmar($event)"
-    (cancelarCita)="cancelar($event)" (eliminarCita)="eliminar($event)">
+    (cancelarCita)="cancelar($event)" (eliminarCita)="eliminar($event)" (facturarCita)="crearFactura($event)">
   </app-citas-lista>
   }
 

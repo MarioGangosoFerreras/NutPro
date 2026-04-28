@@ -2,154 +2,148 @@
 
 <ion-content class="ion-padding">
   @if (loading) {
-    <div class="loading-container">
-      <div class="avocado-spinner">🥑</div>
-      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px">
-        Cargando datos del paciente...
-      </p>
-    </div>
+  <div class="loading-container">
+    <div class="avocado-spinner">🥑</div>
+    <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px">
+      Cargando datos del paciente...
+    </p>
+  </div>
   }
 
   @if (!loading && paciente) {
-    <div class="ficha-container">
-      <div class="header-acciones">
-        <ion-button fill="clear" (click)="volver()" class="btn-volver">
-          <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
-          Volver
-        </ion-button>
+  <div class="ficha-container">
+    <div class="header-acciones">
+      <ion-button fill="clear" (click)="volver()" class="btn-volver">
+        <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
+        Volver
+      </ion-button>
+    </div>
+
+    <ion-card class="paciente-hero">
+      <div class="acciones-edicion">
+        <div class="menu-acciones">
+          <button class="btn-dots" (click)="toggleMenu()">⋯</button>
+
+          @if (menuAbierto) {
+          <div class="dropdown">
+            <div class="dropdown-item" (click)="editarDesdeMenu()">
+              <ion-icon name="create-outline"></ion-icon>
+              Editar paciente
+            </div>
+            <div class="dropdown-item danger" (click)="onEliminarPaciente()">
+              <ion-icon name="trash-outline"></ion-icon>
+              Eliminar paciente
+            </div>
+          </div>
+          }
+        </div>
       </div>
 
-      <ion-card class="paciente-hero">
-        <div class="acciones-edicion">
-          <div class="menu-acciones">
-            <button class="btn-dots" (click)="toggleMenu()">⋯</button>
+      <ion-item lines="none" class="hero-item">
+        <ion-avatar slot="start" class="paciente-avatar">
+          @if (paciente.usuario?.avatar_url) {
+          <img [src]="paciente.usuario.avatar_url" />
+          } @else {
+          <ion-icon name="person-circle-outline"></ion-icon>
+          }
+        </ion-avatar>
 
-            @if (menuAbierto) {
-              <div class="dropdown">
-                <div class="dropdown-item" (click)="editarDesdeMenu()">
-                  <ion-icon name="create-outline"></ion-icon>
-                  Editar paciente
-                </div>
-                <div class="dropdown-item danger" (click)="onEliminarPaciente()">
-                  <ion-icon name="trash-outline"></ion-icon>
-                  Eliminar paciente
-                </div>
-              </div>
-            }
-          </div>
-        </div>
+        <ion-label class="paciente-info">
+          <h1>{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</h1>
+          <p class="email-text">{{ paciente.usuario?.email }}</p>
 
-        <ion-item lines="none" class="hero-item">
-          <ion-avatar slot="start" class="paciente-avatar">
-            @if (paciente.usuario?.avatar_url) {
-              <img [src]="paciente.usuario.avatar_url" />
-            } @else {
-              <ion-icon name="person-circle-outline"></ion-icon>
-            }
-          </ion-avatar>
-
-          <ion-label class="paciente-info">
-            <h1>{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</h1>
-            <p class="email-text">{{ paciente.usuario?.email }}</p>
-
-            <div
-              style="
+          <div style="
                 display: flex;
                 align-items: center;
                 gap: 8px;
                 margin-top: 10px;
                 flex-wrap: wrap;
-              "
-            >
-              <ion-button
-                size="small"
-                fill="outline"
-                color="primary"
-                [routerLink]="['/pacientes', paciente.id, 'chat']"
-                style="margin: 0"
-              >
-                <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
-                Chat directo
-              </ion-button>
+              ">
+            <ion-button size="small" fill="outline" color="primary" [routerLink]="['/pacientes', paciente.id, 'chat']"
+              style="margin: 0">
+              <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
+              Chat directo
+            </ion-button>
 
-              @if (paciente.motivo_consulta) {
-                <ion-badge color="primary" class="badge-motivo" style="margin: 0">
-                  {{ paciente.motivo_consulta }}
-                </ion-badge>
-              }
-            </div>
-          </ion-label>
-        </ion-item>
-      </ion-card>
+            @if (paciente.motivo_consulta) {
+            <ion-badge color="primary" class="badge-motivo" style="margin: 0">
+              {{ paciente.motivo_consulta }}
+            </ion-badge>
+            }
+          </div>
+        </ion-label>
+      </ion-item>
+    </ion-card>
 
-      <!-- ✅ TABS -->
-      <ion-segment
-        [value]="tabActiva"
-        (ionChange)="onTabChange($event)"
-        class="ficha-tabs"
-        scrollable="true"
-      >
-        <ion-segment-button value="resumen">
-          <ion-icon name="person-circle-outline"></ion-icon>
-          <ion-label>Resumen</ion-label>
-        </ion-segment-button>
+    <!-- ✅ TABS -->
+    <ion-segment [value]="tabActiva" (ionChange)="onTabChange($event)" class="ficha-tabs" scrollable="true">
+      <ion-segment-button value="resumen">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <ion-label>Resumen</ion-label>
+      </ion-segment-button>
 
-        <ion-segment-button value="clinica">
-          <ion-icon name="medkit-outline"></ion-icon>
-          <ion-label>Clínica</ion-label>
-        </ion-segment-button>
+      <ion-segment-button value="clinica">
+        <ion-icon name="medkit-outline"></ion-icon>
+        <ion-label>Clínica</ion-label>
+      </ion-segment-button>
 
-        <ion-segment-button value="alimentacion">
-          <ion-icon name="restaurant-outline"></ion-icon>
-          <ion-label>Alimentación</ion-label>
-        </ion-segment-button>
+      <ion-segment-button value="alimentacion">
+        <ion-icon name="restaurant-outline"></ion-icon>
+        <ion-label>Alimentación</ion-label>
+      </ion-segment-button>
 
-        <ion-segment-button value="mediciones">
-          <ion-icon name="scale-outline"></ion-icon>
-          <ion-label>Mediciones</ion-label>
-        </ion-segment-button>
+      <ion-segment-button value="mediciones">
+        <ion-icon name="scale-outline"></ion-icon>
+        <ion-label>Mediciones</ion-label>
+      </ion-segment-button>
 
-        <ion-segment-button value="plan">
-          <ion-icon name="nutrition-outline"></ion-icon>
-          <ion-label>Plan</ion-label>
-        </ion-segment-button>
+      <ion-segment-button value="plan">
+        <ion-icon name="nutrition-outline"></ion-icon>
+        <ion-label>Plan</ion-label>
+      </ion-segment-button>
 
-        <ion-segment-button value="citas">
-          <ion-icon name="calendar-outline"></ion-icon>
-          <ion-label>Citas</ion-label>
-        </ion-segment-button>
-      </ion-segment>
+      <ion-segment-button value="citas">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <ion-label>Citas</ion-label>
+      </ion-segment-button>
 
-      <!-- CONTENIDO -->
-      @if (tabActiva === 'resumen') {
-        <app-tab-resumen
-          [paciente]="paciente"
-          (pacienteActualizado)="onPacienteActualizado($event)"
-          (eliminarPaciente)="onEliminarPaciente()"
-        >
-        </app-tab-resumen>
-      }
+      <ion-segment-button value="documentos">
+        <ion-icon name="document-attach-outline"></ion-icon>
+        <ion-label>Docs/Facturas</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
-      @if (tabActiva === 'clinica') {
-        <app-tab-clinica [pacienteId]="paciente.id"></app-tab-clinica>
-      }
+    <!-- CONTENIDO -->
+    @if (tabActiva === 'resumen') {
+    <app-tab-resumen [paciente]="paciente" (pacienteActualizado)="onPacienteActualizado($event)"
+      (eliminarPaciente)="onEliminarPaciente()">
+    </app-tab-resumen>
+    }
 
-      @if (tabActiva === 'alimentacion') {
-        <app-tab-alimentacion [pacienteId]="paciente.id"></app-tab-alimentacion>
-      }
+    @if (tabActiva === 'clinica') {
+    <app-tab-clinica [pacienteId]="paciente.id"></app-tab-clinica>
+    }
 
-      @if (tabActiva === 'mediciones') {
-        <app-tab-mediciones [paciente]="paciente"></app-tab-mediciones>
-      }
+    @if (tabActiva === 'alimentacion') {
+    <app-tab-alimentacion [pacienteId]="paciente.id"></app-tab-alimentacion>
+    }
 
-      @if (tabActiva === 'plan') {
-        <app-tab-plan [paciente]="paciente"></app-tab-plan>
-      }
+    @if (tabActiva === 'mediciones') {
+    <app-tab-mediciones [paciente]="paciente"></app-tab-mediciones>
+    }
 
-      @if (tabActiva === 'citas') {
-        <app-tab-citas [pacienteId]="paciente.id" [nutricionistaId]="paciente.nutricionista_id">
-        </app-tab-citas>
-      }
-    </div>
+    @if (tabActiva === 'plan') {
+    <app-tab-plan [paciente]="paciente"></app-tab-plan>
+    }
+
+    @if (tabActiva === 'citas') {
+    <app-tab-citas [paciente]="paciente" [nutricionistaId]="paciente.nutricionista_id">
+    </app-tab-citas>
+    }
+
+    @if (tabActiva === 'documentos') {
+    <app-tab-documentos [paciente]="paciente"></app-tab-documentos>
+    }
+  </div>
   }
 </ion-content>

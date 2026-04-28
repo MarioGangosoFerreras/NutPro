@@ -46,8 +46,10 @@ import {
   calendarOutline,
   nutritionOutline,
   chatbubblesOutline,
+  documentAttachOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
+import { TabDocumentos } from "./tabs/tab-documentos/tab-documentos";
 
 @Component({
   selector: 'app-ficha-paciente',
@@ -70,7 +72,8 @@ import { AuthService } from '../../../core/services/auth';
     IonAvatar,
     IonItem,
     RouterLink,
-  ],
+    TabDocumentos
+],
   templateUrl: './ficha-paciente.html',
   styleUrls: ['./ficha-paciente.css'],
   encapsulation: ViewEncapsulation.None,
@@ -111,6 +114,7 @@ export class FichaPaciente implements OnInit {
       nutritionOutline,
       calendarOutline,
       chatbubblesOutline,
+      documentAttachOutline
     });
   }
 

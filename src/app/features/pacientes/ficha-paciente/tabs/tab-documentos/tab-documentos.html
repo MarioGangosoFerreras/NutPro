@@ -1,0 +1,71 @@
+<div class="tab-header">
+    <ion-segment [(ngModel)]="subTabActiva" mode="ios">
+        <ion-segment-button value="informes">
+            <ion-label>Analíticas e Informes</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="facturas">
+            <ion-label>Facturas</ion-label>
+        </ion-segment-button>
+    </ion-segment>
+</div>
+
+<div class="tab-content" style="margin-top: 16px;">
+    @if (cargando) {
+    <div style="text-align: center; padding: 30px;"><ion-spinner></ion-spinner></div>
+    } @else {
+
+    @if (subTabActiva === 'informes') {
+    <div style="margin-bottom: 16px;">
+        <input type="file" #fileInput (change)="subirInforme($event)" hidden accept=".pdf,.doc,.docx,.jpg,.png" />
+        <ion-button expand="block" (click)="fileInput.click()" [disabled]="subiendo">
+            <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+            {{ subiendo ? 'Subiendo...' : 'Subir nuevo informe/analítica' }}
+        </ion-button>
+    </div>
+
+    <ion-list>
+        @for (doc of getDocumentosPorTipo('informe'); track doc.id) {
+        <ion-item lines="full" class="doc-item">
+            <ion-icon name="document-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+                <h3>{{ doc.nombre }}</h3>
+                <p>{{ doc.created_at | date: 'dd/MM/yyyy' }}</p>
+            </ion-label>
+            <ion-button fill="clear" slot="end" [href]="doc.archivo_url" target="_blank">
+                <ion-icon slot="icon-only" name="download-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" color="danger" slot="end" (click)="eliminar(doc)">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+        </ion-item>
+        }
+        @if (getDocumentosPorTipo('informe').length === 0) {
+        <p style="text-align:center; color:gray; padding:20px">No hay informes subidos.</p>
+        }
+    </ion-list>
+    }
+
+    @if (subTabActiva === 'facturas') {
+    <ion-list>
+        @for (doc of getDocumentosPorTipo('factura'); track doc.id) {
+        <ion-item lines="full" class="doc-item">
+            <ion-icon name="document-text-outline" slot="start" color="success"></ion-icon>
+            <ion-label>
+                <h3>{{ doc.nombre }}</h3>
+                <p>{{ doc.created_at | date: 'dd/MM/yyyy HH:mm' }}</p>
+            </ion-label>
+            <ion-button fill="clear" slot="end" [href]="doc.archivo_url" target="_blank" color="success">
+                <ion-icon slot="icon-only" name="download-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" color="danger" slot="end" (click)="eliminar(doc)">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+        </ion-item>
+        }
+        @if (getDocumentosPorTipo('factura').length === 0) {
+        <p style="text-align:center; color:gray; padding:20px">Las facturas se generan desde la pestaña Citas.</p>
+        }
+    </ion-list>
+    }
+    }
+</div>

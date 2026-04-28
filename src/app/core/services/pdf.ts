@@ -102,7 +102,7 @@ export class PdfService {
       doc.setGState(new (doc as any).GState({ opacity: 0.12 }));
       doc.addImage(logoNutPro, 'PNG', pageWidth - 50, pageHeight - 50, 35, 35);
       doc.setGState(new (doc as any).GState({ opacity: 1.0 }));
-    } catch (e) {}
+    } catch (e) { }
 
     doc.setTextColor(150, 150, 150);
     doc.setFontSize(9);
@@ -137,5 +137,123 @@ export class PdfService {
       img.onerror = (error) => reject(error);
       img.src = imageUrl;
     });
+  }
+
+  //PDF para factura (con cálculos de IVA y formato profesional)
+
+  // src/app/core/services/pdf.ts
+
+  async generarFacturaPdfBlob(cita: any, paciente: any, nutriData: any, importeTotal: number): Promise<Blob> {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // ─── 1. CONFIGURACIÓN DE COLORES Y MARCA ───
+    const verdeNutPro: [number, number, number] = [45, 106, 79];
+    const grisTexto: [number, number, number] = [80, 80, 80];
+
+    // Cálculos de IVA (En España, nutrición suele estar exenta si es salud, 
+    // pero si el nutri lo cobra con IVA, aquí calculamos el 21%)
+    const baseImponible = importeTotal / 1.21;
+    const importeIva = importeTotal - baseImponible;
+    const numeroFactura = `FAC-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`;
+
+    // ─── 2. ENCABEZADO Y LOGOS ───
+    // Logo NutPro (Marca de agua / Logo arriba)
+    try {
+      const logoNutPro = await this.getBase64ImageFromUrl('img/Logo_app.png');
+      doc.addImage(logoNutPro, 'PNG', 15, 10, 20, 20);
+    } catch (e) { console.warn("No se pudo cargar el logo"); }
+
+    // Avatar del Nutricionista
+    if (nutriData?.avatar_url) {
+      try {
+        const nutriImg = await this.getBase64ImageFromUrl(nutriData.avatar_url);
+        doc.addImage(nutriImg, 'JPEG', pageWidth - 40, 10, 25, 25);
+      } catch (e) { }
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(verdeNutPro[0], verdeNutPro[1], verdeNutPro[2]);
+    doc.text('FACTURA', pageWidth / 2, 25, { align: 'center' });
+
+    // ─── 3. DATOS FISCALES (EMISOR Y RECEPTOR) ───
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+
+    // Bloque Emisor (Izquierda)
+    let yPos = 45;
+    doc.setFont('helvetica', 'bold');
+    doc.text('DATOS DEL PROFESIONAL (EMISOR):', 15, yPos);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${nutriData?.nombre} ${nutriData?.apellidos}`, 15, yPos + 6);
+    doc.text(`NIF/DNI: ${nutriData?.dni_fiscal || '---'}`, 15, yPos + 11);
+    doc.text(`Dirección: ${nutriData?.direccion_fiscal || '---'}`, 15, yPos + 16);
+
+    // Bloque Receptor (Derecha)
+    doc.setFont('helvetica', 'bold');
+    doc.text('DATOS DEL PACIENTE:', pageWidth / 2 + 10, yPos);
+    doc.setFont('helvetica', 'normal');
+    const nombrePac = `${paciente?.usuario?.nombre} ${paciente?.usuario?.apellidos}`;
+    doc.text(nombrePac, pageWidth / 2 + 10, yPos + 6);
+    doc.text(`NIF/DNI: ${paciente?.dni || '---'}`, pageWidth / 2 + 10, yPos + 11);
+    doc.text(`Dirección: ${paciente?.direccion || '---'}`, pageWidth / 2 + 10, yPos + 16);
+
+    // Info Factura
+    doc.setDrawColor(200, 200, 200);
+    doc.line(15, 75, pageWidth - 15, 75);
+    doc.text(`Número: ${numeroFactura}`, 15, 82);
+    doc.text(`Fecha Emisión: ${new Date().toLocaleDateString('es-ES')}`, pageWidth - 15, 82, { align: 'right' });
+
+    // ─── 4. TABLA DE CONCEPTOS ───
+    const citaFecha = new Date(cita.fecha_hora).toLocaleDateString('es-ES');
+    autoTable(doc, {
+      startY: 90,
+      head: [['Descripción del Servicio', 'Cantidad', 'Base Imp.', 'IVA', 'Total']],
+      body: [
+        [
+          `Servicio de Nutrición y Dietética\nSesión de ${cita.tipo} - ${citaFecha}`,
+          '1',
+          `${baseImponible.toFixed(2)} €`,
+          '21%',
+          `${importeTotal.toFixed(2)} €`
+        ]
+      ],
+      theme: 'striped',
+      headStyles: { fillColor: verdeNutPro, textColor: 255 },
+      styles: { cellPadding: 5 }
+    });
+
+    const finalY = (doc as any).lastAutoTable.finalY + 15;
+
+    // ─── 5. TOTALES ───
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Base Imponible:`, pageWidth - 80, finalY);
+    doc.text(`${baseImponible.toFixed(2)} €`, pageWidth - 20, finalY, { align: 'right' });
+
+    doc.text(`IVA (21%):`, pageWidth - 80, finalY + 7);
+    doc.text(`${importeIva.toFixed(2)} €`, pageWidth - 20, finalY + 7, { align: 'right' });
+
+    doc.setFillColor(verdeNutPro[0], verdeNutPro[1], verdeNutPro[2]);
+    doc.rect(pageWidth - 85, finalY + 12, 70, 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`TOTAL FACTURA:`, pageWidth - 80, finalY + 19);
+    doc.text(`${importeTotal.toFixed(2)} €`, pageWidth - 20, finalY + 19, { align: 'right' });
+
+    // ─── 6. MARCA DE AGUA Y PIE DE PÁGINA ───
+    doc.setTextColor(180, 180, 180);
+    doc.setFontSize(40);
+    doc.setFont('helvetica', 'bold');
+    doc.setGState(new (doc as any).GState({ opacity: 0.08 }));
+    doc.text('NUTPRO', pageWidth / 2, pageHeight / 2, { align: 'center', angle: 45 });
+
+    doc.setGState(new (doc as any).GState({ opacity: 1 }));
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text('Documento generado a través de la plataforma NutPro. El servicio de nutrición está sujeto a la normativa vigente.', pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+    return doc.output('blob');
   }
 }
