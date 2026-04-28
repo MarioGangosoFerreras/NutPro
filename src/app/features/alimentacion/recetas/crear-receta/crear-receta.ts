@@ -5,12 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import {
-  IonHeader,
-  IonToolbar,
-  IonButtons,
   IonButton,
   IonIcon,
-  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -28,8 +24,6 @@ import {
   IonList,
   IonNote,
   IonCheckbox,
-  IonProgressBar,
-  IonThumbnail,
   IonBadge,
 } from '@ionic/angular/standalone';
 import { computed, inject, signal } from '@angular/core';
@@ -50,7 +44,6 @@ import {
 import { RecetaService } from '../../../../core/services/receta';
 import { FoodItem, FoodService, IngredienteLocal } from '../../../../core/services/food';
 import { CloudinaryService } from '../../../../core/services/cloudinary';
-import { IonicSafeString } from '@ionic/core';
 import { Header } from "../../../../shared/components/header/header";
 
 @Component({
@@ -60,12 +53,8 @@ import { Header } from "../../../../shared/components/header/header";
     CommonModule,
     FormsModule,
     RouterModule,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
     IonButton,
     IonIcon,
-    IonTitle,
     IonContent,
     IonCard,
     IonCardHeader,

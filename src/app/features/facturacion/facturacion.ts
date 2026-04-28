@@ -13,7 +13,7 @@ Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
 @Component({
   selector: 'app-facturacion',
   standalone: true,
-  imports: [CommonModule, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonButton, IonBadge, IonSpinner, Header],
+  imports: [CommonModule, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonButton, IonBadge, Header],
   templateUrl: './facturacion.html',
   styleUrls: ['./facturacion.css']
 })
