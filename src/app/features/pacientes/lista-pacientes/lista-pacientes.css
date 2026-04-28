@@ -178,3 +178,15 @@ ion-fab-button {
   --color: #ffffff !important;
   --box-shadow: 0 4px 14px rgba(45, 106, 79, 0.35);
 }
+
+/* ── Opciones del Menú Desplegable (FAB List) ── */
+ion-fab-list ion-fab-button {
+  /* Hacemos el botón un pelín más grande para que respire el icono */
+  width: 48px; 
+  height: 48px;
+}
+
+ion-fab-list ion-fab-button ion-icon {
+  /* Aumentamos el tamaño del icono (por defecto es más pequeño) */
+  font-size: 26px; 
+}

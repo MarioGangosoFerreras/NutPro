@@ -1,51 +1,52 @@
-import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, signal, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PacientesService } from '../../../core/services/pacientes';
 import { AuthService } from '../../../core/services/auth';
 import { Header } from '../../../shared/components/header/header';
-import { IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonSpinner, IonAvatar, IonBadge, IonFab, IonFabButton, IonHeader, IonToolbar, IonSearchbar } from '@ionic/angular/standalone';
+import {
+  ViewWillEnter, // <--- Importante para que refresque bien
+  IonContent, IonList, IonItem, IonLabel, IonButton, IonIcon,
+  IonSpinner, IonAvatar, IonBadge, IonFab, IonFabButton,
+  IonHeader, IonToolbar, IonSearchbar, ToastController, IonFabList // <--- Añadimos Toast y FabList
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addOutline, personOutline, callOutline, mailOutline, searchOutline } from 'ionicons/icons';
+import { addOutline, personOutline, callOutline, mailOutline, searchOutline, linkOutline, shareSocialOutline } from 'ionicons/icons'; // <--- Nuevos iconos
 
 @Component({
   selector: 'app-lista-pacientes',
   imports: [
     Header, IonContent, IonList, IonItem, IonLabel, IonButton,
     IonIcon, IonAvatar, IonBadge, IonFab, IonFabButton,
-    IonToolbar,
-    IonSearchbar
-],
+    IonToolbar, IonSearchbar, IonFabList
+  ],
   templateUrl: './lista-pacientes.html',
   styleUrl: './lista-pacientes.css',
 })
-export class ListaPacientes implements OnInit {
+export class ListaPacientes implements ViewWillEnter {
   pacientes = signal<any[]>([]);
   pacientesFiltrados = signal<any[]>([]);
   loading = signal<boolean>(true);
   busquedaActiva = signal<string>('');
   version = 0;
 
+  private miNutriId = ''; // Guardamos el ID para crear el enlace
+  private toastCtrl = inject(ToastController); // Para el mensajito de "Copiado"
+
   constructor(
     private pacientesService: PacientesService,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
   ) {
-    addIcons({ addOutline, personOutline, callOutline, mailOutline, searchOutline });
+    addIcons({ addOutline, personOutline, callOutline, mailOutline, searchOutline, linkOutline, shareSocialOutline });
   }
-
-  ngOnInit() {}
 
   async ionViewWillEnter() {
     this.loading.set(true);
-  }
-
-  async ionViewDidEnter() {
     this.version = new Date().getTime();
     await this.cargarPacientes();
 
-    // Lee ?q= del header tras cargar
     this.route.queryParams.subscribe(params => {
       const q = params['q'] ?? '';
       this.busquedaActiva.set(q);
@@ -55,18 +56,17 @@ export class ListaPacientes implements OnInit {
 
   private async cargarPacientes() {
     try {
-      const nutricionistaId = await this.authService.getNutricionistaId();
-      if (!nutricionistaId) { this.loading.set(false); return; }
+      this.miNutriId = await this.authService.getNutricionistaId() || '';
+      if (!this.miNutriId) { this.loading.set(false); return; }
 
-      // Ejecutamos la petición y el delay en paralelo
       const [data] = await Promise.all([
-        this.pacientesService.getPacientes(nutricionistaId),
+        this.pacientesService.getPacientes(this.miNutriId),
         new Promise(resolve => setTimeout(resolve, 800))
       ]);
 
       this.pacientes.set(data || []);
       this.pacientesFiltrados.set(data || []);
-      
+
     } catch (error) {
       console.error('Error cargando:', error);
     } finally {
@@ -75,6 +75,26 @@ export class ListaPacientes implements OnInit {
     }
   }
 
+  // 👇 NUEVO MÉTODO PARA COPIAR EL ENLACE 👇
+  async copiarEnlaceInvitacion() {
+    // Generamos la URL con tu dominio actual (localhost en desarrollo, el real en produccion)
+    const urlBase = window.location.origin;
+    const enlace = `${urlBase}/registro-paciente?ref=${this.miNutriId}`;
+
+    try {
+      await navigator.clipboard.writeText(enlace);
+      const toast = await this.toastCtrl.create({
+        message: '¡Enlace de invitación copiado! Pégalo en WhatsApp.',
+        duration: 3000,
+        color: 'success',
+        icon: 'checkmark-circle'
+      });
+      await toast.present();
+    } catch (err) {
+      console.error('Error al copiar:', err);
+    }
+  }
+  
   // Nuevo método para que el searchbar filtre en tiempo real
   onBusqueda(event: any) {
     const query = event.detail.value ?? '';
