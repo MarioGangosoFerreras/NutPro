@@ -1,0 +1,141 @@
+<app-header titulo="Mi Dieta"></app-header>
+
+<ion-content class="ion-padding" color="light">
+  @if (cargando()) {
+    <div class="loading-container">
+      <div class="avocado-spinner">🥑</div>
+      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px">Cargando tu menú...</p>
+    </div>
+  } @else if (planActivo(); as plan) {
+    <div class="header-acciones">
+      <h2>Menú Semanal</h2>
+      <ion-button fill="outline" color="primary" class="btn-pdf" (click)="exportarPDF()">
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Descargar PDF
+      </ion-button>
+    </div>
+
+    <ion-card class="dash-card">
+      <ion-card-content class="plan-resumen">
+        <div class="plan-stat">
+          <ion-icon name="flame-outline" color="danger"></ion-icon>
+          <div class="stat-info">
+            <span>Objetivo diario</span>
+            <strong>{{ plan.calorias_objetivo || 0 }} kcal</strong>
+          </div>
+        </div>
+        <div class="plan-macros">
+          <ion-badge color="primary">Prot: {{ plan.proteinas_g || 0 }}g</ion-badge>
+          <ion-badge color="tertiary">Carbs: {{ plan.carbohidratos_g || 0 }}g</ion-badge>
+          <ion-badge color="warning">Grasas: {{ plan.grasas_g || 0 }}g</ion-badge>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="menu-grid">
+      @for (dia of dias; track dia.id) {
+        <ion-card class="dia-card">
+          <div class="dia-header">
+            <h3>{{ dia.nombre }}</h3>
+          </div>
+          <ion-card-content class="dia-content">
+            @for (comida of tiposComida; track comida.id) {
+              <div class="comida-seccion">
+                <span class="comida-titulo">{{ comida.label }}</span>
+                <div class="comida-entradas">
+                  @let entradasComida = obtenerEntradas(dia.id, comida.id);
+                  @if (entradasComida.length === 0) {
+                    <p class="empty-text">Sin asignar</p>
+                  }
+                  @for (entrada of entradasComida; track entrada.id) {
+                    <div class="entrada-item" (click)="abrirReceta(entrada.receta)">
+                      <div class="entrada-img-wrapper">
+                        @if (entrada.receta?.imagen_url) {
+                          <img [src]="entrada.receta.imagen_url" />
+                        } @else {
+                          <ion-icon name="restaurant-outline"></ion-icon>
+                        }
+                      </div>
+                      <div class="entrada-info">
+                        <span class="entrada-titulo">{{ entrada.receta?.nombre }}</span>
+                        <span class="entrada-kcal">{{ entrada.receta?.calorias_kcal }} kcal</span>
+                      </div>
+                      <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </ion-card-content>
+        </ion-card>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <h3>Sin plan activo</h3>
+      <p>Tu menú aparecerá aquí en cuanto esté listo.</p>
+    </div>
+  }
+
+  <ion-modal
+    [isOpen]="modalRecetaAbierto()"
+    (didDismiss)="cerrarReceta()"
+    initialBreakpoint="0.85"
+    [breakpoints]="[0, 0.85, 1]"
+  >
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar>
+          <ion-title>Detalle del Plato</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarReceta()"
+              ><ion-icon name="close-circle" style="font-size: 26px; color: #94a3b8"></ion-icon
+            ></ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding modal-bg">
+        @if (recetaSeleccionada(); as receta) {
+          <div class="receta-hero">
+            @if (receta.imagen_url) {
+              <img [src]="receta.imagen_url" class="receta-img-full" />
+            } @else {
+              <div class="receta-img-placeholder">
+                <ion-icon name="restaurant-outline"></ion-icon>
+              </div>
+            }
+          </div>
+          <h2 class="receta-title-modal">{{ receta.nombre }}</h2>
+          <div class="macros-grid">
+            <div class="macro-box">
+              <span class="macro-val kcal">{{ receta.calorias_kcal }}</span
+              ><span class="macro-lbl">kcal</span>
+            </div>
+            <div class="macro-box">
+              <span class="macro-val prot">{{ receta.proteina_g }}g</span
+              ><span class="macro-lbl">Prot</span>
+            </div>
+            <div class="macro-box">
+              <span class="macro-val carbs">{{ receta.carbohidratos_g }}g</span
+              ><span class="macro-lbl">Carbs</span>
+            </div>
+            <div class="macro-box">
+              <span class="macro-val grasa">{{ receta.grasa_g }}g</span
+              ><span class="macro-lbl">Grasa</span>
+            </div>
+          </div>
+          <div class="instrucciones-box">
+            <h3>Preparación paso a paso</h3>
+            <p>
+              {{
+                receta.instrucciones ||
+                  'Tu nutricionista no ha añadido instrucciones específicas para esta receta. ¡Disfrútala!'
+              }}
+            </p>
+          </div>
+        }
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

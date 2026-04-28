@@ -103,7 +103,9 @@ export class Shell implements OnInit {
       // 2. Setear los items de forma dinámica con .set()
       if (user.rol === 'paciente') {
         this.navItems.set([
-          { label: 'Mi Portal', icon: 'home-outline', route: '/portal-paciente' },
+          { label: 'Inicio', icon: 'home-outline', route: '/portal-paciente' },
+          { label: 'Mi Dieta', icon: 'restaurant-outline', route: '/portal-paciente/plan' },
+          { label: 'Mi Evolución', icon: 'trending-up-outline', route: '/portal-paciente/evolucion' },
           { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' }
         ]);
       } else {
