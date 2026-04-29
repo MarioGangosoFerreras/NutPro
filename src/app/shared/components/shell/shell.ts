@@ -26,7 +26,8 @@ import {
   restaurantOutline,
   chatbubblesOutline,
   walletOutline,
-  homeOutline
+  homeOutline,
+  trendingUpOutline
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 import { ChatService } from '../../../core/services/chat';
@@ -83,7 +84,7 @@ export class Shell implements OnInit {
       peopleOutline, calendarOutline, gridOutline, logOutOutline,
       menuOutline, closeOutline, chevronForwardOutline, settingsOutline,
       giftOutline, personCircleOutline, restaurantOutline, chatbubblesOutline,
-      walletOutline, homeOutline
+      walletOutline, homeOutline, trendingUpOutline
     });
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e: any) => {
       this.rutaActiva.set(e.urlAfterRedirects);
@@ -106,7 +107,8 @@ export class Shell implements OnInit {
           { label: 'Inicio', icon: 'home-outline', route: '/portal-paciente' },
           { label: 'Mi Dieta', icon: 'restaurant-outline', route: '/portal-paciente/plan' },
           { label: 'Mi Evolución', icon: 'trending-up-outline', route: '/portal-paciente/evolucion' },
-          { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' }
+          { label: 'Citas', icon: 'calendar-outline', route: '/portal-paciente/citas'},
+          { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' },
         ]);
       } else {
         this.navItems.set([

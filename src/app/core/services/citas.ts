@@ -43,11 +43,7 @@ export class CitasService {
   }
 
   async crearCita(cita: Omit<Cita, 'id'>): Promise<Cita> {
-    const { data, error } = await this.supabase
-      .from('citas')
-      .insert(cita)
-      .select()
-      .single();
+    const { data, error } = await this.supabase.from('citas').insert(cita).select().single();
     if (error) throw error;
     return data as Cita;
   }
@@ -80,10 +76,7 @@ export class CitasService {
   }
 
   async eliminarCita(id: string): Promise<void> {
-    const { error } = await this.supabase
-      .from('citas')
-      .delete()
-      .eq('id', id);
+    const { error } = await this.supabase.from('citas').delete().eq('id', id);
     if (error) throw error;
   }
 
@@ -125,10 +118,16 @@ export class CitasService {
   suscribirCambios(nutricionistaId: string, callback: (cita: Cita) => void) {
     return this.supabase
       .channel('citas-realtime')
-      .on('postgres_changes', {
-        event: '*', schema: 'public', table: 'citas',
-        filter: `nutricionista_id=eq.${nutricionistaId}`
-      }, payload => callback(payload.new as Cita))
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'citas',
+          filter: `nutricionista_id=eq.${nutricionistaId}`,
+        },
+        (payload) => callback(payload.new as Cita),
+      )
       .subscribe();
   }
 
@@ -146,5 +145,24 @@ export class CitasService {
 
     if (error) throw error;
     return data as Cita[];
+  }
+
+  async getHorasOcupadas(nutricionistaId: string, fecha: string): Promise<string[]> {
+    const inicioDia = new Date(fecha);
+    inicioDia.setHours(0, 0, 0, 0);
+    const finDia = new Date(fecha);
+    finDia.setHours(23, 59, 59, 999);
+
+    const { data, error } = await this.supabase
+      .from('citas')
+      .select('fecha_hora')
+      .eq('nutricionista_id', nutricionistaId)
+      .neq('estado', 'cancelada') // Las canceladas no ocupan sitio
+      .gte('fecha_hora', inicioDia.toISOString())
+      .lte('fecha_hora', finDia.toISOString());
+
+    if (error) return [];
+    // Devolvemos solo la parte de la hora "HH:mm"
+    return data.map((c) => new Date(c.fecha_hora).toTimeString().slice(0, 5));
   }
 }

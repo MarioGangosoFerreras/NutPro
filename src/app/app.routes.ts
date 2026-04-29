@@ -13,7 +13,8 @@ export const routes: Routes = [
   },
   {
     path: 'registro-paciente',
-    loadComponent: () => import('./features/auth/registro-paciente/registro-paciente').then((m) => m.RegistroPaciente),
+    loadComponent: () =>
+      import('./features/auth/registro-paciente/registro-paciente').then((m) => m.RegistroPaciente),
   },
   {
     path: 'register',
@@ -95,7 +96,8 @@ export const routes: Routes = [
       },
       {
         path: 'facturacion',
-        loadComponent: () => import('./features/facturacion/facturacion').then((m) => m.Facturacion),
+        loadComponent: () =>
+          import('./features/facturacion/facturacion').then((m) => m.Facturacion),
       },
       {
         path: 'ajustes',
@@ -118,16 +120,26 @@ export const routes: Routes = [
       },
       {
         path: 'portal-paciente',
-        loadComponent: () => import('./features/portal-paciente/portal-paciente').then((m) => m.PortalPaciente),
+        loadComponent: () =>
+          import('./features/portal-paciente/portal-paciente').then((m) => m.PortalPaciente),
       },
       {
         path: 'portal-paciente/plan',
-        loadComponent: () => import('./features/portal-paciente/components/mi-plan/mi-plan').then((m) => m.MiPlan),
+        loadComponent: () =>
+          import('./features/portal-paciente/components/mi-plan/mi-plan').then((m) => m.MiPlan),
       },
       {
         path: 'portal-paciente/evolucion',
-        loadComponent: () => import('./features/portal-paciente/components/mi-evolucion/mi-evolucion').then((m) => m.MiEvolucion),
-      }
+        loadComponent: () =>
+          import('./features/portal-paciente/components/mi-evolucion/mi-evolucion').then(
+            (m) => m.MiEvolucion,
+          ),
+      },
+      {
+        path: 'portal-paciente/citas',
+        loadComponent: () =>
+          import('./features/portal-paciente/components/mis-citas/mis-citas').then((m) => m.MisCitas),
+      },
     ],
   },
 ];
