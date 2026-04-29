@@ -50,7 +50,7 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   @Input() citasInput: Cita[] = [];
 
   // Solo en mode='patient': para el botón "Añadir cita"
-  @Output() nuevaCita = new EventEmitter<void>();
+  @Output() nuevaCita = new EventEmitter<string>();
 
   // Solo en mode='patient': al pulsar editar en una CitaCard
   @Output() editarCita = new EventEmitter<Cita>();
@@ -222,10 +222,20 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   }
 
   async onNuevaCita() {
+    // 1. Evitamos el problema de la zona horaria UTC montando la fecha en local
+    const targetDate = this.diaSeleccionado || this.hoy;
+    const year = targetDate.getFullYear();
+    const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const day = String(targetDate.getDate()).padStart(2, '0');
+    const fechaInicial = `${year}-${month}-${day}`;
+
     if (this.mode === 'full') {
       const modal = await this.modalCtrl.create({
         component: ModalCitaComponent,
-        componentProps: { nutricionistaId: this.nutricionistaId },
+        componentProps: { 
+          nutricionistaId: this.nutricionistaId,
+          fechaSeleccionada: fechaInicial 
+        },
         breakpoints: [0, 0.95],
         initialBreakpoint: 0.95,
       });
@@ -233,7 +243,8 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
       const { role } = await modal.onDidDismiss();
       if (role === 'guardado') await this.cargarMes();
     } else {
-      this.nuevaCita.emit();
+      // 2. Emitimos el string limpiamente
+      this.nuevaCita.emit(fechaInicial); 
     }
   }
 

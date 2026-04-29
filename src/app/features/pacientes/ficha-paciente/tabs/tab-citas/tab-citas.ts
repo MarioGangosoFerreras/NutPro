@@ -100,12 +100,17 @@ export class TabCitas implements OnInit {
     });
   }
 
-  async abrirModal(cita?: Cita) {
+  async abrirModal(dato?: Cita | string) {
+    // Comprobamos si el dato es un objeto Cita o un string de fecha
+    const esCita = dato && typeof dato === 'object';
+    const fechaInput = typeof dato === 'string' ? dato : undefined;
+
     const modal = await this.modalCtrl.create({
       component: ModalCitaComponent,
       componentProps: {
-        cita,
-        pacienteId: this.paciente.id, // Actualizado para usar el id del objeto paciente
+        cita: esCita ? dato : undefined,
+        fechaSeleccionada: fechaInput, // Pasamos la fecha detectada
+        pacienteId: this.paciente.id,
         nutricionistaId: this.nutricionistaId,
       },
     });

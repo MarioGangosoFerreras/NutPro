@@ -28,7 +28,7 @@ import { PacientesService } from '../../core/services/pacientes';
 import { PlanNutricionalService } from '../../core/services/plan-nutricional';
 import { CitasService, Cita } from '../../core/services/citas';
 import { SupabaseService } from '../../core/services/supabase';
-import { HabitosTrackerComponent } from './components/habitos-tracker/habitos-tracker'; // <-- IMPORT
+import { HabitosTrackerComponent } from './components/habitos-tracker/habitos-tracker';
 import { addIcons } from 'ionicons';
 import {
   personCircleOutline,
@@ -66,7 +66,7 @@ import { ModalCitaComponent } from '../../shared/components/modal-cita/modal-cit
     IonBadge,
     IonList,
     Header,
-    HabitosTrackerComponent, // <-- AÑADIR
+    HabitosTrackerComponent,
   ],
   templateUrl: './portal-paciente.html',
   styleUrls: ['./portal-paciente.css'],
@@ -149,16 +149,22 @@ export class PortalPaciente implements OnInit {
             if (menu) this.entradasMenu.set(await this.planService.getEntradasMenu(menu.id));
           }
 
-          // Cargar Cita (¡CORREGIDO!)
-          // Usamos perfil.nutricionista?.id en lugar de perfil.nutricionista_id
+          // Cargar Citas
           const citas = await this.citasService.getCitasPaciente(
             perfil.id,
-            perfil.nutricionista?.id,
+            perfil.nutricionista?.id, // <-- CORRECCIÓN 1: Accedemos a nutricionista?.id en lugar de nutricionista_id
           );
+
+          // CORRECCIÓN 2: Lógica de fecha para no descartar las citas de hoy que ya han pasado su hora
+          const hoyAlInicio = new Date();
+          hoyAlInicio.setHours(0, 0, 0, 0);
 
           this.proximaCita.set(
             citas
-              .filter((c) => new Date(c.fecha_hora) > new Date() && c.estado !== 'cancelada')
+              .filter((c) => {
+                const fechaCita = new Date(c.fecha_hora);
+                return fechaCita >= hoyAlInicio && c.estado !== 'cancelada';
+              })
               .sort(
                 (a, b) => new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime(),
               )[0] || null,
@@ -205,37 +211,27 @@ export class PortalPaciente implements OnInit {
   }
 
   async pedirCita() {
+    const p = this.paciente();
+    if (!p) return;
+
     const modal = await this.modalCtrl.create({
       component: ModalCitaComponent,
       componentProps: {
-        pacienteId: this.paciente().id,
-        nutricionistaId: this.nutricionista().id,
-        esPaciente: true // Le decimos al modal que es un paciente
+        pacienteId: p.id,
+        // Usamos la propiedad del objeto nutricionista cargado
+        nutricionistaId: p.nutricionista?.id,
+        esPaciente: true,
       },
       breakpoints: [0, 0.85],
-      initialBreakpoint: 0.85
+      initialBreakpoint: 0.85,
     });
-    
+
     await modal.present();
-    
+
     const { role } = await modal.onDidDismiss();
     if (role === 'guardado') {
-      // Si guardó la cita, recargamos la vista para que aparezca
       this.cargando.set(true);
-      this.ngOnInit();
+      await this.ngOnInit(); // Recargamos todo el panel
     }
-  }
-
-  async getHorariosOcupadosNutricionista(nutricionistaId: string) {
-    // Pedimos ÚNICAMENTE la fecha, hora y duración. Nada de información privada de otros pacientes.
-    const { data, error } = await this.supabase
-      .from('citas')
-      .select('fecha_hora, duracion_min')
-      .eq('nutricionista_id', nutricionistaId)
-      .neq('estado', 'cancelada') // Las canceladas quedan libres
-      .gte('fecha_hora', new Date().toISOString()); // Solo citas futuras
-
-    if (error) throw error;
-    return data || [];
   }
 }

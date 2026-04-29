@@ -31,13 +31,21 @@ export class CitasService {
     return data as Cita[];
   }
 
-  async getCitasPaciente(pacienteId: string, nutricionistaId: string): Promise<Cita[]> {
-    const { data, error } = await this.supabase
+  async getCitasPaciente(pacienteId: string, nutricionistaId?: string): Promise<Cita[]> {
+    let query = this.supabase
       .from('citas')
       .select('*')
-      .eq('paciente_id', pacienteId)
-      .eq('nutricionista_id', nutricionistaId)
-      .order('fecha_hora', { ascending: true });
+      .eq('paciente_id', pacienteId);
+    
+    if (nutricionistaId) {
+      query = query.eq('nutricionista_id', nutricionistaId);
+    }
+
+    const { data, error } = await query.order('fecha_hora', { ascending: true });
+    
+    // 👇 AÑADE ESTO PARA DEPURAR 👇
+    console.log("Respuesta de Supabase para el paciente:", data, "Error:", error);
+    
     if (error) throw error;
     return data as Cita[];
   }
@@ -80,7 +88,6 @@ export class CitasService {
     if (error) throw error;
   }
 
-  // Para el dashboard: citas de hoy + mañana
   async getCitasProximas(nutricionistaId: string): Promise<Cita[]> {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -99,7 +106,6 @@ export class CitasService {
     return data as Cita[];
   }
 
-  // Para el calendario: citas de un mes concreto
   async getCitasMes(nutricionistaId: string, año: number, mes: number): Promise<Cita[]> {
     const inicio = new Date(año, mes, 1).toISOString();
     const fin = new Date(año, mes + 1, 0, 23, 59, 59).toISOString();
@@ -140,7 +146,7 @@ export class CitasService {
       .eq('nutricionista_id', nutricionistaId)
       .eq('estado', 'confirmada')
       .eq('facturada', false)
-      .lt('fecha_hora', hoy) // Solo citas que ya han pasado
+      .lt('fecha_hora', hoy)
       .order('fecha_hora', { ascending: false });
 
     if (error) throw error;
@@ -148,16 +154,18 @@ export class CitasService {
   }
 
   async getHorariosOcupadosNutricionista(nutricionistaId: string) {
-  // Usamos .rpc para llamar a la función de Postgres que creamos en el paso 3
-  const { data, error } = await this.supabase.rpc('get_horarios_ocupados', { 
-    nutri_id: nutricionistaId 
-  });
+    const { data, error } = await this.supabase
+      .from('citas')
+      .select('fecha_hora, duracion_min')
+      .eq('nutricionista_id', nutricionistaId)
+      .neq('estado', 'cancelada')
+      .gte('fecha_hora', new Date().toISOString());
 
-  if (error) {
-    console.error('Error obteniendo horarios:', error);
-    throw error;
+    if (error) {
+      console.error('Error obteniendo horarios:', error);
+      throw error;
+    }
+
+    return data || [];
   }
-  
-  return data || [];
-}
 }

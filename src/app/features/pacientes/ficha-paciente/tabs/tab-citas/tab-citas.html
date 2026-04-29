@@ -23,8 +23,10 @@
   }
 
   @if (!cargando && vistaActiva === 'calendario') {
-  <app-universal-calendar mode="patient" [citasInput]="citas" (nuevaCita)="abrirModal()"
-    (editarCita)="abrirModal($event)" (facturarCita)="crearFactura($event)">
+  <app-universal-calendar mode="patient" [citasInput]="citas" 
+    (nuevaCita)="abrirModal($event)"
+    (editarCita)="abrirModal($event)" 
+    (facturarCita)="crearFactura($event)">
   </app-universal-calendar>
   }
 </div>
