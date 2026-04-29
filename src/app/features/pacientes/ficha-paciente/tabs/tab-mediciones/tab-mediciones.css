@@ -220,3 +220,22 @@
 .modo-portal-paciente .medicion-card {
   border-left-width: 4px; /* Un toque más sutil */
 }
+
+.info-helper-box {
+  background-color: var(--np-green-50); /* El verde muy clarito de fondo */
+  border-left: 4px solid var(--np-green-400); /* El nuevo verde oscuro que configuramos */
+  margin: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.info-helper-box p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #444; /* Gris oscuro para lectura fácil */
+  line-height: 1.4;
+}
+
+.info-helper-box strong {
+  color: var(--np-green-600); /* Resaltado en verde oscuro */
+}

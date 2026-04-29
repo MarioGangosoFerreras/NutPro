@@ -11,8 +11,8 @@
   /* Paleta */
   --np-green-50:   #E8FAF0;
   --np-green-100:  #B3EDCB;
-  --np-green-400:  #1DB954;
-  --np-green-600:  #0D8A3C;
+  --np-green-400:  #2d6a4f; 
+  --np-green-600:  #1b4332; 
   --np-green-800:  #095C28;
 
   --np-coral-50:   #FFF0EA;
@@ -32,12 +32,11 @@
   --np-radius-input: 12px;
 
   /* ── Ionic color primary → verde ─────────────────────────── */
-  --ion-color-primary:              #1DB954;
-  --ion-color-primary-rgb:          29,185,84;
+  --ion-color-primary:              #2d6a4f; 
+  --ion-color-primary-rgb:          45,106,79;
   --ion-color-primary-contrast:     #ffffff;
-  --ion-color-primary-contrast-rgb: 255,255,255;
-  --ion-color-primary-shade:        #19a34a;
-  --ion-color-primary-tint:         #34c065;
+  --ion-color-primary-shade:        #1b4332;
+  --ion-color-primary-tint:         #40916c;
 
   /* ── Ionic color secondary → coral ──────────────────────── */
   --ion-color-secondary:              #FF5E2C;
@@ -307,10 +306,9 @@ ion-spinner {
    FAB
    ═══════════════════════════════════════════════════════════════ */
 ion-fab-button {
-  --background: var(--np-green-400);
-  --background-activated: var(--np-green-600);
-  --color: #ffffff;
-  --box-shadow: 0 4px 16px rgba(29,185,84,0.35);
+  --background: #2d6a4f !important;
+  --background-activated: #1b4332 !important;
+  --color: #ffffff !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════

@@ -173,10 +173,7 @@ ion-badge {
 
 /* ── FAB ── */
 ion-fab-button {
-  --background: #1DB954 !important;
-  --background-activated: #1b4332 !important;
-  --color: #ffffff !important;
-  --box-shadow: 0 4px 14px rgba(45, 106, 79, 0.35);
+  --background: var(--np-green-400) !important;
 }
 
 /* ── Opciones del Menú Desplegable (FAB List) ── */
