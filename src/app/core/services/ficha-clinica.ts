@@ -129,7 +129,7 @@ export class FichaClinicaService {
     const payload: any = {
       paciente_id: pacienteId,
       fecha: datos.fecha ?? new Date().toISOString().split('T')[0],
-      registrado_por: datos.registrado_por, // <--- Nuevo campo para el control de edición
+      registrado_por: datos.registrado_por
     };
 
     if (datos.peso_kg) payload.peso_kg = Number(datos.peso_kg);
@@ -143,8 +143,7 @@ export class FichaClinicaService {
       payload.perimetro_abdomen_cm = Number(datos.perimetro_abdomen_cm);
     if (datos.notas) payload.notas = datos.notas;
 
-    const { error } = await this.supabase.from('mediciones').insert(payload);
-    if (error) throw error;
+    await this.supabase.from('mediciones').insert(payload);
   }
 
   async updateMedicion(id: string, datos: any) {

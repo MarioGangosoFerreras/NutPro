@@ -174,14 +174,19 @@ export class TabMediciones implements OnInit {
       this.nuevaMedicion.registrado_por = this.esPaciente ? 'paciente' : 'nutricionista';
 
       await this.fichaClinicaService.addMedicion(this.paciente.id, this.nuevaMedicion);
-      await this.cargarMediciones();
+      
+      // 1. Apagamos el spinner y cerramos el modal síncronamente
+      this.guardandoMedicion = false;
       this.modalNueva = false;
+      this.cdr.detectChanges(); // Angular procesa todo a la vez sin errores
+
+      // 2. Recargamos la lista en segundo plano y lanzamos el toast
+      await this.cargarMediciones();
       await this.mostrarToast('Medición añadida', 'success');
     } catch (e) {
-      await this.mostrarToast('Error al guardar', 'danger');
-    } finally {
       this.guardandoMedicion = false;
       this.cdr.detectChanges();
+      await this.mostrarToast('Error al guardar', 'danger');
     }
   }
 
@@ -192,14 +197,19 @@ export class TabMediciones implements OnInit {
         this.medicionEditando.id,
         this.medicionEditando,
       );
-      await this.cargarMediciones();
+      
+      // 1. Apagamos el spinner y cerramos el modal síncronamente
+      this.guardandoMedicion = false;
       this.modalEditar = false;
+      this.cdr.detectChanges(); // Angular procesa todo a la vez sin errores
+
+      // 2. Recargamos la lista en segundo plano y lanzamos el toast
+      await this.cargarMediciones();
       await this.mostrarToast('Medición actualizada', 'success');
     } catch (e) {
-      await this.mostrarToast('Error al actualizar', 'danger');
-    } finally {
       this.guardandoMedicion = false;
       this.cdr.detectChanges();
+      await this.mostrarToast('Error al actualizar', 'danger');
     }
   }
 
