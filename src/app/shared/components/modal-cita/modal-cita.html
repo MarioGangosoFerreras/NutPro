@@ -44,13 +44,34 @@
 
   <ion-item>
     <ion-label position="stacked">Fecha</ion-label>
-    <ion-input type="date" [(ngModel)]="fecha"></ion-input>
+    <ion-input type="date" [(ngModel)]="fecha" (ionChange)="onFechaCambiada($event)"></ion-input>
   </ion-item>
 
-  <ion-item>
-    <ion-label position="stacked">Hora</ion-label>
-    <ion-input type="time" [(ngModel)]="hora"></ion-input>
-  </ion-item>
+  @if (fecha) {
+    <div style="margin-top: 16px; margin-bottom: 16px;">
+      <p style="font-size: 12px; font-weight: 600; color: #64748b; margin-left: 16px; text-transform: uppercase;">
+        Horas disponibles
+      </p>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; padding: 0 16px;">
+        @for (h of horasDisponibles; track h) {
+          <ion-chip 
+            [color]="hora === h ? 'primary' : 'medium'"
+            [outline]="hora !== h"
+            (click)="hora = h"
+            style="font-weight: 600; cursor: pointer;">
+            <ion-label>{{ h }}</ion-label>
+          </ion-chip>
+        }
+
+        @if (horasDisponibles.length === 0) {
+          <p style="color: #ef4444; font-size: 13px; width: 100%; margin-left: 16px;">
+            No hay horas disponibles para este día.
+          </p>
+        }
+      </div>
+    </div>
+  }
 
   <ion-item>
     <ion-label position="stacked">Duración (minutos)</ion-label>
@@ -77,6 +98,7 @@
   </ion-item>
   }
 
+  @if (!esPaciente) {
   <ion-item>
     <ion-label position="stacked">Estado</ion-label>
     <ion-select [(ngModel)]="estado">
@@ -85,6 +107,7 @@
       <ion-select-option value="cancelada">Cancelada</ion-select-option>
     </ion-select>
   </ion-item>
+}
 
   <ion-item>
     <ion-label position="stacked">Notas</ion-label>

@@ -6,7 +6,6 @@ import { UniversalCalendar } from '../../../../shared/components/universal-calen
 import { Cita, CitasService } from '../../../../core/services/citas';
 import { AuthService } from '../../../../core/services/auth';
 import { PacientesService } from '../../../../core/services/pacientes';
-import { ModalPedirCitaComponent } from '../../../../shared/components/modal-pedir-cita/modal-pedir-cita';
 
 @Component({
   selector: 'app-mis-citas',
@@ -44,19 +43,5 @@ export class MisCitas implements OnInit {
       this.pacienteData.nutricionista_id
     );
     this.citas.set(data);
-  }
-
-  async abrirModalSolicitud() {
-    const modal = await this.modalCtrl.create({
-      component: ModalPedirCitaComponent,
-      componentProps: { 
-        nutricionistaId: this.pacienteData.nutricionista_id,
-        pacienteId: this.pacienteData.id
-      }
-    });
-    await modal.present();
-    if ((await modal.onDidDismiss()).role === 'creado') {
-      await this.cargarCitas();
-    }
   }
 }

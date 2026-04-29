@@ -3,9 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonButton,
-  IonContent, IonItem, IonLabel, IonInput, IonSelect,
-  IonSelectOption, IonTextarea, IonSpinner,
-  ModalController, IonSearchbar, IonList, IonAvatar, IonIcon
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+  IonTextarea,
+  IonSpinner,
+  ModalController,
+  IonSearchbar,
+  IonList,
+  IonAvatar,
+  IonIcon,
+  IonChip, // <-- AÑADIDO AQUI
 } from '@ionic/angular/standalone';
 import { CitasService, Cita } from '../../../core/services/citas';
 import { PacientesService } from '../../../core/services/pacientes';
@@ -16,18 +27,31 @@ import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionico
   selector: 'app-modal-cita',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, IonButton,
-    IonContent, IonItem, IonLabel, IonInput, IonSelect,
-    IonSelectOption, IonTextarea, IonSpinner,
-    IonSearchbar, IonList, IonAvatar, IonIcon
+    CommonModule,
+    FormsModule,
+    IonButton,
+    IonContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonSelect,
+    IonSelectOption,
+    IonTextarea,
+    IonSpinner,
+    IonSearchbar,
+    IonList,
+    IonAvatar,
+    IonIcon,
+    IonChip, // <-- AÑADIDO AQUI
   ],
   templateUrl: './modal-cita.html',
-  styleUrls: ['./modal-cita.css'] // <-- Añadimos el archivo de estilos
+  styleUrls: ['./modal-cita.css'],
 })
 export class ModalCitaComponent implements OnInit {
   @Input() cita?: Cita;
   @Input() pacienteId?: string;
   @Input() nutricionistaId!: string;
+  @Input() esPaciente = false;
 
   private modalCtrl = inject(ModalController);
   private citasService = inject(CitasService);
@@ -44,20 +68,41 @@ export class ModalCitaComponent implements OnInit {
   notas = '';
   urlVideo = '';
 
+  // 👇 AÑADIDO: Lógica de disponibilidad 👇
+  horasDeTrabajo = [
+    '09:00',
+    '09:30',
+    '10:00',
+    '10:30',
+    '11:00',
+    '11:30',
+    '16:00',
+    '16:30',
+    '17:00',
+    '17:30',
+    '18:00',
+    '18:30',
+  ];
+  horasDisponibles: string[] = [];
+
   // Lógica del buscador
   pacientes = signal<any[]>([]);
   pacientesFiltrados = signal<any[]>([]);
   pacienteSeleccionadoId = '';
   pacienteSeleccionadoNombre = '';
 
-  get esEdicion() { return !!this.cita?.id; }
-  get titulo() { return this.esEdicion ? 'Editar cita' : 'Nueva cita'; }
+  get esEdicion() {
+    return !!this.cita?.id;
+  }
+  get titulo() {
+    return this.esEdicion ? 'Editar cita' : 'Nueva cita';
+  }
 
   constructor() {
     addIcons({ checkmarkCircle, closeCircleOutline, personCircleOutline });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.pacienteSeleccionadoId = this.pacienteId || '';
 
     // Si abrimos desde el calendario grande, cargamos los pacientes
@@ -75,6 +120,45 @@ export class ModalCitaComponent implements OnInit {
       this.notas = this.cita.notas ?? '';
       this.urlVideo = this.cita.url_videollamada ?? '';
       this.pacienteSeleccionadoId = this.cita.paciente_id;
+
+      // 👇 AÑADIDO: Cargar horas disponibles para la fecha de la cita en edición
+      await this.onFechaCambiada({ detail: { value: this.fecha } }, true);
+    }
+  }
+
+  // 👇 AÑADIDO: Método para filtrar horas 👇
+  async onFechaCambiada(event: any, esCargaInicial = false) {
+    const value = event.detail?.value || event;
+    if (!value) return;
+
+    this.fecha = value.split('T')[0];
+    if (!esCargaInicial) {
+      this.hora = ''; // Reseteamos la hora si el usuario cambia de día manualmente
+    }
+
+    try {
+      const citasOcupadas = await this.citasService.getHorariosOcupadosNutricionista(
+        this.nutricionistaId,
+      );
+
+      const citasDelDia = citasOcupadas.filter((cita: any) =>
+        cita.fecha_hora.startsWith(this.fecha),
+      );
+
+      this.horasDisponibles = this.horasDeTrabajo.filter((h) => {
+        const horaEstaOcupada = citasDelDia.some((cita: any) => {
+          const d = new Date(cita.fecha_hora);
+          const horaCita = d.toTimeString().slice(0, 5); // ej: "09:30"
+
+          // Si estamos editando y es esta misma cita, la dejamos disponible
+          if (this.esEdicion && this.cita?.fecha_hora === cita.fecha_hora) return false;
+
+          return horaCita === h;
+        });
+        return !horaEstaOcupada;
+      });
+    } catch (e) {
+      console.error('Error al obtener horarios', e);
     }
   }
 
@@ -86,8 +170,8 @@ export class ModalCitaComponent implements OnInit {
 
   filtrarPacientes(event: any) {
     const query = event.detail.value?.toLowerCase() || '';
-    const filtrados = this.pacientes().filter(p =>
-      `${p.usuario?.nombre} ${p.usuario?.apellidos}`.toLowerCase().includes(query)
+    const filtrados = this.pacientes().filter((p) =>
+      `${p.usuario?.nombre} ${p.usuario?.apellidos}`.toLowerCase().includes(query),
     );
     this.pacientesFiltrados.set(filtrados);
   }
@@ -119,7 +203,8 @@ export class ModalCitaComponent implements OnInit {
         fecha_hora,
         duracion_min: this.duracion,
         tipo: this.tipo,
-        estado: this.estado,
+        // Lógica de seguridad: si es paciente, forzamos 'pendiente'
+        estado: this.esPaciente ? 'pendiente' : this.estado,
         notas: this.notas || undefined,
         url_videollamada: this.tipo === 'videollamada' ? this.urlVideo || undefined : undefined,
       };

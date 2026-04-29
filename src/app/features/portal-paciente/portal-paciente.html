@@ -60,7 +60,12 @@
           <ion-card-header><ion-card-title><ion-icon name="calendar-outline"></ion-icon> PRÓXIMA CITA</ion-card-title></ion-card-header>
           <ion-card-content class="placeholder-content">
             <div class="no-date-icon"><ion-icon name="calendar-clear-outline"></ion-icon></div>
-            <div class="no-date-text"><strong>Sin cita agendada</strong><p>Pídela por el chat.</p></div>
+            <div class="no-date-text">
+              <strong>Sin cita agendada</strong>
+              <ion-button size="small" style="margin-top: 8px;" (click)="pedirCita()">
+                Agendar cita
+              </ion-button>
+            </div>
           </ion-card-content>
         </ion-card>
       </ng-template>

@@ -147,22 +147,17 @@ export class CitasService {
     return data as Cita[];
   }
 
-  async getHorasOcupadas(nutricionistaId: string, fecha: string): Promise<string[]> {
-    const inicioDia = new Date(fecha);
-    inicioDia.setHours(0, 0, 0, 0);
-    const finDia = new Date(fecha);
-    finDia.setHours(23, 59, 59, 999);
+  async getHorariosOcupadosNutricionista(nutricionistaId: string) {
+  // Usamos .rpc para llamar a la función de Postgres que creamos en el paso 3
+  const { data, error } = await this.supabase.rpc('get_horarios_ocupados', { 
+    nutri_id: nutricionistaId 
+  });
 
-    const { data, error } = await this.supabase
-      .from('citas')
-      .select('fecha_hora')
-      .eq('nutricionista_id', nutricionistaId)
-      .neq('estado', 'cancelada') // Las canceladas no ocupan sitio
-      .gte('fecha_hora', inicioDia.toISOString())
-      .lte('fecha_hora', finDia.toISOString());
-
-    if (error) return [];
-    // Devolvemos solo la parte de la hora "HH:mm"
-    return data.map((c) => new Date(c.fecha_hora).toTimeString().slice(0, 5));
+  if (error) {
+    console.error('Error obteniendo horarios:', error);
+    throw error;
   }
+  
+  return data || [];
+}
 }
