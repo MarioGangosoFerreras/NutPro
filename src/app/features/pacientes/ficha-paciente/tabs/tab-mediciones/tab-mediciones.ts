@@ -1,4 +1,5 @@
 import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FichaClinicaService } from '../../../../../core/services/ficha-clinica';
 import {
@@ -32,8 +33,6 @@ import {
   closeOutline,
   saveOutline,
 } from 'ionicons/icons';
-
-// Chart.js - importa solo lo necesario
 import {
   Chart,
   LineController,
@@ -45,7 +44,6 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
-import { CommonModule } from '@angular/common';
 
 Chart.register(
   LineController,
@@ -58,8 +56,12 @@ Chart.register(
   Filler,
 );
 
+// Tipo definido sin 'altura' para el gráfico
+type TipoGrafica = 'peso' | 'grasa' | 'musculo' | 'cintura' | 'cadera' | 'abdomen';
+
 @Component({
   selector: 'app-tab-mediciones',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -95,8 +97,8 @@ export class TabMediciones implements OnInit {
   modalNueva = false;
   modalEditar = false;
   vistaActual: 'lista' | 'grafico' = 'lista';
-  graficaActiva: 'peso' | 'grasa' | 'musculo' | 'cintura' | 'altura' | 'cadera' | 'abdomen' =
-    'peso';
+  graficaActiva: TipoGrafica = 'peso';
+
   nuevaMedicion: any = this.medicionVacia();
   medicionEditando: any = {};
 
@@ -121,7 +123,6 @@ export class TabMediciones implements OnInit {
   }
 
   async ngOnInit() {
-    //Inicializamos con la vista que nos pidan
     this.vistaActual = this.vistaInicial;
     await this.cargarMediciones();
   }
@@ -144,8 +145,6 @@ export class TabMediciones implements OnInit {
     this.loading = true;
     try {
       this.mediciones = await this.fichaClinicaService.getMediciones(this.paciente.id);
-
-      // Forzamos el gráfico si estamos en vista gráfico o modo pantalla completa
       if (
         (this.vistaActual === 'grafico' || this.modoPantallaCompleta) &&
         this.mediciones.length > 0
@@ -171,14 +170,15 @@ export class TabMediciones implements OnInit {
   async guardarNueva() {
     this.guardandoMedicion = true;
     try {
+      // Marcamos quién está registrando la medida
+      this.nuevaMedicion.registrado_por = this.esPaciente ? 'paciente' : 'nutricionista';
+
       await this.fichaClinicaService.addMedicion(this.paciente.id, this.nuevaMedicion);
       await this.cargarMediciones();
       this.modalNueva = false;
-      if (this.vistaActual === 'grafico') setTimeout(() => this.renderizarGrafico(), 100);
       await this.mostrarToast('Medición añadida', 'success');
     } catch (e) {
-      console.error(e);
-      await this.mostrarToast('Error al guardar la medición', 'danger');
+      await this.mostrarToast('Error al guardar', 'danger');
     } finally {
       this.guardandoMedicion = false;
       this.cdr.detectChanges();
@@ -194,53 +194,25 @@ export class TabMediciones implements OnInit {
       );
       await this.cargarMediciones();
       this.modalEditar = false;
-      if (this.vistaActual === 'grafico') setTimeout(() => this.renderizarGrafico(), 100);
       await this.mostrarToast('Medición actualizada', 'success');
     } catch (e) {
-      console.error(e);
-      await this.mostrarToast('Error al actualizar la medición', 'danger');
+      await this.mostrarToast('Error al actualizar', 'danger');
     } finally {
       this.guardandoMedicion = false;
       this.cdr.detectChanges();
     }
   }
 
-  async confirmarEliminar(id: string) {
-    const alert = await this.alertCtrl.create({
-      header: 'Eliminar medición',
-      message: '¿Seguro que quieres eliminar esta medición?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          cssClass: 'alert-btn-danger',
-          handler: async () => {
-            await this.fichaClinicaService.deleteMedicion(id);
-            this.mediciones = this.mediciones.filter((m) => m.id !== id);
-            if (this.vistaActual === 'grafico') setTimeout(() => this.renderizarGrafico(), 100);
-            this.cdr.detectChanges();
-          },
-        },
-      ],
-    });
-    await alert.present();
+  puedoEditarMedida(medida: any): boolean {
+    if (!this.esPaciente) return true; // El nutricionista edita todo
+    // El paciente SOLO edita si él mismo registró la medida
+    return medida.registrado_por === 'paciente';
   }
 
-  cambiarVista(event: any) {
-    this.vistaActual = event.detail.value;
-    if (this.vistaActual === 'grafico') {
-      setTimeout(() => this.renderizarGrafico(), 100);
-    } else {
-      this.chartInstance?.destroy();
-      this.chartInstance = null;
-    }
-    this.cdr.detectChanges();
-  }
-
-  cambiarGrafica(tipo: 'peso' | 'grasa' | 'musculo' | 'cintura') {
+  cambiarGrafica(tipo: TipoGrafica) {
     this.graficaActiva = tipo;
     this.renderizarGrafico();
+    this.cdr.detectChanges();
   }
 
   private renderizarGrafico() {
@@ -252,22 +224,25 @@ export class TabMediciones implements OnInit {
       (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
     );
 
-    // 2. Ampliamos la configuración con todas las medidas posibles
     const configs: Record<string, { campo: string; label: string; color: string }> = {
       peso: { campo: 'peso_kg', label: 'Peso (kg)', color: '#2d6a4f' },
-      altura: { campo: 'altura_cm', label: 'Altura (cm)', color: '#10b981' }, // Nuevo
       grasa: { campo: 'grasa_corporal_pct', label: 'Grasa corporal (%)', color: '#e07b39' },
       musculo: { campo: 'masa_muscular_kg', label: 'Masa muscular (kg)', color: '#3b82f6' },
       cintura: { campo: 'perimetro_cintura_cm', label: 'Cintura (cm)', color: '#a855f7' },
-      cadera: { campo: 'perimetro_cadera_cm', label: 'Cadera (cm)', color: '#ec4899' }, // Nuevo
-      abdomen: { campo: 'perimetro_abdomen_cm', label: 'Abdomen (cm)', color: '#6366f1' }, // Nuevo
+      cadera: { campo: 'perimetro_cadera_cm', label: 'Cadera (cm)', color: '#ec4899' },
+      abdomen: { campo: 'perimetro_abdomen_cm', label: 'Abdomen (cm)', color: '#6366f1' },
     };
 
     const cfg = configs[this.graficaActiva];
+    if (!cfg) return;
+
     this.chartInstance = new Chart(canvas, {
       type: 'line',
       data: {
-        labels: ordenadas.map((m) => m.fecha),
+        labels: ordenadas.map((m) => {
+          const d = new Date(m.fecha);
+          return `${d.getDate()}/${d.getMonth() + 1}`;
+        }),
         datasets: [
           {
             label: cfg.label,
@@ -279,52 +254,63 @@ export class TabMediciones implements OnInit {
             spanGaps: true,
             pointBackgroundColor: cfg.color,
             pointRadius: 5,
-            pointHoverRadius: 7,
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-        scales: {
-          x: { grid: { display: false } },
-          y: { grid: { color: '#f1f5f9' }, beginAtZero: false },
-        },
+        plugins: { legend: { display: false } },
+        scales: { x: { grid: { display: false } }, y: { beginAtZero: false } },
       },
     });
   }
 
-  // 3. Nueva función para verificar si el paciente puede editar
-  // Asumimos que el paciente solo edita si él es el usuario actual y la medida no es "clínica" (opcional)
-  // O más simple: comparamos el ID del usuario actual con el creador de la medida
-  puedoEditarMedida(medida: any): boolean {
-    if (!this.esPaciente) return true; // El nutricionista siempre edita todo
-
-    // Si estamos en el portal del paciente, permitimos editar solo si la medida
-    // tiene un flag o si simplemente decides que el paciente puede editar sus registros.
-    // Si tu tabla tiene 'creado_por', usarías: return medida.creado_por === usuarioActualId;
-    return true;
+  async confirmarEliminar(id: string) {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar',
+      message: '¿Borrar esta medición?',
+      buttons: [
+        { text: 'No', role: 'cancel' },
+        {
+          text: 'Sí',
+          role: 'destructive',
+          handler: async () => {
+            await this.fichaClinicaService.deleteMedicion(id);
+            this.mediciones = this.mediciones.filter((m) => m.id !== id);
+            if (this.vistaActual === 'grafico' || this.modoPantallaCompleta)
+              this.renderizarGrafico();
+            this.cdr.detectChanges();
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
-  imcCategoria(imc: number): { label: string; color: string } {
+  cambiarVista(event: any) {
+    this.vistaActual = event.detail.value;
+    if (this.vistaActual === 'grafico') setTimeout(() => this.renderizarGrafico(), 100);
+    this.cdr.detectChanges();
+  }
+
+  imcCategoria(imc: number) {
     if (imc < 18.5) return { label: 'Bajo peso', color: 'warning' };
     if (imc < 25) return { label: 'Normopeso', color: 'success' };
     if (imc < 30) return { label: 'Sobrepeso', color: 'warning' };
     return { label: 'Obesidad', color: 'danger' };
   }
 
-  iccCategoria(icc: number, sexo: string): { label: string; color: string } {
+  iccCategoria(icc: number, sexo: string) {
     const esMujer = sexo === 'femenino';
     if (esMujer) {
       if (icc < 0.75) return { label: 'Bajo riesgo', color: 'warning' };
       if (icc < 0.85) return { label: 'Normal', color: 'success' };
       return { label: 'Riesgo alto', color: 'danger' };
-    } else {
-      if (icc < 0.8) return { label: 'Bajo riesgo', color: 'warning' };
-      if (icc < 0.9) return { label: 'Normal', color: 'success' };
-      return { label: 'Riesgo alto', color: 'danger' };
     }
+    if (icc < 0.8) return { label: 'Bajo riesgo', color: 'warning' };
+    if (icc < 0.9) return { label: 'Normal', color: 'success' };
+    return { label: 'Riesgo alto', color: 'danger' };
   }
 
   private async mostrarToast(mensaje: string, color: string) {

@@ -126,20 +126,21 @@ export class FichaClinicaService {
   }
 
   async addMedicion(pacienteId: string, datos: any) {
-    // imc es columna generada: NO se envía, Supabase la calcula sola
     const payload: any = {
       paciente_id: pacienteId,
       fecha: datos.fecha ?? new Date().toISOString().split('T')[0],
+      registrado_por: datos.registrado_por, // <--- Nuevo campo para el control de edición
     };
 
-    // Solo añadimos los campos numéricos si tienen valor real
     if (datos.peso_kg) payload.peso_kg = Number(datos.peso_kg);
     if (datos.altura_cm) payload.altura_cm = Number(datos.altura_cm);
     if (datos.grasa_corporal_pct) payload.grasa_corporal_pct = Number(datos.grasa_corporal_pct);
     if (datos.masa_muscular_kg) payload.masa_muscular_kg = Number(datos.masa_muscular_kg);
-    if (datos.perimetro_cintura_cm) payload.perimetro_cintura_cm = Number(datos.perimetro_cintura_cm);
+    if (datos.perimetro_cintura_cm)
+      payload.perimetro_cintura_cm = Number(datos.perimetro_cintura_cm);
     if (datos.perimetro_cadera_cm) payload.perimetro_cadera_cm = Number(datos.perimetro_cadera_cm);
-    if (datos.perimetro_abdomen_cm) payload.perimetro_abdomen_cm = Number(datos.perimetro_abdomen_cm);
+    if (datos.perimetro_abdomen_cm)
+      payload.perimetro_abdomen_cm = Number(datos.perimetro_abdomen_cm);
     if (datos.notas) payload.notas = datos.notas;
 
     const { error } = await this.supabase.from('mediciones').insert(payload);
@@ -147,27 +148,26 @@ export class FichaClinicaService {
   }
 
   async updateMedicion(id: string, datos: any) {
-  // imc e indice_cintura_cadera son columnas generadas: NO se envían
-  const payload: any = {
-    fecha: datos.fecha ?? new Date().toISOString().split('T')[0],
-  };
+    // imc e indice_cintura_cadera son columnas generadas: NO se envían
+    const payload: any = {
+      fecha: datos.fecha ?? new Date().toISOString().split('T')[0],
+    };
 
-  if (datos.peso_kg) payload.peso_kg = Number(datos.peso_kg);
-  if (datos.altura_cm) payload.altura_cm = Number(datos.altura_cm);
-  if (datos.grasa_corporal_pct) payload.grasa_corporal_pct = Number(datos.grasa_corporal_pct);
-  if (datos.masa_muscular_kg) payload.masa_muscular_kg = Number(datos.masa_muscular_kg);
-  if (datos.perimetro_cintura_cm) payload.perimetro_cintura_cm = Number(datos.perimetro_cintura_cm);
-  if (datos.perimetro_cadera_cm) payload.perimetro_cadera_cm = Number(datos.perimetro_cadera_cm);
-  if (datos.perimetro_abdomen_cm) payload.perimetro_abdomen_cm = Number(datos.perimetro_abdomen_cm);
-  // notas puede ser string vacío (para borrarla), así que chequeamos distinto
-  payload.notas = datos.notas || null;
+    if (datos.peso_kg) payload.peso_kg = Number(datos.peso_kg);
+    if (datos.altura_cm) payload.altura_cm = Number(datos.altura_cm);
+    if (datos.grasa_corporal_pct) payload.grasa_corporal_pct = Number(datos.grasa_corporal_pct);
+    if (datos.masa_muscular_kg) payload.masa_muscular_kg = Number(datos.masa_muscular_kg);
+    if (datos.perimetro_cintura_cm)
+      payload.perimetro_cintura_cm = Number(datos.perimetro_cintura_cm);
+    if (datos.perimetro_cadera_cm) payload.perimetro_cadera_cm = Number(datos.perimetro_cadera_cm);
+    if (datos.perimetro_abdomen_cm)
+      payload.perimetro_abdomen_cm = Number(datos.perimetro_abdomen_cm);
+    // notas puede ser string vacío (para borrarla), así que chequeamos distinto
+    payload.notas = datos.notas || null;
 
-  const { error } = await this.supabase
-    .from('mediciones')
-    .update(payload)
-    .eq('id', id);
-  if (error) throw error;
-}
+    const { error } = await this.supabase.from('mediciones').update(payload).eq('id', id);
+    if (error) throw error;
+  }
 
   async deleteMedicion(id: string) {
     const { error } = await this.supabase.from('mediciones').delete().eq('id', id);
