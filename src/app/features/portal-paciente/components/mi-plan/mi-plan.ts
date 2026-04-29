@@ -12,7 +12,7 @@ import { MenuSemanalComponent } from '../../../pacientes/ficha-paciente/tabs/tab
 @Component({
   selector: 'app-mi-plan',
   standalone: true,
-  imports: [CommonModule, IonContent, IonCard, IonCardContent, IonIcon, IonBadge, IonSpinner, Header, MenuSemanalComponent],
+  imports: [CommonModule, IonContent, IonCard, IonCardContent, IonIcon, IonBadge, Header, MenuSemanalComponent],
   templateUrl: './mi-plan.html',
   styleUrls: ['./mi-plan.css']
 })

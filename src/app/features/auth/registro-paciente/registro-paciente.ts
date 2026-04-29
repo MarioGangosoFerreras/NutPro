@@ -15,7 +15,7 @@ import { AuthService } from '../../../core/services/auth';
   standalone: true,
   imports: [
     CommonModule, FormsModule, RouterLink, IonContent, IonInput,
-    IonButton, IonSpinner, IonIcon, IonItem, IonLabel, IonText,
+    IonButton, IonSpinner, IonText,
     IonSelect, IonSelectOption // <--- Importamos los select
   ],
   templateUrl: './registro-paciente.html',

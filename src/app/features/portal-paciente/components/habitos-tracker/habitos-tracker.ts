@@ -5,7 +5,7 @@ import { IonCard, IonCardContent } from '@ionic/angular/standalone';
 @Component({
   selector: 'app-habitos-tracker',
   standalone: true,
-  imports: [CommonModule, IonCard, IonCardContent],
+  imports: [CommonModule, IonCard, ],
   templateUrl: './habitos-tracker.html',
   styleUrls: ['../../portal-paciente.css']
 })

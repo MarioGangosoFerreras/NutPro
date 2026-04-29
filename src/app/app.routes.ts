@@ -124,12 +124,10 @@ export const routes: Routes = [
         path: 'portal-paciente/plan',
         loadComponent: () => import('./features/portal-paciente/components/mi-plan/mi-plan').then((m) => m.MiPlan),
       },
-      /*
       {
         path: 'portal-paciente/evolucion',
-        loadComponent: () => import('./features/portal-paciente/pages/mi-evolucion/mi-evolucion').then((m) => m.MiEvolucion),
+        loadComponent: () => import('./features/portal-paciente/components/mi-evolucion/mi-evolucion').then((m) => m.MiEvolucion),
       }
-        */
     ],
   },
 ];

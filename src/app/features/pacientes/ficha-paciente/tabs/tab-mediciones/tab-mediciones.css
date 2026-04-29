@@ -190,7 +190,33 @@
   color: white;
 }
 
+/* Altura por defecto (para el nutricionista) */
 .canvas-wrapper {
   position: relative;
-  height: 300px;
+  height: 300px; /* Tamaño estándar en la ficha del paciente */
+  width: 100%;
+}
+
+/* Altura especial (para el portal del paciente) */
+.full-screen-chart .canvas-wrapper {
+  height: 550px; 
+}
+
+/* Opcional: Ocultar los botones de cambio de vista si quieres que sea SOLO gráfico */
+.full-screen-chart .vista-toggle {
+  display: none;
+}
+
+/* Estilos específicos para cuando el componente se usa en Mi Evolución */
+.modo-portal-paciente .canvas-wrapper {
+  height: 500px; /* Gráfico mucho más grande */
+}
+
+.modo-portal-paciente .grafico-container {
+  margin-bottom: 30px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Sombra más elegante */
+}
+
+.modo-portal-paciente .medicion-card {
+  border-left-width: 4px; /* Un toque más sutil */
 }

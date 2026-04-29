@@ -1,0 +1,32 @@
+<app-header titulo="Mi Evolución"></app-header>
+
+<ion-content class="ion-padding" color="light">
+  @if (cargando()) {
+    <div class="loading-container">
+      <div class="avocado-spinner">🥑</div>
+      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px">Cargando tu progreso...</p>
+    </div>
+  } @else if (paciente()) {
+    <div class="evolucion-container">
+      <div class="welcome-header">
+        <h2>Tu progreso, {{ paciente().usuario?.nombre }}</h2>
+        <p>Registra tus medidas regularmente para visualizar tu avance en los gráficos.</p>
+      </div>
+
+      <div class="mediciones-wrapper">
+        <app-tab-mediciones
+          [paciente]="paciente()"
+          [modoPantallaCompleta]="true"
+          [esPaciente]="true"
+        >
+        </app-tab-mediciones>
+      </div>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <h3>Error al cargar</h3>
+      <p>No se pudo cargar tu perfil. Inténtalo de nuevo más tarde.</p>
+    </div>
+  }
+</ion-content>

@@ -26,9 +26,7 @@ import {
   standalone: true,
   imports: [
     CommonModule, RouterLink, IonContent, IonCard, IonCardHeader, IonCardTitle, 
-    IonCardContent, IonAvatar, IonItem, IonLabel, IonIcon, IonButton, 
-    IonSpinner, IonBadge, IonModal, IonHeader, IonToolbar, IonTitle, 
-    IonButtons, IonList, Header, HabitosTrackerComponent // <-- AÑADIR
+    IonCardContent, IonAvatar, IonItem, IonLabel, IonIcon, IonButton, IonBadge, IonList, Header, HabitosTrackerComponent // <-- AÑADIR
   ],
   templateUrl: './portal-paciente.html',
   styleUrls: ['./portal-paciente.css']

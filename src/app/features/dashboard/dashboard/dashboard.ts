@@ -23,7 +23,7 @@ import { cashOutline, receiptOutline } from 'ionicons/icons';
 @Component({
   selector: 'app-dashboard',
   imports: [
-    CommonModule, IonContent, IonButton, Header, RouterLink, UniversalCalendar,
+    CommonModule, IonContent, IonButton, Header, UniversalCalendar,
     EstadisticasDashboardComponent, ListaPacientesPreviewComponent,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
     IonList, IonItem, IonLabel, IonIcon, IonBadge
