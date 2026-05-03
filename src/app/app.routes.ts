@@ -140,6 +140,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/portal-paciente/components/mis-citas/mis-citas').then((m) => m.MisCitas),
       },
+      {
+        path: 'portal-paciente/documentos',
+        loadComponent: () =>
+          import('./features/portal-paciente/components/mis-documentos/mis-documentos').then((m) => m.MisDocumentos),
+      },
     ],
   },
 ];

@@ -1,29 +1,29 @@
 <ion-split-pane contentId="main-content" when="lg" [class.menu-collapsed]="collapsed">
-
   <ion-menu menuId="main-menu" contentId="main-content" side="start">
     <div class="sidebar-wrapper">
-
-      <div class="brand" (click)="navegar('/dashboard')">
+      <div class="brand" style="cursor: pointer" (click)="navegar(homeRoute())">
         <img src="img/Logo_app.png" alt="NutPro" class="logo" />
         @if (!collapsed) {
-        <span class="brand-text">
-          <span class="nut">Nut</span><span class="pro">Pro</span>
-        </span>
+          <span class="brand-text"> <span class="nut">Nut</span><span class="pro">Pro</span> </span>
         }
       </div>
 
       <div class="nav-container">
         @for (item of navItems(); track item.route) {
-        <button class="nav-btn" [class.active]="isActive(item)" (click)="navegar(item.route)"
-          [title]="collapsed ? item.label : ''">
-          <ion-icon [name]="item.icon"></ion-icon>
-          @if (!collapsed) {
-          <span>{{ item.label }}</span>
-          }
-          @if (item.route === '/mensajes' && mensajesSinLeer() > 0) {
-          <ion-badge color="danger" class="badge-nav">{{ mensajesSinLeer() }}</ion-badge>
-          }
-        </button>
+          <button
+            class="nav-btn"
+            [class.active]="isActive(item)"
+            (click)="navegar(item.route)"
+            [title]="collapsed ? item.label : ''"
+          >
+            <ion-icon [name]="item.icon"></ion-icon>
+            @if (!collapsed) {
+              <span>{{ item.label }}</span>
+            }
+            @if (item.route === '/mensajes' && mensajesSinLeer() > 0) {
+              <ion-badge color="danger" class="badge-nav">{{ mensajesSinLeer() }}</ion-badge>
+            }
+          </button>
         }
       </div>
 
@@ -33,33 +33,35 @@
         <div class="user-profile">
           <ion-avatar>
             @if (usuarioActual().avatar) {
-            <img [src]="usuarioActual().avatar" />
+              <img [src]="usuarioActual().avatar" />
             } @else {
-            <ion-icon name="person-circle-outline"></ion-icon>
+              <ion-icon name="person-circle-outline"></ion-icon>
             }
           </ion-avatar>
 
           @if (!collapsed) {
-          <div class="user-details">
-            <span class="name">{{ usuarioActual().nombre }}</span>
-            <span class="role">{{ usuarioActual().rol }}</span>
-          </div>
+            <div class="user-details">
+              <span class="name">{{ usuarioActual().nombre }}</span>
+              <span class="role">{{ usuarioActual().rol }}</span>
+            </div>
           }
         </div>
 
-        <button class="nav-btn logout-btn" (click)="cerrarSesion()" [title]="collapsed ? 'Cerrar sesión' : ''">
+        <button
+          class="nav-btn logout-btn"
+          (click)="cerrarSesion()"
+          [title]="collapsed ? 'Cerrar sesión' : ''"
+        >
           <ion-icon name="log-out-outline"></ion-icon>
           @if (!collapsed) {
-          <span>Cerrar sesión</span>
+            <span>Cerrar sesión</span>
           }
         </button>
       </div>
-
     </div>
   </ion-menu>
 
   <div class="ion-page" id="main-content">
     <ion-router-outlet></ion-router-outlet>
   </div>
-
 </ion-split-pane>

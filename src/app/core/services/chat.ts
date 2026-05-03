@@ -1,5 +1,4 @@
-// src/app/core/services/chat.ts
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase';
 
 export interface Mensaje {
@@ -14,6 +13,80 @@ export interface Mensaje {
 @Injectable({ providedIn: 'root' })
 export class ChatService {
   private supabase = inject(SupabaseService).client;
+
+  // Signal Reactivo para el badge de la barra de navegación
+  public unreadCountBadge = signal<number>(0);
+
+  // NUEVO: Actualiza el signal global adaptándose al rol del usuario
+  async actualizarContadorBadge(usuarioId: string, rol: string) {
+    let chatIds: string[] = [];
+
+    if (rol === 'nutricionista' || rol === 'admin') {
+      const { data: nutri } = await this.supabase
+        .from('nutricionistas')
+        .select('id')
+        .eq('usuario_id', usuarioId)
+        .maybeSingle();
+      if (nutri) {
+        const { data: chats } = await this.supabase
+          .from('chats')
+          .select('id')
+          .eq('nutricionista_id', nutri.id);
+        chatIds = chats?.map((c: any) => c.id) || [];
+      }
+    } else if (rol === 'paciente') {
+      const { data: pac } = await this.supabase
+        .from('pacientes')
+        .select('id')
+        .eq('usuario_id', usuarioId)
+        .maybeSingle();
+      if (pac) {
+        const { data: chats } = await this.supabase
+          .from('chats')
+          .select('id')
+          .eq('paciente_id', pac.id);
+        chatIds = chats?.map((c: any) => c.id) || [];
+      }
+    }
+
+    if (chatIds.length === 0) {
+      this.unreadCountBadge.set(0);
+      return;
+    }
+
+    const { count } = await this.supabase
+      .from('mensajes')
+      .select('id', { count: 'exact', head: true })
+      .eq('leido', false)
+      .neq('sender_id', usuarioId)
+      .in('chat_id', chatIds);
+
+    this.unreadCountBadge.set(count || 0);
+  }
+
+  async getUnreadCountsPerChat(
+    chatIds: string[],
+    miUsuarioId: string,
+  ): Promise<Record<string, number>> {
+    if (!chatIds || chatIds.length === 0) return {};
+    const { data, error } = await this.supabase
+      .from('mensajes')
+      .select('chat_id')
+      .eq('leido', false)
+      .neq('sender_id', miUsuarioId)
+      .in('chat_id', chatIds);
+
+    if (error) {
+      console.error('Error obteniendo conteo de mensajes sin leer:', error);
+      return {};
+    }
+
+    const unreadMap: Record<string, number> = {};
+    data?.forEach((m) => {
+      unreadMap[m.chat_id] = (unreadMap[m.chat_id] || 0) + 1;
+    });
+    return unreadMap;
+  }
 
   async getOrCreateChat(nutricionistaId: string, pacienteId: string) {
     let { data: chat, error } = await this.supabase

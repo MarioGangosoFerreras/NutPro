@@ -1,21 +1,34 @@
-// universal-calendar.component.ts
 import {
-  Component, Input, Output, EventEmitter,
-  OnInit, OnDestroy, OnChanges, SimpleChanges,
-  inject, ChangeDetectorRef
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
-  IonButton, IonIcon, IonBadge, IonSpinner,
-  ModalController
+  IonButton,
+  IonIcon,
+  IonBadge,
+  IonSpinner,
+  ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  chevronBackOutline, chevronForwardOutline,
-  addCircleOutline, calendarOutline,
-  videocamOutline, locationOutline,
-  documentTextOutline
+  chevronBackOutline,
+  chevronForwardOutline,
+  addCircleOutline,
+  calendarOutline,
+  videocamOutline,
+  locationOutline,
+  documentTextOutline,
+  trashOutline,
 } from 'ionicons/icons';
 import { CitasService, Cita } from '../../../core/services/citas';
 import { AuthService } from '../../../core/services/auth';
@@ -39,33 +52,21 @@ interface DiaCal {
   styleUrls: ['./universal-calendar.css'],
 })
 export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
-
-  // ── Modo de uso ─────────────────────────────────────────────────────────
-  // 'full'    → vista /citas del menú lateral (carga sus propias citas)
-  // 'dashboard' → widget compacto del dashboard (carga sus propias citas)
-  // 'patient' → ficha del paciente (recibe citas por @Input)
   @Input() mode: CalendarMode = 'full';
-
-  // Solo en mode='patient': recibe las citas ya filtradas desde el padre
   @Input() citasInput: Cita[] = [];
+  @Input() puedeFacturar = true;
+  @Input() esPaciente = false; // <-- NUEVO: Para identificar si estamos en el portal del paciente
 
-  // Solo en mode='patient': para el botón "Añadir cita"
   @Output() nuevaCita = new EventEmitter<string>();
-
-  // Solo en mode='patient': al pulsar editar en una CitaCard
   @Output() editarCita = new EventEmitter<Cita>();
-
-  // En mode='full' y 'dashboard': al pulsar una cita navega al paciente
-  // En mode='patient': no se usa (el padre controla la navegación)
   @Output() citaSeleccionada = new EventEmitter<Cita>();
-
   @Output() facturarCita = new EventEmitter<Cita>();
+  @Output() eliminarCita = new EventEmitter<Cita>();
 
-  // ── Estado interno ───────────────────────────────────────────────────────
   hoy = new Date();
   mesActual = new Date(this.hoy.getFullYear(), this.hoy.getMonth(), 1);
   semanas: DiaCal[][] = [];
-  citas: Cita[] = [];          // citas cargadas internamente (full/dashboard)
+  citas: Cita[] = [];
   diaSeleccionado: Date | null = null;
   citasDelDia: Cita[] = [];
   cargando = false;
@@ -82,22 +83,23 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
 
   constructor() {
     addIcons({
-      chevronBackOutline, chevronForwardOutline,
-      addCircleOutline, calendarOutline,
-      videocamOutline, locationOutline, documentTextOutline
+      chevronBackOutline,
+      chevronForwardOutline,
+      addCircleOutline,
+      calendarOutline,
+      videocamOutline,
+      locationOutline,
+      documentTextOutline,
+      trashOutline,
     });
   }
 
-  // ── Ciclo de vida ────────────────────────────────────────────────────────
-
   async ngOnInit() {
     if (this.mode === 'patient') {
-      // Las citas vienen del padre, no cargamos nada
       this.citas = this.citasInput;
       this.construirCalendario();
       this.seleccionarFecha(this.hoy);
     } else {
-      // full o dashboard: cargamos nosotros
       this.nutricionistaId = (await this.authService.getNutricionistaId()) ?? '';
       await this.cargarMes();
       this.seleccionarFecha(this.hoy);
@@ -106,14 +108,12 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // Solo aplica en mode='patient' cuando el padre actualiza las citas
     if (changes['citasInput'] && this.mode === 'patient') {
       this.citas = this.citasInput;
       this.construirCalendario();
       if (this.diaSeleccionado) {
         this.citasDelDia = this.citasEnFecha(this.diaSeleccionado);
       }
-      // Forzar renderizado profundo para atrapar los booleanos cambiados (facturada)
       this.cdr.detectChanges();
     }
   }
@@ -121,8 +121,6 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   ngOnDestroy() {
     this.channel?.unsubscribe();
   }
-
-  // ── Carga de datos ───────────────────────────────────────────────────────
 
   async cargarMes() {
     this.cargando = true;
@@ -142,13 +140,8 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   }
 
   private suscribirRealtime() {
-    this.channel = this.citasService.suscribirCambios(
-      this.nutricionistaId,
-      () => this.cargarMes()
-    );
+    this.channel = this.citasService.suscribirCambios(this.nutricionistaId, () => this.cargarMes());
   }
-
-  // ── Construcción del calendario ──────────────────────────────────────────
 
   construirCalendario() {
     const año = this.mesActual.getFullYear();
@@ -181,12 +174,10 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   }
 
   private citasEnFecha(fecha: Date): Cita[] {
-    return (this.citas ?? []).filter(c =>
-      new Date(c.fecha_hora).toDateString() === fecha.toDateString()
+    return (this.citas ?? []).filter(
+      (c) => new Date(c.fecha_hora).toDateString() === fecha.toDateString(),
     );
   }
-
-  // ── Interacción ──────────────────────────────────────────────────────────
 
   seleccionarFecha(fecha: Date) {
     this.diaSeleccionado = fecha;
@@ -214,7 +205,6 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
 
   onCitaClick(cita: Cita) {
     if (this.mode === 'patient') {
-      // El padre maneja la lógica; aquí no navegamos
       this.citaSeleccionada.emit(cita);
     } else {
       this.router.navigate(['/pacientes', cita.paciente_id]);
@@ -222,7 +212,6 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   }
 
   async onNuevaCita() {
-    // 1. Evitamos el problema de la zona horaria UTC montando la fecha en local
     const targetDate = this.diaSeleccionado || this.hoy;
     const year = targetDate.getFullYear();
     const month = String(targetDate.getMonth() + 1).padStart(2, '0');
@@ -232,9 +221,9 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     if (this.mode === 'full') {
       const modal = await this.modalCtrl.create({
         component: ModalCitaComponent,
-        componentProps: { 
+        componentProps: {
           nutricionistaId: this.nutricionistaId,
-          fechaSeleccionada: fechaInicial 
+          fechaSeleccionada: fechaInicial,
         },
         breakpoints: [0, 0.95],
         initialBreakpoint: 0.95,
@@ -243,18 +232,19 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
       const { role } = await modal.onDidDismiss();
       if (role === 'guardado') await this.cargarMes();
     } else {
-      // 2. Emitimos el string limpiamente
-      this.nuevaCita.emit(fechaInicial); 
+      this.nuevaCita.emit(fechaInicial);
     }
   }
 
-  // ── Helpers de vista ─────────────────────────────────────────────────────
-
-  esHoy(f: Date) { return f.toDateString() === this.hoy.toDateString(); }
-  esSeleccionado(f: Date) { return this.diaSeleccionado?.toDateString() === f.toDateString(); }
+  esHoy(f: Date) {
+    return f.toDateString() === this.hoy.toDateString();
+  }
+  esSeleccionado(f: Date) {
+    return this.diaSeleccionado?.toDateString() === f.toDateString();
+  }
 
   tieneEstado(dia: DiaCal, estado: string) {
-    return dia.citas.some(c => c.estado === estado);
+    return dia.citas.some((c) => c.estado === estado);
   }
 
   colorEstado(estado: string) {
@@ -265,15 +255,16 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     return this.mode === 'patient' || this.mode === 'full';
   }
 
-  // El panel de detalle de cita usa CitaCard en 'patient', filas simples en el resto
-  get usaCitaCard() { return this.mode === 'patient'; }
+  get usaCitaCard() {
+    return this.mode === 'patient';
+  }
 
   citaPasada(cita: Cita): boolean {
     return new Date(cita.fecha_hora).getTime() < new Date().getTime();
   }
 
   emitirFacturaEvent(event: Event, cita: Cita) {
-    event.stopPropagation(); // Para que no navegue a la ficha
+    event.stopPropagation();
     this.facturarCita.emit(cita);
   }
 }

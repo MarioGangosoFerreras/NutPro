@@ -4,11 +4,15 @@
       <ion-icon [name]="icono"></ion-icon>
       <span>{{ cita.tipo | titlecase }}</span>
 
-      @if (citaPasada() && !cita.facturada && cita.estado === 'confirmada') {
-      <ion-badge color="danger" style="font-size: 10px; margin-left: 8px;">Sin facturar</ion-badge>
-      }
-      @if (cita.facturada) {
-      <ion-badge color="success" style="font-size: 10px; margin-left: 8px;">Facturada</ion-badge>
+      @if (!esPaciente) {
+        @if (citaPasada() && !cita.facturada && cita.estado === 'confirmada') {
+          <ion-badge color="danger" style="font-size: 10px; margin-left: 8px"
+            >Sin facturar</ion-badge
+          >
+        }
+        @if (cita.facturada) {
+          <ion-badge color="success" style="font-size: 10px; margin-left: 8px">Facturada</ion-badge>
+        }
       }
     </div>
     <ion-badge [color]="colorEstado">{{ cita.estado }}</ion-badge>
@@ -21,35 +25,37 @@
   </div>
 
   @if (mostrarAcciones) {
-  <div class="cita-card__acciones">
-    @if (cita.estado === 'pendiente') {
-    <ion-button fill="clear" color="success" size="small" (click)="confirmar.emit(cita)">
-      <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-      Confirmar
-    </ion-button>
-    <ion-button fill="clear" color="warning" size="small" (click)="cancelar.emit(cita)">
-      <ion-icon slot="start" name="close-circle-outline"></ion-icon>
-      Cancelar
-    </ion-button>
-    }
+    <div class="cita-card__acciones">
+      @if (cita.estado === 'pendiente' && !cita.facturada) {
+        <ion-button fill="clear" color="success" size="small" (click)="confirmar.emit(cita)">
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          Confirmar
+        </ion-button>
+        <ion-button fill="clear" color="warning" size="small" (click)="cancelar.emit(cita)">
+          <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+          Cancelar
+        </ion-button>
+      }
 
-    @if (cita.estado !== 'cancelada') {
-    <ion-button fill="clear" size="small" (click)="editar.emit(cita)">
-      <ion-icon slot="start" name="create-outline"></ion-icon>
-      Editar
-    </ion-button>
-    }
+      @if (cita.estado !== 'cancelada' && !cita.facturada) {
+        <ion-button fill="clear" size="small" (click)="editar.emit(cita)">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
+          Editar
+        </ion-button>
+      }
 
-    @if (!cita.facturada) {
-    <ion-button fill="clear" color="primary" size="small" (click)="facturar.emit(cita)">
-      <ion-icon slot="start" name="document-text-outline"></ion-icon>
-      Factura
-    </ion-button>
-    }
+      @if (!cita.facturada && permitirFacturar && cita.estado === 'confirmada') {
+        <ion-button fill="clear" color="primary" size="small" (click)="facturar.emit(cita)">
+          <ion-icon slot="start" name="document-text-outline"></ion-icon>
+          Factura
+        </ion-button>
+      }
 
-    <ion-button fill="clear" color="danger" size="small" (click)="eliminar.emit(cita)">
-      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-    </ion-button>
-  </div>
+      @if (!cita.facturada) {
+        <ion-button fill="clear" color="danger" size="small" (click)="eliminar.emit(cita)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      }
+    </div>
   }
 </div>

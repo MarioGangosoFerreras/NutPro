@@ -26,7 +26,7 @@
   <app-universal-calendar mode="patient" [citasInput]="citas" 
     (nuevaCita)="abrirModal($event)"
     (editarCita)="abrirModal($event)" 
-    (facturarCita)="crearFactura($event)">
-  </app-universal-calendar>
+    (facturarCita)="crearFactura($event)"
+    (eliminarCita)="eliminar($event)"> </app-universal-calendar>
   }
 </div>

@@ -4,7 +4,9 @@
     <app-universal-calendar
       mode="patient"
       [citasInput]="citas()"
-      (nuevaCita)="pedirCita($event)" 
+      [puedeFacturar]="false"
+      [esPaciente]="true"
+      (nuevaCita)="pedirCita($event)"
     >
     </app-universal-calendar>
   </div>

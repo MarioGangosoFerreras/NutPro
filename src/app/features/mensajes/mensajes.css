@@ -288,3 +288,45 @@
     max-width: 85%;
   }
 }
+
+/* ─── ESTILOS AÑADIDOS PARA EL "CIRCULITO" DE WHATSAPP ─── */
+.contact-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.contact-time.unread {
+  color: #25D366; /* Verde icónico de WhatsApp */
+  font-weight: 700;
+}
+
+.contact-last-msg {
+  flex: 1;
+  font-size: 13px;
+  color: #667781;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-last-msg.unread {
+  color: #111b21;
+  font-weight: 600;
+}
+
+.unread-badge {
+  background-color: #25D366; /* Verde WhatsApp */
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 12px;
+  min-width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  margin-left: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}

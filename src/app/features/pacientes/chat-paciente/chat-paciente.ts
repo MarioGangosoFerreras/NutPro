@@ -1,39 +1,72 @@
-import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectorRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  inject,
+  signal,
+  ChangeDetectorRef,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router'; // <-- Añadido RouterLink
-import { IonHeader, IonToolbar, IonContent, IonFooter, IonInput, IonButton, IonIcon, IonButtons, IonBackButton, IonAvatar } from '@ionic/angular/standalone'; // <-- Añadido IonAvatar
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import {
+  IonHeader,
+  IonToolbar,
+  IonContent,
+  IonFooter,
+  IonInput,
+  IonButton,
+  IonIcon,
+  IonButtons,
+  IonBackButton,
+  IonAvatar,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { sendOutline, personCircleOutline } from 'ionicons/icons'; // <-- Añadido icono
+import { sendOutline, personCircleOutline } from 'ionicons/icons';
 import { ChatService, Mensaje } from '../../../core/services/chat';
 import { AuthService } from '../../../core/services/auth';
-import { PacientesService } from '../../../core/services/pacientes'; // <-- Añadido servicio
+import { PacientesService } from '../../../core/services/pacientes';
 
 @Component({
   selector: 'app-chat-paciente',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonContent, IonFooter, IonInput, IonButton, IonIcon, IonButtons, IonBackButton, IonAvatar, RouterLink], // <-- Añadidos al array
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonHeader,
+    IonToolbar,
+    IonContent,
+    IonFooter,
+    IonInput,
+    IonButton,
+    IonIcon,
+    IonButtons,
+    IonBackButton,
+    IonAvatar,
+    RouterLink,
+  ],
   templateUrl: './chat-paciente.html',
-  styleUrls: ['./chat-paciente.css']
+  styleUrls: ['./chat-paciente.css'],
 })
 export class ChatPaciente implements OnInit, OnDestroy {
   @ViewChild(IonContent) content!: IonContent;
 
   private chatService = inject(ChatService);
   private authService = inject(AuthService);
-  private pacientesService = inject(PacientesService); // <-- Inyectamos servicio
+  private pacientesService = inject(PacientesService);
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
 
   pacienteId = '';
   chatId = '';
   miUsuarioId = '';
-  
-  paciente = signal<any>(null); // <-- Guardará los datos del paciente
+
+  paciente = signal<any>(null);
   mensajes = signal<Mensaje[]>([]);
   nuevoMensaje = '';
   cargando = true;
-  
+
   private realtimeChannel: any;
 
   constructor() {
@@ -46,23 +79,30 @@ export class ChatPaciente implements OnInit, OnDestroy {
     const nutricionistaId = await this.authService.getNutricionistaId();
 
     if (this.pacienteId) {
-      // 1. Cargamos los datos del paciente para la cabecera
       const datosPaciente = await this.pacientesService.getPacienteById(this.pacienteId);
       this.paciente.set(datosPaciente);
     }
 
     if (nutricionistaId && this.pacienteId) {
-      // 2. Obtenemos la sala
       const chat = await this.chatService.getOrCreateChat(nutricionistaId, this.pacienteId);
       this.chatId = chat.id;
 
-      // 3. Cargamos el historial
+      // NUEVO: Marcar mensajes como leídos y actualizar la burbuja del menú lateral
+      await this.chatService.marcarComoLeidos(this.chatId, this.miUsuarioId);
+      this.chatService.actualizarContadorBadge(this.miUsuarioId, 'nutricionista');
+
       const historial = await this.chatService.getMensajes(this.chatId);
       this.mensajes.set(historial);
-      
-      // 4. Nos suscribimos para escuchar en tiempo real
+
       this.realtimeChannel = this.chatService.suscribirMensajes(this.chatId, (msg) => {
-        this.mensajes.update(msgs => [...msgs, msg]);
+        this.mensajes.update((msgs) => [...msgs, msg]);
+
+        // Si el paciente escribe, lo marcamos leído al instante
+        if (msg.sender_id !== this.miUsuarioId) {
+          this.chatService.marcarComoLeidos(this.chatId, this.miUsuarioId);
+          this.chatService.actualizarContadorBadge(this.miUsuarioId, 'nutricionista');
+        }
+
         this.scrollToBottom();
         this.cdr.detectChanges();
       });

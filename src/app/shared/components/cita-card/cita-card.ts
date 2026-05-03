@@ -3,8 +3,14 @@ import { CommonModule } from '@angular/common';
 import { IonIcon, IonBadge, IonButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  videocamOutline, locationOutline,
-  checkmarkCircleOutline, closeCircleOutline, timeOutline
+  videocamOutline,
+  locationOutline,
+  checkmarkCircleOutline,
+  closeCircleOutline,
+  timeOutline,
+  createOutline,
+  documentTextOutline,
+  trashOutline, // Aseguramos que estén los iconos de acciones
 } from 'ionicons/icons';
 import { Cita } from '../../../core/services/citas';
 
@@ -17,8 +23,10 @@ import { Cita } from '../../../core/services/citas';
 })
 export class CitaCard {
   @Input() cita!: Cita;
-  @Input() mostrarPaciente = false;   // en dashboard se muestra, en ficha no
-  @Input() mostrarAcciones = false;   // confirmar/cancelar rápido
+  @Input() mostrarPaciente = false; // en dashboard se muestra, en ficha no
+  @Input() mostrarAcciones = false; // confirmar/cancelar rápido
+  @Input() permitirFacturar = true;
+  @Input() esPaciente = false; // <-- NUEVO: Para limpiar la interfaz del paciente
 
   @Output() confirmar = new EventEmitter<Cita>();
   @Output() cancelar = new EventEmitter<Cita>();
@@ -27,11 +35,23 @@ export class CitaCard {
   @Output() facturar = new EventEmitter<Cita>();
 
   constructor() {
-    addIcons({ videocamOutline, locationOutline, checkmarkCircleOutline, closeCircleOutline, timeOutline });
+    addIcons({
+      videocamOutline,
+      locationOutline,
+      checkmarkCircleOutline,
+      closeCircleOutline,
+      timeOutline,
+      createOutline,
+      documentTextOutline,
+      trashOutline,
+    });
   }
 
   get colorEstado(): string {
-    return { pendiente: 'warning', confirmada: 'success', cancelada: 'danger' }[this.cita.estado] ?? 'medium';
+    return (
+      { pendiente: 'warning', confirmada: 'success', cancelada: 'danger' }[this.cita.estado] ??
+      'medium'
+    );
   }
 
   get icono(): string {

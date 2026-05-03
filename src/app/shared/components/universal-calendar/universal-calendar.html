@@ -1,5 +1,8 @@
-<div class="ucal" [class.ucal--dashboard]="mode === 'dashboard'" [class.ucal--full]="mode === 'full'">
-
+<div
+  class="ucal"
+  [class.ucal--dashboard]="mode === 'dashboard'"
+  [class.ucal--full]="mode === 'full'"
+>
   <div class="ucal__nav">
     <ion-button fill="clear" size="small" (click)="mesAnterior()">
       <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
@@ -14,81 +17,106 @@
 
   <div class="ucal__grid">
     @for (dia of DIAS; track dia) {
-    <div class="ucal__dia-header">{{ dia }}</div>
+      <div class="ucal__dia-header">{{ dia }}</div>
     }
     @for (semana of semanas; track $index) {
-    @for (dia of semana; track dia.fecha.toISOString()) {
-    <div class="ucal__dia" [class.otro-mes]="!dia.esDelMes" [class.hoy]="esHoy(dia.fecha)"
-      [class.seleccionado]="esSeleccionado(dia.fecha)" [class.con-citas]="dia.citas.length > 0"
-      (click)="seleccionarFecha(dia.fecha)">
-      <span class="ucal__num">{{ dia.fecha.getDate() }}</span>
-      <div class="ucal__dots">
-        @if (tieneEstado(dia, 'confirmada')) {
-        <span class="ucal__dot ucal__dot--confirmada"></span>
-        }
-        @if (tieneEstado(dia, 'pendiente')) {
-        <span class="ucal__dot ucal__dot--pendiente"></span>
-        }
-        @if (tieneEstado(dia, 'cancelada')) {
-        <span class="ucal__dot ucal__dot--cancelada"></span>
-        }
-      </div>
-    </div>
-    }
+      @for (dia of semana; track dia.fecha.toISOString()) {
+        <div
+          class="ucal__dia"
+          [class.otro-mes]="!dia.esDelMes"
+          [class.hoy]="esHoy(dia.fecha)"
+          [class.seleccionado]="esSeleccionado(dia.fecha)"
+          [class.con-citas]="dia.citas.length > 0"
+          (click)="seleccionarFecha(dia.fecha)"
+        >
+          <span class="ucal__num">{{ dia.fecha.getDate() }}</span>
+          <div class="ucal__dots">
+            @if (tieneEstado(dia, 'confirmada')) {
+              <span class="ucal__dot ucal__dot--confirmada"></span>
+            }
+            @if (tieneEstado(dia, 'pendiente')) {
+              <span class="ucal__dot ucal__dot--pendiente"></span>
+            }
+            @if (tieneEstado(dia, 'cancelada')) {
+              <span class="ucal__dot ucal__dot--cancelada"></span>
+            }
+          </div>
+        </div>
+      }
     }
   </div>
 
   @if (diaSeleccionado) {
-  <div class="ucal__detalle">
-    <div class="ucal__detalle-header">
-      <span>{{ diaSeleccionado | date: 'EEEE d MMMM' : '' : 'es' | titlecase }}</span>
-      @if (mostrarBotonNueva) {
-      <ion-button fill="clear" size="small" (click)="onNuevaCita()">
-        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-        Añadir
-      </ion-button>
-      }
-    </div>
-
-    @if (citasDelDia.length === 0) {
-    <p class="ucal__empty">Sin citas este día</p>
-    }
-
-    @for (cita of citasDelDia; track cita.id) {
-    @if (usaCitaCard) {
-    <app-cita-card [cita]="cita" [mostrarAcciones]="true" (editar)="editarCita.emit($event)"
-      (facturar)="facturarCita.emit($event)"></app-cita-card>
-    } @else {
-    <div class="ucal__cita-row" (click)="onCitaClick(cita)">
-      <div class="ucal__cita-hora">{{ cita.fecha_hora | date: 'HH:mm' }}</div>
-      <div class="ucal__cita-info">
-        <span class="ucal__cita-nombre">
-          {{ cita.pacientes?.usuarios?.nombre }} {{ cita.pacientes?.usuarios?.apellidos }}
-        </span>
-        <span class="ucal__cita-meta">
-          <ion-icon [name]="cita.tipo === 'videollamada' ? 'videocam-outline' : 'location-outline'"></ion-icon>
-          {{ cita.tipo }} · {{ cita.duracion_min }} min
-        </span>
-
-        @if (citaPasada(cita) && !cita.facturada && cita.estado === 'confirmada') {
-        <ion-badge color="danger" style="margin-top: 4px; align-self: flex-start;">Sin facturar</ion-badge>
-        }
-        @if (cita.facturada) {
-        <ion-badge color="success" style="margin-top: 4px; align-self: flex-start;">Facturada</ion-badge>
+    <div class="ucal__detalle">
+      <div class="ucal__detalle-header">
+        <span>{{ diaSeleccionado | date: 'EEEE d MMMM' : '' : 'es' | titlecase }}</span>
+        @if (mostrarBotonNueva) {
+          <ion-button fill="clear" size="small" (click)="onNuevaCita()">
+            <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+            Añadir
+          </ion-button>
         }
       </div>
 
-      @if (mode === 'full' && citaPasada(cita) && !cita.facturada && cita.estado === 'confirmada') {
-      <ion-button fill="clear" color="primary" (click)="emitirFacturaEvent($event, cita)">
-        <ion-icon slot="start" name="document-text-outline"></ion-icon>
-        Facturar
-      </ion-button>
+      @if (citasDelDia.length === 0) {
+        <p class="ucal__empty">Sin citas este día</p>
       }
 
-      <ion-badge [color]="colorEstado(cita.estado)">{{ cita.estado }}</ion-badge>
+      @for (cita of citasDelDia; track cita.id) {
+        @if (usaCitaCard) {
+          <app-cita-card
+            [cita]="cita"
+            [mostrarAcciones]="!esPaciente"
+            [permitirFacturar]="puedeFacturar"
+            [esPaciente]="esPaciente"
+            (editar)="editarCita.emit($event)"
+            (facturar)="facturarCita.emit($event)"
+            (eliminar)="eliminarCita.emit($event)"
+          >
+          </app-cita-card>
+        } @else {
+          <div class="ucal__cita-row" (click)="onCitaClick(cita)">
+            <div class="ucal__cita-hora">{{ cita.fecha_hora | date: 'HH:mm' }}</div>
+            <div class="ucal__cita-info">
+              <span class="ucal__cita-nombre">
+                {{ cita.pacientes?.usuarios?.nombre }} {{ cita.pacientes?.usuarios?.apellidos }}
+              </span>
+              <span class="ucal__cita-meta">
+                <ion-icon
+                  [name]="cita.tipo === 'videollamada' ? 'videocam-outline' : 'location-outline'"
+                ></ion-icon>
+                {{ cita.tipo }} · {{ cita.duracion_min }} min
+              </span>
+
+              @if (citaPasada(cita) && !cita.facturada && cita.estado === 'confirmada') {
+                <ion-badge color="danger" style="margin-top: 4px; align-self: flex-start"
+                  >Sin facturar</ion-badge
+                >
+              }
+              @if (cita.facturada) {
+                <ion-badge color="success" style="margin-top: 4px; align-self: flex-start"
+                  >Facturada</ion-badge
+                >
+              }
+            </div>
+
+            @if (
+              mode === 'full' &&
+              puedeFacturar &&
+              citaPasada(cita) &&
+              !cita.facturada &&
+              cita.estado === 'confirmada'
+            ) {
+              <ion-button fill="clear" color="primary" (click)="emitirFacturaEvent($event, cita)">
+                <ion-icon slot="start" name="document-text-outline"></ion-icon>
+                Facturar
+              </ion-button>
+            }
+
+            <ion-badge [color]="colorEstado(cita.estado)">{{ cita.estado }}</ion-badge>
+          </div>
+        }
+      }
     </div>
-    }
-    }
-  </div>
   }
 </div>
