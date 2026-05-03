@@ -2,9 +2,21 @@ import { ChangeDetectorRef, Component, Input, OnInit, inject, signal } from '@an
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonButton, IonContent, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption,
-  IonTextarea, IonSpinner, ModalController, IonSearchbar, IonList, IonAvatar,
-  IonIcon, IonChip
+  IonButton,
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+  IonTextarea,
+  IonSpinner,
+  ModalController,
+  IonSearchbar,
+  IonList,
+  IonAvatar,
+  IonIcon,
+  IonChip,
 } from '@ionic/angular/standalone';
 import { CitasService, Cita } from '../../../core/services/citas';
 import { PacientesService } from '../../../core/services/pacientes';
@@ -15,9 +27,22 @@ import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionico
   selector: 'app-modal-cita',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, IonButton, IonContent, IonItem, IonLabel, IonInput,
-    IonSelect, IonSelectOption, IonTextarea, IonSpinner, IonSearchbar, IonList,
-    IonAvatar, IonIcon, IonChip,
+    CommonModule,
+    FormsModule,
+    IonButton,
+    IonContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonSelect,
+    IonSelectOption,
+    IonTextarea,
+    IonSpinner,
+    IonSearchbar,
+    IonList,
+    IonAvatar,
+    IonIcon,
+    IonChip,
   ],
   templateUrl: './modal-cita.html',
   styleUrls: ['./modal-cita.css'],
@@ -50,15 +75,15 @@ export class ModalCitaComponent implements OnInit {
     { label: '30 min', value: 30 },
     { label: '45 min', value: 45 },
     { label: '60 min', value: 60 },
-    { label: '90 min', value: 90 }
+    { label: '90 min', value: 90 },
   ];
 
   // CONSTANTES DE HORARIO Y MÁRGENES
-  readonly MARGEN_MINUTOS = 0;          // Citas consecutivas sin descanso (ej: 9:00 - 9:30 y 9:30 - 10:30)
+  readonly MARGEN_MINUTOS = 0; // Citas consecutivas sin descanso (ej: 9:00 - 9:30 y 9:30 - 10:30)
   readonly HORA_INICIO_MANANA = 9 * 60; // 09:00 (en minutos desde las 00:00)
-  readonly HORA_FIN_MANANA = 15 * 60;   // 15:00
+  readonly HORA_FIN_MANANA = 15 * 60; // 15:00
   readonly HORA_INICIO_TARDE = 16 * 60; // 16:00
-  readonly HORA_FIN_TARDE = 21 * 60;    // 21:00
+  readonly HORA_FIN_TARDE = 21 * 60; // 21:00
 
   horasDisponibles: string[] = [];
   citasDelDiaSeleccionado: any[] = [];
@@ -69,8 +94,12 @@ export class ModalCitaComponent implements OnInit {
   pacienteSeleccionadoId = '';
   pacienteSeleccionadoNombre = '';
 
-  get esEdicion() { return !!this.cita?.id; }
-  get titulo() { return this.esEdicion ? 'Editar cita' : 'Nueva cita'; }
+  get esEdicion() {
+    return !!this.cita?.id;
+  }
+  get titulo() {
+    return this.esEdicion ? 'Editar cita' : 'Nueva cita';
+  }
 
   constructor() {
     addIcons({ checkmarkCircle, closeCircleOutline, personCircleOutline });
@@ -107,13 +136,13 @@ export class ModalCitaComponent implements OnInit {
   async cargarCitasDelDia(fechaIso: string) {
     try {
       const todas = await this.citasService.getHorariosOcupadosNutricionista(this.nutricionistaId);
-      this.citasDelDiaSeleccionado = todas.filter(c => c.fecha_hora.startsWith(fechaIso));
+      this.citasDelDiaSeleccionado = todas.filter((c) => c.fecha_hora.startsWith(fechaIso));
       this.recalcularHoras();
     } catch (e) {
       console.error('Error al obtener horarios', e);
     } finally {
       // ESTO ES LO QUE OBLIGA A LA PANTALLA A DIBUJAR LAS HORAS AUTOMÁTICAMENTE
-      this.cdr.detectChanges(); 
+      this.cdr.detectChanges();
     }
   }
 
@@ -122,7 +151,7 @@ export class ModalCitaComponent implements OnInit {
     if (!val) return;
 
     this.fecha = val.split('T')[0];
-    if (!esCargaInicial) this.hora = ''; 
+    if (!esCargaInicial) this.hora = '';
     await this.cargarCitasDelDia(this.fecha);
   }
 
@@ -131,13 +160,15 @@ export class ModalCitaComponent implements OnInit {
 
     const duracionMinima = 30;
 
-    const intervalosOcupados = this.citasDelDiaSeleccionado.map(cita => {
-      if (this.esEdicion && this.cita?.id === cita.id) return null;
-      
-      const d = new Date(cita.fecha_hora);
-      const start = d.getHours() * 60 + d.getMinutes();
-      return { start, end: start + (cita.duracion_min || 30) + this.MARGEN_MINUTOS };
-    }).filter(i => i !== null) as {start: number, end: number}[];
+    const intervalosOcupados = this.citasDelDiaSeleccionado
+      .map((cita) => {
+        if (this.esEdicion && this.cita?.id === cita.id) return null;
+
+        const d = new Date(cita.fecha_hora);
+        const start = d.getHours() * 60 + d.getMinutes();
+        return { start, end: start + (cita.duracion_min || 30) + this.MARGEN_MINUTOS };
+      })
+      .filter((i) => i !== null) as { start: number; end: number }[];
 
     const slots: string[] = [];
 
@@ -161,7 +192,11 @@ export class ModalCitaComponent implements OnInit {
     this.cdr.detectChanges(); // FUERZA LA ACTUALIZACIÓN VISUAL
   }
 
-  private esSlotLibre(start: number, end: number, ocupados: {start: number, end: number}[]): boolean {
+  private esSlotLibre(
+    start: number,
+    end: number,
+    ocupados: { start: number; end: number }[],
+  ): boolean {
     for (const o of ocupados) {
       // Hay solapamiento si mi hora de inicio es menor que el fin de otra, y mi fin es mayor que el inicio de otra
       if (start < o.end && end > o.start) {
@@ -174,17 +209,19 @@ export class ModalCitaComponent implements OnInit {
   // Valida si la duración seleccionada "cabe" antes de la próxima cita
   esDuracionValida(duracionCandidata: number): boolean {
     if (!this.hora) return true; // Si no ha elegido hora, no podemos saberlo
-    
+
     const [h, m] = this.hora.split(':').map(Number);
     const inicioSelected = h * 60 + m;
     const finCandidato = inicioSelected + duracionCandidata;
 
     // Buscamos todas las citas que empiecen DESPUÉS de la hora que ha elegido
-    const intervalosOcupados = this.citasDelDiaSeleccionado.map(cita => {
+    const intervalosOcupados = this.citasDelDiaSeleccionado
+      .map((cita) => {
         if (this.esEdicion && this.cita?.id === cita.id) return null;
         const d = new Date(cita.fecha_hora);
         return d.getHours() * 60 + d.getMinutes();
-    }).filter(start => start !== null && start > inicioSelected) as number[];
+      })
+      .filter((start) => start !== null && start > inicioSelected) as number[];
 
     if (intervalosOcupados.length === 0) return true; // No hay más citas hoy después de esta
 
@@ -192,11 +229,13 @@ export class ModalCitaComponent implements OnInit {
     const proximaCitaStart = Math.min(...intervalosOcupados);
 
     // Es válido si nuestra cita candidata (más el margen) termina a la misma hora o antes que empiece la siguiente
-    return (finCandidato + this.MARGEN_MINUTOS) <= proximaCitaStart;
+    return finCandidato + this.MARGEN_MINUTOS <= proximaCitaStart;
   }
 
   private minutosAHora(m: number): string {
-    const horas = Math.floor(m / 60).toString().padStart(2, '0');
+    const horas = Math.floor(m / 60)
+      .toString()
+      .padStart(2, '0');
     const mins = (m % 60).toString().padStart(2, '0');
     return `${horas}:${mins}`;
   }
@@ -236,6 +275,7 @@ export class ModalCitaComponent implements OnInit {
     try {
       const fecha_hora = new Date(`${this.fecha}T${this.hora}`).toISOString();
 
+      // AQUÍ ESTÁ EL CAMBIO EN EL PAYLOAD
       const payload: Omit<Cita, 'id'> = {
         paciente_id: this.pacienteSeleccionadoId,
         nutricionista_id: this.nutricionistaId,
@@ -244,7 +284,9 @@ export class ModalCitaComponent implements OnInit {
         tipo: this.tipo,
         estado: this.esPaciente ? 'pendiente' : this.estado,
         notas: this.notas || undefined,
-        url_videollamada: this.tipo === 'videollamada' ? this.urlVideo || undefined : undefined,
+        // Limpiamos la URL de videollamada si quien guarda es el paciente
+        url_videollamada:
+          this.tipo === 'videollamada' && !this.esPaciente ? this.urlVideo || undefined : undefined,
       };
 
       if (this.esEdicion) {

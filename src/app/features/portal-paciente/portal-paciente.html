@@ -44,9 +44,9 @@
       @if (proximaCita()) {
         <ion-card class="dash-card appointment-card-v2">
           <ion-card-header>
-            <ion-card-title
-              ><ion-icon name="calendar-outline"></ion-icon> PRÓXIMA CITA</ion-card-title
-            >
+            <ion-card-title>
+              <ion-icon name="calendar-outline"></ion-icon> PRÓXIMA CITA
+            </ion-card-title>
           </ion-card-header>
           <ion-card-content class="appointment-content-pad">
             <div class="appointment-layout">
@@ -54,18 +54,33 @@
                 <span class="day">{{ proximaCita()!.fecha_hora | date: 'dd' }}</span>
                 <span class="month">{{ proximaCita()!.fecha_hora | date: 'MMM' | uppercase }}</span>
               </div>
-              <div class="details-v2">
+              <div class="details-v2" style="flex: 1">
                 <strong>{{ proximaCita()!.fecha_hora | date: 'HH:mm' }}h</strong>
-                <p>
-                  <ion-icon
-                    [name]="
-                      proximaCita()!.tipo === 'videollamada'
-                        ? 'videocam-outline'
-                        : 'location-outline'
-                    "
-                  ></ion-icon
-                  >Ver detalles
-                </p>
+
+                @if (proximaCita()!.tipo === 'videollamada' && proximaCita()!.url_videollamada) {
+                  <ion-button
+                    expand="block"
+                    size="small"
+                    [href]="proximaCita()!.url_videollamada"
+                    target="_blank"
+                    color="success"
+                    style="margin-top: 10px; --border-radius: 8px"
+                  >
+                    <ion-icon slot="start" name="videocam-outline"></ion-icon>
+                    Unirse ahora
+                  </ion-button>
+                } @else {
+                  <p>
+                    <ion-icon
+                      [name]="
+                        proximaCita()!.tipo === 'videollamada'
+                          ? 'videocam-outline'
+                          : 'location-outline'
+                      "
+                    ></ion-icon>
+                    {{ proximaCita()!.tipo | titlecase }}
+                  </p>
+                }
               </div>
             </div>
           </ion-card-content>

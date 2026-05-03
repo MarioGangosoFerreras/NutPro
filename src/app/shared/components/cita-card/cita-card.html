@@ -24,6 +24,42 @@
     <span class="cita-card__duracion">· {{ cita.duracion_min }} min</span>
   </div>
 
+  @if (cita.tipo === 'videollamada') {
+    <div
+      class="cita-card__online-info"
+      style="margin-top: 10px; padding: 10px; background: #f0f4f8; border-radius: 8px"
+    >
+      @if (cita.url_videollamada) {
+        <p style="margin: 0 0 8px 0; font-size: 12px; color: #2d6a4f; font-weight: 600">
+          <ion-icon
+            name="videocam-outline"
+            style="vertical-align: middle; margin-right: 4px"
+          ></ion-icon>
+          La sesión será online
+        </p>
+        <ion-button
+          expand="block"
+          size="small"
+          [href]="cita.url_videollamada"
+          target="_blank"
+          color="success"
+          style="margin: 0"
+        >
+          <ion-icon slot="start" name="link-outline"></ion-icon>
+          Unirse a la reunión
+        </ion-button>
+      } @else {
+        <p style="margin: 0; font-size: 12px; color: #64748b; font-style: italic">
+          <ion-icon
+            name="information-circle-outline"
+            style="vertical-align: middle; margin-right: 4px"
+          ></ion-icon>
+          El nutricionista adjuntará el enlace pronto.
+        </p>
+      }
+    </div>
+  }
+
   @if (mostrarAcciones) {
     <div class="cita-card__acciones">
       @if (cita.estado === 'pendiente' && !cita.facturada) {

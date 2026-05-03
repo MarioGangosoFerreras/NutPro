@@ -10,7 +10,9 @@ import {
   timeOutline,
   createOutline,
   documentTextOutline,
-  trashOutline, // Aseguramos que estén los iconos de acciones
+  trashOutline,
+  linkOutline, // <-- AÑADIDO
+  informationCircleOutline, // <-- AÑADIDO
 } from 'ionicons/icons';
 import { Cita } from '../../../core/services/citas';
 
@@ -23,10 +25,10 @@ import { Cita } from '../../../core/services/citas';
 })
 export class CitaCard {
   @Input() cita!: Cita;
-  @Input() mostrarPaciente = false; // en dashboard se muestra, en ficha no
-  @Input() mostrarAcciones = false; // confirmar/cancelar rápido
+  @Input() mostrarPaciente = false;
+  @Input() mostrarAcciones = false;
   @Input() permitirFacturar = true;
-  @Input() esPaciente = false; // <-- NUEVO: Para limpiar la interfaz del paciente
+  @Input() esPaciente = false;
 
   @Output() confirmar = new EventEmitter<Cita>();
   @Output() cancelar = new EventEmitter<Cita>();
@@ -44,6 +46,8 @@ export class CitaCard {
       createOutline,
       documentTextOutline,
       trashOutline,
+      linkOutline, // <-- AÑADIDO
+      informationCircleOutline, // <-- AÑADIDO
     });
   }
 
