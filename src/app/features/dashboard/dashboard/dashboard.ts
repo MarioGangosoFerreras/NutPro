@@ -20,6 +20,14 @@ import { SupabaseService } from '../../../core/services/supabase';
 import { addIcons } from 'ionicons';
 import { cashOutline, receiptOutline } from 'ionicons/icons';
 
+/**
+ * Componente principal del panel de control (dashboard) para el nutricionista.
+ * Reúne estadísticas clave, citas pendientes de facturar, calendario y vista previa de pacientes.
+ *
+ * @export
+ * @class Dashboard
+ * @implements {ViewWillEnter}
+ */
 @Component({
   selector: 'app-dashboard',
   imports: [
@@ -33,12 +41,14 @@ import { cashOutline, receiptOutline } from 'ionicons/icons';
 })
 export class Dashboard implements ViewWillEnter {
 
+  /** Referencia al componente hijo que muestra las estadísticas numéricas */
   @ViewChild(EstadisticasDashboardComponent) statsWidget!: EstadisticasDashboardComponent;
+  /** Referencia al componente hijo del calendario incrustado */
   @ViewChild(UniversalCalendar) calendarWidget!: UniversalCalendar;
 
   nombreUsuario = '';
   cargandoPagina = signal(true);
-  citasPendientes = signal<Cita[]>([]); // <--- NUEVA SEÑAL
+  citasPendientes = signal<Cita[]>([]);
 
   private citasService = inject(CitasService);
   private alertCtrl = inject(AlertController);
@@ -48,6 +58,13 @@ export class Dashboard implements ViewWillEnter {
   private docsService = inject(DocumentosService);
   private supabase = inject(SupabaseService).client;
 
+  /**
+   * Crea una instancia de Dashboard y registra los iconos usados en su vista.
+   *
+   * @param {AuthService} authService - Servicio de autenticación.
+   * @param {Router} router - Servicio de enrutamiento para navegar en la app.
+   * @param {ChangeDetectorRef} cdr - Herramienta para detectar cambios de interfaz.
+   */
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -56,6 +73,12 @@ export class Dashboard implements ViewWillEnter {
     addIcons({ cashOutline, receiptOutline });
   }
 
+  /**
+   * Evento de Ionic que se ejecuta justo antes de mostrar la vista.
+   * Recarga todos los datos del usuario, las facturas pendientes y refresca componentes hijos.
+   *
+   * @returns {Promise<void>}
+   */
   async ionViewWillEnter() {
     await this.cargarUsuario(); // Carga las facturas pendientes
 
@@ -68,6 +91,13 @@ export class Dashboard implements ViewWillEnter {
     }
   }
 
+  /**
+   * Carga los datos del usuario actual y, si es un nutricionista, 
+   * obtiene la lista de citas pendientes de facturar.
+   *
+   * @private
+   * @returns {Promise<void>}
+   */
   private async cargarUsuario() {
     try {
       const usuario = await this.authService.getUsuario();
@@ -90,12 +120,25 @@ export class Dashboard implements ViewWillEnter {
     }
   }
 
+  /**
+   * Cierra la sesión activa del usuario y lo redirige a la pantalla de login.
+   *
+   * @returns {Promise<void>}
+   */
   async logout() {
     await this.authService.signOut();
     this.router.navigate(['/login']);
   }
 
-  // 👇 Lógica para facturar directamente desde el dashboard 👇
+  // Lógica para facturar directamente desde el dashboard 
+
+  /**
+   * Despliega un diálogo para confirmar y recolectar el importe de una cita
+   * a facturar, y a continuación procesa la facturación.
+   *
+   * @param {Cita} cita - La cita que está pendiente de facturar.
+   * @returns {Promise<void>}
+   */
   async facturarCita(cita: Cita) {
     const alert = await this.alertCtrl.create({
       header: 'Generar Factura',
@@ -123,6 +166,15 @@ export class Dashboard implements ViewWillEnter {
     await alert.present();
   }
 
+  /**
+   * Ejecuta el flujo interno para crear el archivo PDF, registrar la factura en la base de datos,
+   * y actualizar el estado de la cita, refrescando la vista del panel principal al terminar.
+   *
+   * @private
+   * @param {Cita} cita - Objeto de la cita involucrada.
+   * @param {number} importe - Valor total a facturar.
+   * @returns {Promise<void>}
+   */
   private async procesarGeneracionFactura(cita: Cita, importe: number) {
     if (isNaN(importe) || importe <= 0) return;
 

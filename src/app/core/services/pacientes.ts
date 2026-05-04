@@ -2,20 +2,42 @@ import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase';
 
+/**
+ * Servicio de gestión de pacientes
+ * @description Proporciona métodos para consultar, crear, actualizar y eliminar pacientes
+ * desde la base de datos de Supabase. Gestiona también la carga de avatares en Cloudinary
+ * y el perfil del paciente logueado.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class PacientesService {
   private supabase: SupabaseClient;
 
+  /**
+   * Constructor del servicio
+   * @param {SupabaseService} supabaseService - Servicio de Supabase inyectado
+   */
   constructor(private supabaseService: SupabaseService) {
     this.supabase = this.supabaseService.client;
   }
 
+  /**
+   * Obtiene el cliente de Supabase
+   * @returns {SupabaseClient} Cliente de Supabase
+   */
   get supabaseClient() {
     return this.supabase;
   }
 
+  /**
+   * Obtiene la lista de pacientes de un nutricionista
+   * @async
+   * @param {string} nutricionistaId - ID del nutricionista
+   * @returns {Promise<any[]>} Array de pacientes con datos del usuario relacionado, ordenados por fecha de creación descendente
+   * @example
+   * const pacientes = await pacientesService.getPacientes('nutricionista-123');
+   */
   async getPacientes(nutricionistaId: string) {
     const { data, error } = await this.supabase
       .from('pacientes')
@@ -46,6 +68,14 @@ export class PacientesService {
     return data;
   }
 
+  /**
+   * Crea un nuevo paciente junto con su usuario asociado
+   * @async
+   * @param {any} datos - Objeto con los datos del paciente (nombre, apellidos, email, dni, fecha_nacimiento, sexo, etc.)
+   * @param {File | null} [avatarFile] - Archivo de imagen del avatar a subir a Cloudinary (opcional)
+   * @returns {Promise<{data: any | null, error: any}>} Objeto con los datos del paciente creado o error
+   * @throws {Error} Si hay error al crear el usuario o el paciente
+   */
   async crearPaciente(datos: any, avatarFile?: File | null) {
     let avatarUrl = null;
 
@@ -120,8 +150,12 @@ export class PacientesService {
     }
   }
 
-  // src/app/core/services/pacientes.ts
-
+  /**
+   * Obtiene los detalles completos de un paciente por su ID
+   * @async
+   * @param {string} id - ID del paciente
+   * @returns {Promise<any | null>} Objeto del paciente con datos del usuario y nutricionista relacionados, o null si hay error
+   */
   async getPacienteById(id: string) {
     const { data, error } = await this.supabase
       .from('pacientes')
@@ -156,6 +190,14 @@ export class PacientesService {
     return data;
   }
 
+  /**
+   * Actualiza los datos de un paciente existente
+   * @async
+   * @param {string} id - ID del paciente a actualizar
+   * @param {any} datos - Objeto con los datos a actualizar (nombre, apellidos, email, teléfono, dirección, etc.)
+   * @returns {Promise<void>}
+   * @throws {Error} Si hay error al actualizar el usuario o el paciente
+   */
   async actualizarPaciente(id: string, datos: any) {
     const {
       nombre,
@@ -212,6 +254,14 @@ export class PacientesService {
     if (errorPaciente) throw errorPaciente;
   }
 
+  /**
+   * Elimina un paciente y su usuario asociado
+   * @async
+   * @param {string} id - ID del paciente a eliminar
+   * @param {string} usuarioId - ID del usuario asociado al paciente
+   * @returns {Promise<void>}
+   * @throws {Error} Si hay error al eliminar el usuario
+   */
   async eliminarPaciente(id: string, usuarioId: string) {
     // Al borrar usuario, paciente se borra en cascada
     const { error } = await this.supabase.from('usuarios').delete().eq('id', usuarioId);
@@ -219,6 +269,13 @@ export class PacientesService {
     if (error) throw error;
   }
 
+  /**
+   * Obtiene una vista previa de pacientes con sus próximas citas ordenadas por fecha
+   * @async
+   * @param {string} nutricionistaId - ID del nutricionista
+   * @param {number} [limite=5] - Número máximo de pacientes a retornar
+   * @returns {Promise<any[]>} Array de pacientes con su próxima cita, ordenados por fecha de cita ascendente
+   */
   async getPacientesPreview(nutricionistaId: string, limite: number = 5) {
     // 1. Filtramos desde el inicio de hoy para que las citas que ya pasaron
     // hoy sigan apareciendo en la lista hasta que acabe el día.
@@ -276,13 +333,22 @@ export class PacientesService {
       .slice(0, limite); // Aplicamos el límite visual final
   }
 
-  // Método para limpiar canales desde el componente
+  /**
+   * Desuscribe y limpia un canal de Supabase para dejar de escuchar cambios en citas
+   * @async
+   * @param {any} canal - Canal de Supabase a limpiar
+   * @returns {Promise<void>}
+   */
   async desuscribirCitas(canal: any) {
     if (canal) await this.supabase.removeChannel(canal);
   }
 
-  // src/app/core/services/pacientes.ts
-
+  /**
+   * Obtiene el perfil completo del paciente logueado
+   * @async
+   * @param {string} usuarioId - ID del usuario (paciente) logueado
+   * @returns {Promise<any | null>} Objeto del perfil del paciente con datos del usuario y nutricionista, o null si hay error
+   */
   async getMiPerfilDePaciente(usuarioId: string) {
     const { data, error } = await this.supabase
       .from('pacientes')

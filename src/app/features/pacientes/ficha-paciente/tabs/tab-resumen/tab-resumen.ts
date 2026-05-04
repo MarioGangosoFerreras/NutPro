@@ -45,6 +45,14 @@ import {
   closeCircle,
 } from 'ionicons/icons';
 
+/**
+ * Componente "Dashboard" del paciente que recopila, expone a la vista,
+ * y en su contraparte condicional edita los parámetros biográficos, foto de perfil (avatar),
+ * de contacto y médicos (Alergias) más directos.
+ *
+ * @export
+ * @class TabResumen
+ */
 @Component({
   selector: 'app-tab-resumen',
   imports: [
@@ -76,8 +84,11 @@ import {
   styleUrl: './tab-resumen.css',
 })
 export class TabResumen {
+  /** Estructura central devuelta por GET id. */
   @Input() paciente: any;
+  /** Actualizador inyectado emitible tras POST al padre FichaPaciente que fuerza refresco Reactivo. */
   @Output() pacienteActualizado = new EventEmitter<any>();
+  /** Informa intencion de borrado permanente. */
   @Output() eliminarPaciente = new EventEmitter<void>();
 
   editando = false;
@@ -89,6 +100,14 @@ export class TabResumen {
   nuevaAlergia = '';
   nuevaIntolerancia = '';
 
+  /**
+   * Crea una instancia del tab-resumen.
+   *
+   * @param {PacientesService} pacientesService - Control CRUD BD.
+   * @param {CloudinaryService} cloudinaryService - Subidor para Blob Img Files de Avatar Upload con API.
+   * @param {ChangeDetectorRef} cdr - Angular CD.
+   * @param {ToastController} toastCtrl - Para notificar el completado asincrono exitoso en pantalla.
+   */
   constructor(
     private pacientesService: PacientesService,
     private cloudinaryService: CloudinaryService,
@@ -103,6 +122,12 @@ export class TabResumen {
     });
   }
 
+  /**
+   * Herramienta visual directa aritmética computada sobre fechas ISO 8601.
+   *
+   * @param {string} fechaNacimiento - Dato String AAAA-MM-DD.
+   * @returns {number} Valor Entero en Años edad.
+   */
   calcularEdad(fechaNacimiento: string): number {
     const hoy = new Date();
     const nac = new Date(fechaNacimiento);
@@ -112,11 +137,16 @@ export class TabResumen {
     return edad;
   }
 
+  /** Presenta un helper booleano invertido en ionic html toggleado con CDR. */
   toggleMenu() {
     this.menuAbierto = !this.menuAbierto;
     this.cdr.detectChanges();
   }
 
+  /**
+   * Población inicial local, tras pulsar boton en "Modificar / Edit".
+   * Rescata y copia todos los valores de `@Input` a unas variables reactivas propias llamadas form.
+   */
   iniciarEdicion() {
     this.form = {
       nombre: this.paciente.usuario?.nombre,
@@ -139,6 +169,7 @@ export class TabResumen {
     this.cdr.detectChanges();
   }
 
+  /** Cierra abruptamente vaciando toda previsualización local o foto insertada. */
   cancelarEdicion() {
     this.editando = false;
     this.avatarPreview = null;
@@ -146,6 +177,12 @@ export class TabResumen {
     this.cdr.detectChanges();
   }
 
+  /**
+   * Evento FileReader nativo extraído al seleccionar el popup de selector File de Sistema OS
+   * para procesar una visualización instantanea HTML local a través del Data URL.
+   *
+   * @param {*} event - Change event con File array.
+   */
   onAvatarChange(event: any) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -158,6 +195,13 @@ export class TabResumen {
     reader.readAsDataURL(file);
   }
 
+  /**
+   * Actualiza el modelo remoto de BD mandando como primer paso Cloudinary File si aplica,
+   * y después a través del endpoint base UPDATE todas las variables sobreescritas del user y la tabla.
+   * Tras finalizar, emite un re-construcción JSON (sin llamar HTTP Get) hacia su padre directo para repintar UI rápido.
+   *
+   * @returns {Promise<void>}
+   */
   async guardar() {
     this.guardando = true;
     try {
@@ -207,6 +251,12 @@ export class TabResumen {
     }
   }
 
+  /**
+   * Operador local HTML iterador push string genérico; no permite subidas de strings dobles duplicados o nulos ("").
+   *
+   * @param {('alergias' | 'intolerancias')} tipo - Propiedad target local array strings form.
+   * @param {string} input - Valor string real escrito.
+   */
   agregarTag(tipo: 'alergias' | 'intolerancias', input: string) {
     const valor = input.trim();
     if (!valor || this.form[tipo].includes(valor)) return;
@@ -216,15 +266,36 @@ export class TabResumen {
     this.cdr.detectChanges();
   }
 
+  /**
+   * Local array slice para un string del input extraído a partir de índice nativo del *ngFor.
+   *
+   * @param {('alergias' | 'intolerancias')} tipo - Input base target a manipular.
+   * @param {number} index - Referencia inidice HTML en array para borrar.
+   */
   eliminarTag(tipo: 'alergias' | 'intolerancias', index: number) {
     this.form[tipo] = this.form[tipo].filter((_: any, i: number) => i !== index);
     this.cdr.detectChanges();
   }
 
+  /**
+   * Escucha keypress eventos para automatizar en UI un tag-push sin clicks explicitos sobre su boton (+) solo usando salto de línea Enter.
+   *
+   * @param {KeyboardEvent} event - Interaccion hardware raton nativa de key HTML.
+   * @param {('alergias' | 'intolerancias')} tipo - Propiedad target form local.
+   * @param {string} valor - Valor base value a trasladar al push de array.
+   */
   onTagKeydown(event: KeyboardEvent, tipo: 'alergias' | 'intolerancias', valor: string) {
     if (event.key === 'Enter') this.agregarTag(tipo, valor);
   }
 
+  /**
+   * Helper unificador y automatizador privado para desplegar componentes asíncronos en capa Toast.
+   *
+   * @private
+   * @param {string} mensaje - El texto informativo de UX app.
+   * @param {string} color - El theme tipográfico para la maquetación.
+   * @returns {Promise<void>}
+   */
   private async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastCtrl.create({
       message: mensaje,

@@ -16,11 +16,25 @@ import { AuthService } from '../../../core/services/auth';
 import { CloudinaryService } from '../../../core/services/cloudinary';
 import { SupabaseService } from '../../../core/services/supabase';
 
+/**
+ * Interfaz que define la estructura de un centro de consulta de un nutricionista.
+ *
+ * @interface CentroConsulta
+ */
 interface CentroConsulta {
+  /** Nombre del centro, clínica o establecimiento */
   nombre: string;
+  /** Dirección física del centro de consulta */
   direccion: string;
 }
 
+/**
+ * Componente encargado del registro de nuevos nutricionistas en la plataforma.
+ * Maneja la recolección de datos personales, profesionales, centros de consulta, facturación y subida de avatar.
+ *
+ * @export
+ * @class Register
+ */
 @Component({
   selector: 'app-register',
   imports: [
@@ -54,6 +68,7 @@ export class Register {
   bio = '';
 
   // Centros de consulta
+  /** Lista dinámica de centros donde el nutricionista pasa consulta */
   centros: CentroConsulta[] = [{ nombre: '', direccion: '' }];
 
   // Facturación
@@ -67,6 +82,15 @@ export class Register {
   loading = false;
   errorMessage = '';
 
+  /**
+   * Crea una instancia del componente Register y registra los iconos usados en la vista.
+   *
+   * @param {AuthService} authService - Servicio para manejar la creación de cuenta en Auth.
+   * @param {CloudinaryService} cloudinaryService - Servicio para la subida de imágenes a Cloudinary.
+   * @param {SupabaseService} supabase - Servicio de base de datos de Supabase.
+   * @param {Router} router - Servicio de enrutamiento de Angular.
+   * @param {ChangeDetectorRef} cdr - Servicio para forzar la detección de cambios en la vista.
+   */
   constructor(
     private authService: AuthService,
     private cloudinaryService: CloudinaryService,
@@ -77,6 +101,12 @@ export class Register {
     addIcons({ cameraOutline, personCircleOutline, addOutline, trashOutline });
   }
 
+  /**
+   * Manejador ejecutado al seleccionar una imagen para el avatar.
+   * Extrae el archivo y genera una vista previa en base64.
+   *
+   * @param {*} event - Objeto del evento de selección de archivo.
+   */
   onAvatarSelected(event: any) {
     const file = event.target.files[0];
     if (!file) return;
@@ -88,14 +118,29 @@ export class Register {
     reader.readAsDataURL(file);
   }
 
+  /**
+   * Añade un nuevo centro de consulta vacío a la lista dinámica de centros.
+   */
   addCentro() {
     this.centros.push({ nombre: '', direccion: '' });
   }
 
+  /**
+   * Elimina un centro de consulta de la lista dinámica según el índice proporcionado.
+   *
+   * @param {number} index - Posición del centro a eliminar en el array.
+   */
   removeCentro(index: number) {
     this.centros.splice(index, 1);
   }
 
+  /**
+   * Ejecuta el proceso de registro del nutricionista.
+   * Valida campos obligatorios, sube el avatar a Cloudinary (si lo hay) 
+   * y crea la cuenta en Supabase Auth inyectando los metadatos necesarios.
+   *
+   * @returns {Promise<void>}
+   */
   async onRegister() {
     if (!this.nombre || !this.apellidos || !this.email || !this.password) {
       this.errorMessage = 'Por favor rellena todos los campos obligatorios';

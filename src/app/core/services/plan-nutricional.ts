@@ -2,11 +2,23 @@ import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase';
 import { AuthService } from './auth';
 
+/**
+ * Servicio para gestionar planes nutricionales de pacientes.
+ * Proporciona métodos para crear, obtener, modificar y gestionar planes nutricionales,
+ * así como menús semanales y sus entradas asociadas.
+ * @class PlanNutricionalService
+ */
 @Injectable({ providedIn: 'root' })
 export class PlanNutricionalService {
   private supabase = inject(SupabaseService).client;
   private authService = inject(AuthService);
 
+  /**
+   * Obtiene el plan nutricional activo de un paciente.
+   * @param {string} pacienteId - Identificador del paciente
+   * @returns {Promise<any>} El plan nutricional activo del paciente, o null si no existe
+   * @throws {Error} Si ocurre un error en la consulta a la base de datos
+   */
   async getPlanActivo(pacienteId: string) {
     const { data, error } = await this.supabase
       .from('planes_nutricionales')
@@ -20,6 +32,12 @@ export class PlanNutricionalService {
     return data;
   }
 
+  /**
+   * Obtiene el historial completo de planes nutricionales de un paciente.
+   * @param {string} pacienteId - Identificador del paciente
+   * @returns {Promise<any[]>} Lista de planes nutricionales ordenados por fecha de creación
+   * @throws {Error} Si ocurre un error en la consulta a la base de datos
+   */
   async getHistorialPlanes(pacienteId: string) {
     const { data, error } = await this.supabase
       .from('planes_nutricionales')
@@ -30,6 +48,14 @@ export class PlanNutricionalService {
     return data;
   }
 
+  /**
+   * Crea o actualiza un plan nutricional, desactivando planes anteriores.
+   * Desactiva todos los planes previos del paciente e inserta un nuevo plan activo.
+   * @param {string} pacienteId - Identificador del paciente
+   * @param {any} plan - Objeto con los datos del plan nutricional a crear
+   * @returns {Promise<any>} El nuevo plan nutricional creado
+   * @throws {Error} Si ocurre un error en la operación de base de datos
+   */
   async upsertPlan(pacienteId: string, plan: any) {
     await this.supabase
       .from('planes_nutricionales')
@@ -44,6 +70,14 @@ export class PlanNutricionalService {
     return data;
   }
 
+  /**
+   * Obtiene o crea un menú semanal para un plan nutricional.
+   * Si el menú no existe, crea uno nuevo con fechas de inicio y fin (7 días).
+   * @param {string} planId - Identificador del plan nutricional
+   * @param {string} pacienteId - Identificador del paciente propietario del plan
+   * @returns {Promise<any>} El menú semanal existente o recién creado
+   * @throws {Error} Si ocurre un error en la operación de base de datos
+   */
   async getOrCreateMenuParaPlan(planId: string, pacienteId: string) {
     let { data: menu, error } = await this.supabase
       .from('menus_semanales')
@@ -77,7 +111,13 @@ export class PlanNutricionalService {
     return menu;
   }
 
-  // Método de SOLO LECTURA para que lo use el paciente
+  /**
+   * Obtiene un menú semanal para un plan nutricional (solo lectura).
+   * Método de lectura para pacientes que necesitan ver su menú.
+   * @param {string} planId - Identificador del plan nutricional
+   * @returns {Promise<any>} El menú semanal asociado al plan, o null si no existe
+   * @throws {Error} Si ocurre un error en la consulta a la base de datos
+   */
   async getMenuParaPlan(planId: string) {
     const { data, error } = await this.supabase
       .from('menus_semanales')
@@ -89,6 +129,12 @@ export class PlanNutricionalService {
     return data;
   }
 
+  /**
+   * Obtiene todas las entradas (recetas) de un menú semanal.
+   * @param {string} menuId - Identificador del menú semanal
+   * @returns {Promise<any[]>} Lista de entradas con información de la receta asociada
+   * @throws {Error} Si ocurre un error en la consulta a la base de datos
+   */
   async getEntradasMenu(menuId: string) {
     const { data, error } = await this.supabase
       .from('menu_entradas')
@@ -98,6 +144,12 @@ export class PlanNutricionalService {
     return data || [];
   }
 
+  /**
+   * Añade una nueva entrada (receta) a un menú semanal.
+   * @param {any} entrada - Objeto con los datos de la entrada a añadir
+   * @returns {Promise<any>} La entrada recién creada con la información de la receta
+   * @throws {Error} Si ocurre un error en la inserción
+   */
   async addEntradaMenu(entrada: any) {
     const { data, error } = await this.supabase
       .from('menu_entradas')
@@ -108,12 +160,22 @@ export class PlanNutricionalService {
     return data;
   }
 
+  /**
+   * Elimina una entrada de un menú semanal.
+   * @param {string} id - Identificador de la entrada a eliminar
+   * @throws {Error} Si ocurre un error en la eliminación
+   */
   async deleteEntradaMenu(id: string) {
     const { error } = await this.supabase.from('menu_entradas').delete().eq('id', id);
     if (error) throw error;
   }
 
-  // Obtiene todos los menús semanales del paciente
+  /**
+   * Obtiene todos los menús semanales de un paciente con sus planes asociados.
+   * @param {string} pacienteId - Identificador del paciente
+   * @returns {Promise<any[]>} Lista de menús semanales ordenados por fecha de inicio (descendente)
+   * @throws {Error} Si ocurre un error en la consulta a la base de datos
+   */
   async getHistorialMenus(pacienteId: string) {
     const { data, error } = await this.supabase
       .from('menus_semanales')
@@ -124,7 +186,13 @@ export class PlanNutricionalService {
     return data || [];
   }
 
-  // Copia las recetas de un menú viejo al menú actual
+  /**
+   * Copia todas las entradas (recetas) de un menú antiguo a un menú nuevo.
+   * Elimina las entradas existentes en el menú destino antes de copiar.
+   * @param {string} menuOrigenId - Identificador del menú de origen
+   * @param {string} menuDestinoId - Identificador del menú destino
+   * @throws {Error} Si ocurre un error en la operación de base de datos
+   */
   async copiarEntradasMenu(menuOrigenId: string, menuDestinoId: string) {
     // 1. Borramos las recetas que haya en el menú actual para reemplazarlas
     await this.supabase.from('menu_entradas').delete().eq('menu_id', menuDestinoId);

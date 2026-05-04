@@ -46,6 +46,11 @@ import { FoodItem, FoodService, IngredienteLocal } from '../../../../core/servic
 import { CloudinaryService } from '../../../../core/services/cloudinary';
 import { Header } from "../../../../shared/components/header/header";
 
+/**
+ * Componente principal para la creación y edición de recetas.
+ * Permite gestionar la información básica, etiquetas, imagen y los ingredientes
+ * asociados a la receta, calculando dinámicamente los macronutrientes.
+ */
 @Component({
   selector: 'app-crear-receta',
   standalone: true,
@@ -74,7 +79,7 @@ import { Header } from "../../../../shared/components/header/header";
     IonCheckbox,
     IonBadge,
     Header
-],
+  ],
   templateUrl: './crear-receta.html',
 })
 export class CrearReceta {
@@ -87,6 +92,7 @@ export class CrearReceta {
 
   router = inject(Router);
 
+  // --- SEÑALES DE DATOS BÁSICOS DE LA RECETA ---
   nombre = signal('');
   instrucciones = signal('');
   raciones = signal(1);
@@ -95,20 +101,25 @@ export class CrearReceta {
   tiposComidaSeleccionados = signal<string[]>([]);
   etiquetasSeleccionadas = signal<string[]>([]);
 
+  // --- SEÑALES DE IMAGEN ---
   imagenUrl = signal<string | null>(null);
   subiendoImagen = signal(false);
 
+  // --- SEÑALES DE INGREDIENTES ---
   ingredientes = signal<IngredienteLocal[]>([]);
 
+  // --- SEÑALES DE BÚSQUEDA DE ALIMENTOS ---
   resultadosBusqueda = signal<FoodItem[]>([]);
   buscando = signal(false);
   busquedaQuery = signal('');
 
+  // --- SEÑALES DE SELECCIÓN Y CONFIGURACIÓN DE INGREDIENTE ---
   foodSeleccionado = signal<FoodItem | null>(null);
   cantidadGramos = signal(100);
   cantidadTexto = signal('');
   esOpcional = signal(false);
 
+  // --- SEÑALES DE MODO MANUAL DE ALIMENTOS ---
   modoManual = signal(false);
   manualNombre = signal('');
   manualCalorias = signal(0);
@@ -118,11 +129,15 @@ export class CrearReceta {
   manualFibra = signal(0);
   guardandoManual = signal(false);
 
+  // --- SEÑALES DE ESTADO DEL COMPONENTE ---
   modoEdicion = signal(false);
   recetaId = signal<string | null>(null);
   cargandoDatos = signal(false);
 
+  /** Opciones disponibles para clasificar la receta por tipo de comida */
   readonly tiposComida = ['desayuno', 'comida', 'cena', 'snack'];
+
+  /** Etiquetas dietéticas disponibles para la receta */
   readonly etiquetas = [
     'sin_gluten',
     'sin_lactosa',
@@ -133,6 +148,10 @@ export class CrearReceta {
     'alto_proteico',
   ];
 
+  /**
+   * Calcula los macronutrientes y calorías totales de la receta
+   * sumando los valores de todos los ingredientes añadidos según su cantidad.
+   */
   macrosTotales = computed(() => {
     const lista = this.ingredientes();
     return {
@@ -153,6 +172,10 @@ export class CrearReceta {
     };
   });
 
+  /**
+   * Calcula los macronutrientes y calorías por ración,
+   * dividiendo los macros totales entre el número de raciones especificadas.
+   */
   macrosPorRacion = computed(() => {
     const total = this.macrosTotales();
     const r = this.raciones() || 1;
@@ -164,10 +187,18 @@ export class CrearReceta {
     };
   });
 
+  /**
+   * Determina si el formulario es válido para ser guardado.
+   * Requiere al menos un nombre válido y un ingrediente.
+   */
   formularioValido = computed(
     () => this.nombre().trim().length >= 2 && this.ingredientes().length > 0,
   );
 
+  /**
+   * Proporciona una vista previa de los macros del ingrediente actualmente seleccionado
+   * en función de la cantidad en gramos especificada por el usuario.
+   */
   macrosPreview = computed(() => {
     const food = this.foodSeleccionado();
     if (!food) return null;
@@ -194,6 +225,10 @@ export class CrearReceta {
     });
   }
 
+  /**
+   * Método del ciclo de vida de Angular.
+   * Verifica si la URL contiene un ID para inicializar el componente en modo edición.
+   */
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -203,6 +238,11 @@ export class CrearReceta {
     }
   }
 
+  /**
+   * Carga los datos de una receta existente desde el servicio y
+   * puebla los campos del formulario para su edición.
+   * @param id Identificador único de la receta a cargar.
+   */
   async cargarRecetaParaEditar(id: string) {
     try {
       this.cargandoDatos.set(true);
@@ -240,6 +280,10 @@ export class CrearReceta {
     }
   }
 
+  /**
+   * Gestiona el evento de selección de un archivo de imagen, subiéndolo a Cloudinary.
+   * @param event Evento nativo del input file.
+   */
   async onSeleccionarImagen(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -260,12 +304,20 @@ export class CrearReceta {
     }
   }
 
+  /**
+   * Elimina la imagen actualmente asociada a la receta.
+   */
   quitarImagen() {
     this.imagenUrl.set(null);
   }
 
   private searchTimeout: any;
 
+  /**
+   * Se ejecuta al escribir en el buscador de ingredientes.
+   * Llama al servicio de alimentos con debounce para evitar múltiples peticiones.
+   * @param event Evento emitido por el IonSearchbar.
+   */
   onBuscarAlimento(event: any) {
     const query = event.detail.value?.trim();
     this.busquedaQuery.set(query);
@@ -295,13 +347,21 @@ export class CrearReceta {
     }, 400);
   }
 
-  // Método auxiliar para mostrar la fuente de forma legible en el HTML
+  /**
+   * Formatea la cadena de origen de la fuente para mostrar en la interfaz.
+   * @param fuente Código de la fuente del alimento (ej. 'off', 'manual').
+   * @returns Nombre legible de la base de datos o fuente.
+   */
   formatFuente(fuente: string | undefined): string {
     if (fuente === 'manual' || fuente === 'custom') return 'Base de datos propia';
     if (fuente === 'off') return 'Open Food Facts';
     return 'Base de datos'; // Por defecto/caché general
   }
 
+  /**
+   * Selecciona un alimento de los resultados de búsqueda para configurarlo.
+   * @param food Objeto del alimento seleccionado.
+   */
   seleccionarFood(food: FoodItem) {
     this.foodSeleccionado.set(food);
     this.cantidadGramos.set(100);
@@ -311,10 +371,16 @@ export class CrearReceta {
     this.busquedaQuery.set('');
   }
 
+  /**
+   * Cancela la selección actual del alimento y limpia el configurador.
+   */
   cancelarSeleccion() {
     this.foodSeleccionado.set(null);
   }
 
+  /**
+   * Confirma la configuración actual del ingrediente y lo añade a la lista de ingredientes de la receta.
+   */
   confirmarIngrediente() {
     const food = this.foodSeleccionado();
     if (!food || this.cantidadGramos() <= 0) return;
@@ -339,6 +405,10 @@ export class CrearReceta {
     this.foodSeleccionado.set(null);
   }
 
+  /**
+   * Guarda un alimento ingresado manualmente en la base de datos de usuario,
+   * y luego lo auto-selecciona para agregarlo a la receta.
+   */
   async guardarIngredienteManual() {
     if (!this.manualNombre().trim()) return;
     this.guardandoManual.set(true);
@@ -362,6 +432,9 @@ export class CrearReceta {
     }
   }
 
+  /**
+   * Limpia los campos del formulario de ingreso manual de alimentos.
+   */
   private limpiarFormManual() {
     this.manualNombre.set('');
     this.manualCalorias.set(0);
@@ -371,6 +444,11 @@ export class CrearReceta {
     this.manualFibra.set(0);
   }
 
+  /**
+   * Actualiza la cantidad en gramos de un ingrediente ya presente en la lista de la receta.
+   * @param index Índice del ingrediente en el array.
+   * @param valor Nueva cantidad en gramos (mínimo 1).
+   */
   actualizarCantidad(index: number, valor: number) {
     this.ingredientes.update((lista) => {
       const nueva = [...lista];
@@ -379,22 +457,38 @@ export class CrearReceta {
     });
   }
 
+  /**
+   * Elimina un ingrediente de la lista actual de la receta.
+   * @param index Índice del ingrediente a remover.
+   */
   quitarIngrediente(index: number) {
     this.ingredientes.update((lista) => lista.filter((_, i) => i !== index));
   }
 
+  /**
+   * Alterna la selección de una etiqueta de tipo de comida (ej: Desayuno, Cena).
+   * @param tipo Identificador del tipo de comida.
+   */
   toggleTipoComida(tipo: string) {
     this.tiposComidaSeleccionados.update((tipos) =>
       tipos.includes(tipo) ? tipos.filter((t) => t !== tipo) : [...tipos, tipo],
     );
   }
 
+  /**
+   * Alterna la selección de una etiqueta dietética especial (ej: sin_gluten, vegano).
+   * @param etiqueta Identificador de la etiqueta.
+   */
   toggleEtiqueta(etiqueta: string) {
     this.etiquetasSeleccionadas.update((ets) =>
       ets.includes(etiqueta) ? ets.filter((e) => e !== etiqueta) : [...ets, etiqueta],
     );
   }
 
+  /**
+   * Agrupa los datos del componente y los envía al servicio correspondiente
+   * para guardar la receta (crear nueva o actualizar existente).
+   */
   async guardarReceta() {
     if (!this.formularioValido()) return;
 
@@ -419,12 +513,12 @@ export class CrearReceta {
       let idRecetaActual = '';
 
       if (this.modoEdicion() && this.recetaId()) {
-        // ACTUALIZAR
+        // ACTUALIZAR RECETA EXISTENTE
         idRecetaActual = this.recetaId()!;
         await this.recetaService.actualizarReceta(idRecetaActual, datosReceta);
-        await this.recetaService.eliminarIngredientesDeReceta(idRecetaActual); // Limpieza
+        await this.recetaService.eliminarIngredientesDeReceta(idRecetaActual); // Limpieza de viejos ingredientes
       } else {
-        // CREAR
+        // CREAR NUEVA RECETA
         const recetaNueva = await this.recetaService.crearReceta(datosReceta);
         idRecetaActual = recetaNueva.id;
       }
@@ -449,7 +543,7 @@ export class CrearReceta {
         'success',
       );
 
-      // Volvemos al detalle si editamos, o a la lista general si creamos
+      // Redireccionamiento posterior
       if (this.modoEdicion()) {
         this.router.navigate(['/alimentacion/recetas', idRecetaActual]);
       } else {
@@ -461,6 +555,11 @@ export class CrearReceta {
     }
   }
 
+  /**
+   * Método de utilidad para renderizar Toasts (mensajes flotantes).
+   * @param message Mensaje a mostrar.
+   * @param color Color del componente (success, danger, warning).
+   */
   private async mostrarToast(message: string, color: string) {
     const toast = await this.toastCtrl.create({
       message,
@@ -471,6 +570,10 @@ export class CrearReceta {
     await toast.present();
   }
 
+  /**
+   * Hook de Ionic que se ejecuta justo antes de mostrar la vista.
+   * Sirve para limpiar el formulario y asegurar un estado inicial correcto.
+   */
   ionViewWillEnter() {
     this.nombre.set('');
     this.instrucciones.set('');

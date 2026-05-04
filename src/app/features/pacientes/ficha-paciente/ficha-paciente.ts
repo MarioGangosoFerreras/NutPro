@@ -51,6 +51,15 @@ import {
 import { AuthService } from '../../../core/services/auth';
 import { TabDocumentos } from "./tabs/tab-documentos/tab-documentos";
 
+/**
+ * Componente central y de mayor jerarquía al interactuar con un solo paciente.
+ * Aloja toda la ficha del paciente separada por pestañas (resumen, clínica, alimentación,
+ * mediciones, planes, citas, facturas).
+ *
+ * @export
+ * @class FichaPaciente
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-ficha-paciente',
   imports: [
@@ -82,17 +91,33 @@ export class FichaPaciente implements OnInit {
   paciente: any = null;
   loading = true;
   tabActiva = 'resumen';
+  
   private authService = inject(AuthService);
   private supabaseService = inject(SupabaseService);
   private supabase = this.supabaseService.client;
+  
+  /** Referencia del componente hijo (Resumen) para disparar funciones (ej. editar desde aquí) */
   @ViewChild(TabResumen) tabResumen!: TabResumen;
 
   menuAbierto = false;
 
+  /** Alterna la visibilidad del menú de acciones superior. */
   toggleMenu() {
     this.menuAbierto = !this.menuAbierto;
   }
 
+  /**
+   * Crea una instancia de FichaPaciente e inicializa sus iconos.
+   *
+   * @param {PacientesService} pacientesService - Servicio de pacientes.
+   * @param {FichaClinicaService} fichaClinicaService - Servicio principal de fichas clínicas y mediciones.
+   * @param {CloudinaryService} cloudinaryService - Servicio para gestión de imágenes.
+   * @param {ActivatedRoute} route - Route parameter helper.
+   * @param {Router} router - Angular router.
+   * @param {ChangeDetectorRef} cdr - Herramienta para reflejar los cambios en el DOM.
+   * @param {ToastController} toastCtrl - Para notificaciones.
+   * @param {AlertController} alertCtrl - Para alertas de confirmación.
+   */
   constructor(
     private pacientesService: PacientesService,
     public fichaClinicaService: FichaClinicaService,
@@ -118,6 +143,12 @@ export class FichaPaciente implements OnInit {
     });
   }
 
+  /**
+   * Al iniciar el componente, lee el ID del paciente proveniente en la URL,
+   * y efectúa la descarga inicial de toda la información básica requerida.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
@@ -143,6 +174,10 @@ export class FichaPaciente implements OnInit {
     }
   }
 
+  /**
+   * Fuerza al componente `tab-resumen` interno a entrar en modo edición
+   * si el usuario lo ordena desde el menú desplegable rápido.
+   */
   editarDesdeMenu() {
     this.menuAbierto = false;
     this.tabActiva = 'resumen'; // Cambiamos a la pestaña de resumen por si acaso
@@ -151,20 +186,38 @@ export class FichaPaciente implements OnInit {
     }, 100);
   }
 
+  /**
+   * Responde a los clics en el segmento superior y renderiza dinámicamente
+   * la pestaña (`app-tab-*`) que el usuario haya seleccionado.
+   *
+   * @param {*} event - Objeto del evento `ionChange` de `ion-segment`.
+   */
   onTabChange(event: any) {
     this.tabActiva = event.detail.value;
     this.cdr.detectChanges();
   }
 
+  /** Navega de regreso al listado general de pacientes. */
   volver() {
     this.router.navigate(['/pacientes']);
   }
 
+  /**
+   * Refleja los cambios localmente en la ficha después de una edición
+   * exitosa en el componente hijo `TabResumen`.
+   *
+   * @param {*} pacienteActualizado - El nuevo objeto con la información modificada.
+   */
   onPacienteActualizado(pacienteActualizado: any) {
     this.paciente = pacienteActualizado;
     this.cdr.detectChanges();
   }
 
+  /**
+   * Pide una doble confirmación al nutricionista antes de ejecutar el borrado permanente del paciente.
+   *
+   * @returns {Promise<void>}
+   */
   async onEliminarPaciente() {
     const alert = await this.alertCtrl.create({
       header: 'Eliminar paciente',
@@ -182,6 +235,12 @@ export class FichaPaciente implements OnInit {
     await alert.present();
   }
 
+  /**
+   * Llama a base de datos para destruir al paciente y lo redirige a la lista general.
+   *
+   * @private
+   * @returns {Promise<void>}
+   */
   private async eliminar() {
     try {
       await this.pacientesService.eliminarPaciente(this.paciente.id, this.paciente.usuario_id);
@@ -193,6 +252,12 @@ export class FichaPaciente implements OnInit {
     }
   }
 
+  /**
+   * Crea un Toast semántico con el aviso del estado en el componente actual.
+   *
+   * @param {string} mensaje - El aviso en sí.
+   * @param {string} color - El color de la UI Ionic (`primary`, `success`, `danger`, `warning`).
+   */
   async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastCtrl.create({
       message: mensaje,
@@ -204,6 +269,14 @@ export class FichaPaciente implements OnInit {
   }
 
   // 1. Obtener o crear el menú base para un plan
+  /**
+   * Consulta a base de datos el menú semanal vinculado a un plan y paciente específico.
+   * Si no existe uno, genera el registro primario por defecto.
+   *
+   * @param {string} planId - ID del plan nutricional base.
+   * @param {string} pacienteId - UUID de Supabase del paciente en BD.
+   * @returns {Promise<any>}
+   */
   async getOrCreateMenuParaPlan(planId: string, pacienteId: string) {
     // Buscar si ya existe un menú para este plan
     let { data: menu, error } = await this.supabase
@@ -237,6 +310,13 @@ export class FichaPaciente implements OnInit {
   }
 
   // 2. Obtener las recetas guardadas en el menú
+  /**
+   * Descarga la lista de registros de "entradas", es decir, todas las recetas asignadas
+   * a cada día y cada hora de comida en un determinado menú semanal.
+   *
+   * @param {string} menuId - El id relacional a la tabla menús_semanales.
+   * @returns {Promise<any[]>}
+   */
   async getEntradasMenu(menuId: string) {
     const { data, error } = await this.supabase
       .from('menu_entradas')
@@ -249,6 +329,12 @@ export class FichaPaciente implements OnInit {
   }
 
   // 3. Añadir una receta a un día/comida
+  /**
+   * Incorpora un nuevo plato/receta al menú indicando el día de la semana y si es comida, cena, etc.
+   *
+   * @param {*} entrada - Un payload tipado conteniendo `menu_id`, `receta_id`, `dia_semana`, `tipo_comida`, etc.
+   * @returns {Promise<any>}
+   */
   async addEntradaMenu(entrada: any) {
     const { data, error } = await this.supabase
       .from('menu_entradas')
@@ -262,6 +348,12 @@ export class FichaPaciente implements OnInit {
   }
 
   // 4. Eliminar una receta del menú
+  /**
+   * Elimina un plato/receta de la matriz del menú semanal utilizando su ID directo.
+   *
+   * @param {string} id - Id base de la entrada a limpiar.
+   * @returns {Promise<void>}
+   */
   async deleteEntradaMenu(id: string) {
     const { error } = await this.supabase.from('menu_entradas').delete().eq('id', id);
 

@@ -34,6 +34,14 @@ import {
 import { RecetaService, Receta } from '../../../../core/services/receta';
 import { AuthService } from '../../../../core/services/auth';
 
+/**
+ * Componente que muestra el detalle completo de una receta seleccionada.
+ * Permite visualizar su información nutricional, ingredientes, elaboración, 
+ * así como gestionar acciones como editar, ocultar o eliminar la receta.
+ * * @export
+ * @class DetalleReceta
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-detalle-receta',
   templateUrl: './detalle-receta.html',
@@ -67,11 +75,21 @@ export class DetalleReceta implements OnInit {
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
 
+  /** Señal reactiva que contiene los datos de la receta actual cargada */
   receta = signal<Receta | null>(null);
+  
+  /** Señal reactiva que almacena el UUID del usuario autenticado actualmente */
   miUsuarioId = signal<string>(''); // Almacenará el UUID de Auth
+  
+  /** Señal reactiva que indica si la información principal se está cargando */
   cargando = signal(true);
   error = signal<string | null>(null);
 
+  /**
+   * Valor computado que calcula dinámicamente los macronutrientes por ración 
+   * en función de los macronutrientes totales de la receta y el número de raciones.
+   * * @type {Signal<{ calorias: number; proteina: number; carbohidratos: number; grasa: number; } | null>}
+   */
   macrosPorRacion = computed(() => {
     const r = this.receta();
     if (!r) return null;
@@ -84,6 +102,9 @@ export class DetalleReceta implements OnInit {
     };
   });
 
+  /**
+   * Crea una instancia de DetalleReceta y registra los iconos de Ionic utilizados en el template.
+   */
   constructor() {
     addIcons({
       arrowBackOutline,
@@ -97,6 +118,12 @@ export class DetalleReceta implements OnInit {
     });
   }
 
+  /**
+   * Método del ciclo de vida de Angular. Se ejecuta al inicializar el componente.
+   * Obtiene el ID del usuario, recupera el ID de la receta de los parámetros 
+   * de la URL y ejecuta la carga de datos.
+   * * @returns {Promise<void>}
+   */
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     // IMPORTANTE: Usamos getUserId() para obtener el UUID de Auth
@@ -109,6 +136,13 @@ export class DetalleReceta implements OnInit {
     await this.cargarReceta(id);
   }
 
+  /**
+   * Carga los datos de una receta específica desde la base de datos a través del servicio.
+   * Actualiza los estados de carga y error correspondientes.
+   * * @private
+   * @param {string} id - El identificador único de la receta a cargar.
+   * @returns {Promise<void>}
+   */
   private async cargarReceta(id: string) {
     try {
       this.cargando.set(true);
@@ -122,6 +156,12 @@ export class DetalleReceta implements OnInit {
     }
   }
 
+  /**
+   * Muestra un diálogo de confirmación antes de eliminar u ocultar una receta.
+   * Si la receta es pública, ofrece la opción de ocultarla de la lista del usuario.
+   * Si es privada, ofrece la opción de eliminarla permanentemente.
+   * * @returns {Promise<void>}
+   */
   async confirmarEliminar() {
     const receta = this.receta();
     if (!receta) return;
@@ -145,6 +185,13 @@ export class DetalleReceta implements OnInit {
     await alert.present();
   }
 
+  /**
+   * Oculta una receta pública para que no aparezca en la lista personal del usuario.
+   * Redirige al listado tras finalizar la operación.
+   * * @private
+   * @param {string} id - El identificador de la receta a ocultar.
+   * @returns {Promise<void>}
+   */
   private async ocultarReceta(id: string) {
     const loading = await this.loadingCtrl.create({ message: 'Ocultando...', spinner: 'crescent' });
     await loading.present();
@@ -158,6 +205,13 @@ export class DetalleReceta implements OnInit {
     }
   }
 
+  /**
+   * Elimina de forma permanente una receta privada de la base de datos.
+   * Redirige al listado tras finalizar la operación con éxito.
+   * * @private
+   * @param {string} id - El identificador de la receta a eliminar.
+   * @returns {Promise<void>}
+   */
   private async eliminarReceta(id: string) {
     const loading = await this.loadingCtrl.create({
       message: 'Eliminando...',
@@ -174,14 +228,31 @@ export class DetalleReceta implements OnInit {
     }
   }
 
+  /**
+   * Navega de vuelta a la lista general de recetas.
+   * * @returns {void}
+   */
   volver() {
     this.router.navigate(['/alimentacion/recetas']);
   }
 
+  /**
+   * Calcula el valor de un macronutriente en función de los gramos del ingrediente aportado.
+   * * @param {number} macro - Cantidad del macronutriente base por cada 100g.
+   * @param {number} cantidad_g - Cantidad del ingrediente utilizado en gramos.
+   * @returns {number} Valor calculado del macronutriente redondeado a un decimal.
+   */
   calcularMacrosIngrediente(macro: number, cantidad_g: number): number {
     return Math.round(((macro * cantidad_g) / 100) * 10) / 10;
   }
 
+  /**
+   * Muestra un mensaje emergente (Toast) en la parte inferior de la pantalla.
+   * * @private
+   * @param {string} message - El mensaje de texto a mostrar.
+   * @param {string} color - El color semántico del toast (ej. 'success', 'danger').
+   * @returns {Promise<void>}
+   */
   private async mostrarToast(message: string, color: string) {
     const toast = await this.toastCtrl.create({
       message,

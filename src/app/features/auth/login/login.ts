@@ -9,6 +9,13 @@ import {
   IonSpinner,
 } from '@ionic/angular/standalone';
 
+/**
+ * Componente encargado del inicio de sesión de los usuarios (pacientes y nutricionistas).
+ * También gestiona la vista y lógica para la recuperación de contraseñas.
+ *
+ * @export
+ * @class Login
+ */
 @Component({
   selector: 'app-login',
   imports: [
@@ -27,20 +34,36 @@ export class Login {
   password = '';
   loading = false;
   errorMessage = '';
-  successMessage = ''; // Mensaje de éxito al enviar el correo
+  successMessage = '';
   modoRecuperar = false;
 
+  /**
+   * Crea una instancia del componente Login.
+   *
+   * @param {AuthService} authService - Servicio para manejar la autenticación en Supabase.
+   * @param {Router} router - Servicio de enrutamiento para navegar tras el login exitoso.
+   */
   constructor(
     private authService: AuthService,
     private router: Router
   ) { }
 
+  /**
+   * Alterna entre el modo de inicio de sesión normal y el modo de recuperación de contraseña.
+   * También limpia los mensajes de error y éxito previos.
+   */
   toggleModoRecuperar() {
     this.modoRecuperar = !this.modoRecuperar;
     this.errorMessage = '';
     this.successMessage = '';
   }
 
+  /**
+   * Ejecuta el proceso de inicio de sesión utilizando el email y contraseña proporcionados.
+   * Si tiene éxito, redirige al usuario a su panel correspondiente según su rol (paciente o nutricionista).
+   *
+   * @returns {Promise<void>}
+   */
   async onLogin() {
     this.loading = true;
     this.errorMessage = '';
@@ -63,6 +86,12 @@ export class Login {
     }
   }
 
+  /**
+   * Solicita el envío de un correo electrónico para restablecer la contraseña del usuario.
+   * Dependiendo del resultado de la petición, muestra un mensaje de éxito o de error.
+   *
+   * @returns {Promise<void>}
+   */
   async recuperarPassword() {
     this.errorMessage = '';
     this.successMessage = '';

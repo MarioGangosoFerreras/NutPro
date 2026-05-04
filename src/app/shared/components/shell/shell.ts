@@ -7,8 +7,8 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  peopleOutline, calendarOutline, gridOutline, logOutOutline, menuOutline, closeOutline, 
-  chevronForwardOutline, settingsOutline, giftOutline, personCircleOutline, restaurantOutline, 
+  peopleOutline, calendarOutline, gridOutline, logOutOutline, menuOutline, closeOutline,
+  chevronForwardOutline, settingsOutline, giftOutline, personCircleOutline, restaurantOutline,
   chatbubblesOutline, walletOutline, homeOutline, trendingUpOutline, documentTextOutline
 } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
@@ -46,7 +46,7 @@ export class Shell implements OnInit {
   }
 
   rutaActiva = signal('');
-  
+
   // Ruta de inicio dinámica según el rol
   homeRoute = signal('/dashboard');
 
@@ -82,23 +82,29 @@ export class Shell implements OnInit {
         avatar: user.avatar_url || null,
       });
 
-      if (user.rol === 'paciente') {
-        // Asignamos la ruta base del paciente
+      // Lógica separada por los 3 roles
+      if (user.rol === 'admin') {
+        this.homeRoute.set('/admin');
+
+        this.navItems.set([
+          { label: 'Panel Admin', icon: 'grid-outline', route: '/admin' },
+          { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
+        ]);
+      } else if (user.rol === 'paciente') {
         this.homeRoute.set('/portal-paciente');
-        
+
         this.navItems.set([
           { label: 'Inicio', icon: 'home-outline', route: '/portal-paciente' },
           { label: 'Mi Dieta', icon: 'restaurant-outline', route: '/portal-paciente/plan' },
           { label: 'Mi Evolución', icon: 'trending-up-outline', route: '/portal-paciente/evolucion' },
-          { label: 'Citas', icon: 'calendar-outline', route: '/portal-paciente/citas'},
-          { label: 'Docs y Facturas', icon: 'document-text-outline', route: '/portal-paciente/documentos'},
+          { label: 'Citas', icon: 'calendar-outline', route: '/portal-paciente/citas' },
+          { label: 'Docs y Facturas', icon: 'document-text-outline', route: '/portal-paciente/documentos' },
           { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' },
           { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
         ]);
       } else {
-        // Asignamos la ruta base del nutricionista/admin
         this.homeRoute.set('/dashboard');
-        
+
         this.navItems.set([
           { label: 'Inicio', icon: 'grid-outline', route: '/dashboard' },
           { label: 'Pacientes', icon: 'people-outline', route: '/pacientes' },
@@ -123,7 +129,7 @@ export class Shell implements OnInit {
 
   isActive(item: NavItem): boolean {
     const ruta = this.rutaActiva();
-    
+
     // Si la ruta del elemento es la principal de Inicio (/dashboard o /portal-paciente)
     // exigimos que sea una coincidencia EXACTA para no iluminarse en las demás secciones.
     if (item.route === '/portal-paciente' || item.route === '/dashboard') {

@@ -1,9 +1,16 @@
-// google-calendar-settings.component.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { GoogleCalendarService } from '../../core/services/google-calendar';
 
+/**
+ * Componente individual para configurar la vinculación y desvinculación
+ * de la cuenta de usuario con la API de Google Calendar.
+ *
+ * @export
+ * @class GoogleCalendarSettingsComponent
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-google-calendar-settings',
   standalone: true,
@@ -23,13 +30,29 @@ import { GoogleCalendarService } from '../../core/services/google-calendar';
   `
 })
 export class GoogleCalendarSettingsComponent implements OnInit {
+  /** Servicio inyectado que maneja los flujos de OAuth y operaciones de GCalendar */
   private gcalService = inject(GoogleCalendarService);
+  
+  /** Indica si la cuenta del usuario se encuentra actualmente vinculada */
   conectado = false;
 
+  /**
+   * Se ejecuta al inicializar el componente.
+   * Verifica el estado actual de la conexión consultando la base de datos.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     this.conectado = await this.gcalService.estaConectado();
   }
 
+  /**
+   * Alterna el estado de conexión con Google Calendar.
+   * Si está conectado, ejecuta la desconexión.
+   * Si no está conectado, dispara el flujo de autorización OAuth.
+   *
+   * @returns {Promise<void>}
+   */
   async toggleConexion() {
     if (this.conectado) {
       await this.gcalService.desconectar();

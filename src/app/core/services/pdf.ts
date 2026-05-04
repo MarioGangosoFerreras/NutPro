@@ -1,10 +1,21 @@
-// src/app/core/services/pdf.ts
 import { Injectable } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+/**
+ * Servicio para la generación de documentos PDF relacionados con nutrición.
+ * Proporciona funcionalidades para exportar menús semanales y generar facturas.
+ */
 @Injectable({ providedIn: 'root' })
 export class PdfService {
+  /**
+   * Exporta un menú semanal a PDF con los detalles del plan nutricional del paciente.
+   * 
+   * @param {any} paciente - Objeto del paciente con información de usuario y nutricionista
+   * @param {any} plan - Objeto con datos del plan nutricional (objetivo, calorías, etc.)
+   * @param {any[]} entradas - Array con las entradas del menú semanal por día y tipo de comida
+   * @returns {Promise<void>} Genera y descarga el PDF automáticamente
+   */
   async exportarMenuSemanal(paciente: any, plan: any, entradas: any[]) {
     // 1. CONFIGURACIÓN: 'l' para Landscape (Horizontal)
     const doc = new jsPDF('l', 'mm', 'a4');
@@ -118,6 +129,13 @@ export class PdfService {
     doc.save(filename);
   }
 
+  /**
+   * Convierte una imagen desde una URL en una cadena de texto Base64.
+   * 
+   * @param {string} imageUrl - URL de la imagen a convertir
+   * @returns {Promise<string>} Promesa que resuelve con la cadena Base64 de la imagen
+   * @throws {Error} Si no se puede obtener el contexto del canvas o si falla la carga de la imagen
+   */
   private getBase64ImageFromUrl(imageUrl: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -139,10 +157,15 @@ export class PdfService {
     });
   }
 
-  //PDF para factura (con cálculos de IVA y formato profesional)
-
-  // src/app/core/services/pdf.ts
-
+  /**
+   * Genera un PDF de factura con cálculos de IVA y formato profesional.
+   * 
+   * @param {any} cita - Objeto que contiene los datos de la cita (fecha, hora, tipo)
+   * @param {any} paciente - Objeto del paciente con información personal y de contacto
+   * @param {any} nutriData - Datos del profesional de nutrición (nombre, apellidos, DNI, dirección)
+   * @param {number} importeTotal - Importe total a facturar, incluyendo IVA (21%)
+   * @returns {Promise<Blob>} Promesa que resuelve con el Blob del PDF generado
+   */
   async generarFacturaPdfBlob(cita: any, paciente: any, nutriData: any, importeTotal: number): Promise<Blob> {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();

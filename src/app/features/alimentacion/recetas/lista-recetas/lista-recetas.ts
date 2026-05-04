@@ -39,6 +39,14 @@ import { AuthService } from '../../../../core/services/auth';
 import { Header } from '../../../../shared/components/header/header';
 import { Shell } from '../../../../shared/components/shell/shell';
 
+/**
+ * Componente que muestra el listado de recetas, permitiendo al usuario
+ * buscar, filtrar por tipo de comida y realizar acciones como ver detalle, 
+ * editar, ocultar o eliminar permanentemente las recetas.
+ * * @export
+ * @class ListaRecetas
+ * @implements {ViewWillEnter}
+ */
 @Component({
   selector: 'app-lista-recetas',
   templateUrl: './lista-recetas.html',
@@ -74,18 +82,29 @@ export class ListaRecetas implements ViewWillEnter {
   private cdr = inject(ChangeDetectorRef);
 
   // Estados de carga y datos
+  /** Señal reactiva que contiene todas las recetas activas/visibles */
   recetas = signal<Receta[]>([]);
+  /** Señal reactiva que contiene las recetas después de aplicar búsqueda y filtros */
   recetasFiltradas = signal<Receta[]>([]);
+  /** Señal reactiva que contiene las recetas que el usuario ha decidido ocultar */
   recetasOcultas = signal<Receta[]>([]);
+  /** Señal reactiva que indica si la vista está en estado de carga */
   cargando = signal(true);
 
   // Filtros y UI
+  /** Señal reactiva con el valor del filtro de tipo de comida actualmente activo */
   filtroActivo = signal('todas');
+  /** Señal reactiva que almacena el texto introducido en la barra de búsqueda */
   busqueda = signal('');
+  /** Señal reactiva que controla la visibilidad de la sección de recetas ocultas */
   verOcultas = signal(false);
+  
+  /** Identificador (UUID) del usuario autenticado actualmente */
   miUsuarioId = '';
+  /** Versión o identificador para uso misceláneo (por ejemplo cache) */
   version = 0;
 
+  /** Opciones de filtrado disponibles en la interfaz (segmentos) */
   readonly filtros = [
     { valor: 'todas', label: 'Todas' },
     { valor: 'desayuno', label: 'Desayuno' },
@@ -94,6 +113,9 @@ export class ListaRecetas implements ViewWillEnter {
     { valor: 'snack', label: 'Snacks' },
   ];
 
+  /**
+   * Crea una instancia de ListaRecetas y registra los iconos utilizados en el componente.
+   */
   constructor() {
     addIcons({
       add,
@@ -108,14 +130,28 @@ export class ListaRecetas implements ViewWillEnter {
     });
   }
 
+  /**
+   * Método del ciclo de vida de Ionic que se ejecuta antes de que la vista entre en transición.
+   * Inicializa la carga de las recetas.
+   * * @returns {Promise<void>}
+   */
   async ionViewWillEnter() {
     await this.cargarRecetas();
   }
 
+  /**
+   * Obtiene el estado de colapso del menú lateral desde el componente Shell.
+   * * @readonly
+   * @type {boolean}
+   */
   get collapsed() {
     return Shell.isCollapsed();
   }
 
+  /**
+   * Alterna el estado del menú lateral (colapsado/expandido) dependiendo del ancho de la ventana.
+   * * @returns {void}
+   */
   toggleMenu() {
     if (window.innerWidth >= 992) {
       Shell.isCollapsed.set(!Shell.isCollapsed());
@@ -124,6 +160,11 @@ export class ListaRecetas implements ViewWillEnter {
     }
   }
 
+  /**
+   * Carga desde la base de datos la lista general de recetas y la lista de IDs ocultos
+   * por el usuario actual, para luego separarlas en sus respectivas señales.
+   * * @returns {Promise<void>}
+   */
   async cargarRecetas() {
     try {
       this.cargando.set(true);
@@ -149,21 +190,41 @@ export class ListaRecetas implements ViewWillEnter {
     }
   }
 
+  /**
+   * Manejador del evento "pull to refresh". Recarga la lista de recetas y notifica al componente nativo al terminar.
+   * * @param {*} event - Objeto del evento emitido por el `ion-refresher`.
+   * @returns {Promise<void>}
+   */
   async onRefresh(event: any) {
     await this.cargarRecetas();
     event.target.complete();
   }
 
+  /**
+   * Maneja el cambio de valor en la barra de búsqueda y aplica los filtros actualizados.
+   * * @param {*} event - Objeto del evento emitido por el `ion-searchbar`.
+   * @returns {void}
+   */
   onBusqueda(event: any) {
     this.busqueda.set(event.detail.value?.toLowerCase() ?? '');
     this.aplicarFiltros();
   }
 
+  /**
+   * Maneja el cambio de filtro en los segmentos de tipos de comida y aplica los filtros actualizados.
+   * * @param {*} event - Objeto del evento emitido por el `ion-segment`.
+   * @returns {void}
+   */
   onFiltro(event: any) {
     this.filtroActivo.set(event.detail.value);
     this.aplicarFiltros();
   }
 
+  /**
+   * Aplica la lógica de filtrado sobre las recetas basándose tanto en la búsqueda de texto
+   * como en la pestaña de tipo de comida activa. Actualiza la señal `recetasFiltradas`.
+   * * @returns {void}
+   */
   aplicarFiltros() {
     let resultado = this.recetas();
 
@@ -179,7 +240,11 @@ export class ListaRecetas implements ViewWillEnter {
   }
 
   /**
-   * Determina si la receta se borra (privada) o se oculta (pública)
+   * Determina si la receta se borra definitivamente de la base de datos (privada)
+   * o si solamente se oculta del listado personal del usuario (pública).
+   * Muestra un diálogo de confirmación para procesar la acción.
+   * * @param {Receta} receta - Objeto de la receta a procesar.
+   * @returns {Promise<void>}
    */
   async gestionarAccionEliminar(receta: Receta) {
     const esPublica = receta.visibilidad === 'publica';
@@ -203,6 +268,12 @@ export class ListaRecetas implements ViewWillEnter {
     await alert.present();
   }
 
+  /**
+   * Oculta una receta para que no aparezca en el listado visible del usuario activo
+   * guardando dicha preferencia en base de datos. Recarga la lista tras realizar la acción.
+   * * @param {string} id - Identificador de la receta.
+   * @returns {Promise<void>}
+   */
   async ocultar(id: string) {
     try {
       await this.recetaService.ocultarReceta(id, this.miUsuarioId);
@@ -213,6 +284,12 @@ export class ListaRecetas implements ViewWillEnter {
     }
   }
 
+  /**
+   * Restaura la visibilidad de una receta previamente oculta por el usuario.
+   * Recarga la lista una vez terminada la petición.
+   * * @param {string} id - Identificador de la receta a restaurar.
+   * @returns {Promise<void>}
+   */
   async desocultar(id: string) {
     try {
       await this.recetaService.desocultarReceta(id, this.miUsuarioId);
@@ -223,6 +300,11 @@ export class ListaRecetas implements ViewWillEnter {
     }
   }
 
+  /**
+   * Elimina completamente la receta seleccionada de la base de datos.
+   * * @param {string} id - Identificador de la receta a eliminar.
+   * @returns {Promise<void>}
+   */
   async eliminarReceta(id: string) {
     try {
       await this.recetaService.eliminarReceta(id);
@@ -233,6 +315,11 @@ export class ListaRecetas implements ViewWillEnter {
     }
   }
 
+  /**
+   * Calcula y devuelve los macronutrientes correspondientes a una ración de la receta especificada.
+   * * @param {Receta} receta - La receta de la cual calcular los macros.
+   * @returns {{ kcal: number; prot: number; carbs: number; grasa: number; }} Un objeto con los macros divididos por el total de raciones.
+   */
   getMacrosPorRacion(receta: Receta) {
     const r = receta.raciones || 1;
     return {
@@ -243,6 +330,13 @@ export class ListaRecetas implements ViewWillEnter {
     };
   }
 
+  /**
+   * Muestra un mensaje emergente en la parte inferior de la pantalla.
+   * * @private
+   * @param {string} message - Texto de la notificación.
+   * @param {string} color - Color temático de la notificación.
+   * @returns {Promise<void>}
+   */
   private async mostrarToast(message: string, color: string) {
     const toast = await this.toastCtrl.create({
       message,

@@ -47,6 +47,15 @@ import {
 } from 'ionicons/icons';
 import { ModalCitaComponent } from '../../shared/components/modal-cita/modal-cita';
 
+/**
+ * Componente principal del área del paciente.
+ * Reúne la próxima cita, tarjeta del nutricionista a cargo, control de hábitos diarios 
+ * e información del menú asignado para hoy.
+ *
+ * @export
+ * @class PortalPaciente
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-portal-paciente',
   standalone: true,
@@ -92,12 +101,17 @@ export class PortalPaciente implements OnInit {
   modalRecetaAbierto = signal(false);
   recetaSeleccionada = signal<any>(null);
 
+  /**
+   * Cálculo computado que filtra del listado completo del menú únicamente los platos
+   * (entradasMenu) que correspondan al día de la semana actual.
+   */
   menuHoy = computed(() => {
     let diaActual = new Date().getDay();
     if (diaActual === 0) diaActual = 7;
     return this.entradasMenu().filter((e) => e.dia_semana === diaActual);
   });
 
+  /** Interfaz de configuración fija para estructurar las comidas */
   tiposComida = [
     { id: 'desayuno', label: 'Desayuno', icon: '☀️' },
     { id: 'comida', label: 'Almuerzo', icon: '🍽️' },
@@ -105,6 +119,7 @@ export class PortalPaciente implements OnInit {
     { id: 'cena', label: 'Cena', icon: '🌙' },
   ];
 
+  /** Registra los iconos usados localmente */
   constructor() {
     addIcons({
       personCircleOutline,
@@ -123,6 +138,12 @@ export class PortalPaciente implements OnInit {
     });
   }
 
+  /**
+   * Evento de inicio del portal del paciente. Carga secuencialmente el perfil,
+   * el plan nutricional activo y el historial de hábitos del día presente y establece la próxima cita.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     try {
       const usuario = await this.authService.getUsuario();
@@ -176,6 +197,12 @@ export class PortalPaciente implements OnInit {
     }
   }
 
+  /**
+   * Refleja los taps o interacciones del usuario en el widget del control de hábitos.
+   *
+   * @param {{ tipo: string; valor: number }} event - Los datos sobre qué hábito (agua, fruta, sueño)
+   * y a qué cantidad ha sido fijado el valor local.
+   */
   handleHabitoToggle(event: { tipo: string; valor: number }) {
     const tipo = event.tipo as 'agua' | 'fruta' | 'sueno';
     this.habitos.update((h) => {
@@ -186,6 +213,14 @@ export class PortalPaciente implements OnInit {
     });
   }
 
+  /**
+   * Guarda de forma persistente y asíncrona en base de datos la métrica alterada
+   * del tracker de hábitos usando la operación upsert (actualizar o crear si no existía el registro de hoy).
+   *
+   * @private
+   * @param {*} habitosActuales - Array consolidado con las cifras recién estipuladas.
+   * @returns {Promise<void>}
+   */
   private async guardarHabitosDB(habitosActuales: any) {
     await this.supabase.from('registro_habitos').upsert(
       {
@@ -199,17 +234,33 @@ export class PortalPaciente implements OnInit {
     );
   }
 
+  /**
+   * Obtiene la receta estipulada para un tipo de comida concreto para el día de hoy (ej. la comida para 'desayuno').
+   *
+   * @param {string} tipoId - Identificador de string para la hora del plato.
+   * @returns {*}
+   */
   getEntradaPorTipo(tipoId: string) {
     return this.menuHoy().find((e) => e.tipo_comida === tipoId);
   }
+
+  /** Abre un cuadro modal que muestra la foto completa, los macros y la elaboración de un plato. */
   abrirReceta(r: any) {
     this.recetaSeleccionada.set(r);
     this.modalRecetaAbierto.set(true);
   }
+
+  /** Cierra la pestaña abierta de la receta mostrada y limpia su estado. */
   cerrarReceta() {
     this.modalRecetaAbierto.set(false);
   }
 
+  /**
+   * Abre el Modal oficial de la interfaz de la aplicación preconfigurado para que
+   * el paciente en cuestión se agende una nueva cita con su nutricionista asignado.
+   *
+   * @returns {Promise<void>}
+   */
   async pedirCita() {
     const p = this.paciente();
     if (!p) return;

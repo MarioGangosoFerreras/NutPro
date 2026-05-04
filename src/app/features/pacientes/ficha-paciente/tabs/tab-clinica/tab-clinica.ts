@@ -9,6 +9,14 @@ import {
 import { addIcons } from 'ionicons';
 import { saveOutline } from 'ionicons/icons';
 
+/**
+ * Componente que gestiona la pestaña de "Clínica" en la ficha del paciente.
+ * Permite ver y editar los antecedentes familiares y personales.
+ *
+ * @export
+ * @class TabClinica
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-tab-clinica',
   imports: [
@@ -20,6 +28,7 @@ import { saveOutline } from 'ionicons/icons';
   styleUrl: './tab-clinica.css',
 })
 export class TabClinica implements OnInit {
+  /** Identificador único del paciente asociado. */
   @Input() pacienteId!: string;
 
   antFamiliares: any = null;
@@ -28,9 +37,18 @@ export class TabClinica implements OnInit {
   guardando = false;
   cambios = false;
 
+  /** Formulario bidireccional reactivo para antecedentes familiares. */
   formAntFam: any = {};
+  /** Formulario bidireccional reactivo para antecedentes personales. */
   formAntPer: any = {};
 
+  /**
+   * Crea una instancia de TabClinica e inicializa los iconos a emplear.
+   *
+   * @param {FichaClinicaService} fichaClinicaService - Interfaz que conecta la lógica local con peticiones de historiales y medidas a BD.
+   * @param {ChangeDetectorRef} cdr - Angular CD para reaccionar al binding tras resolver promesas.
+   * @param {ToastController} toastCtrl - Dispara avisos flotantes de feedback de UI en la parte de abajo.
+   */
   constructor(
     private fichaClinicaService: FichaClinicaService,
     private cdr: ChangeDetectorRef,
@@ -39,6 +57,12 @@ export class TabClinica implements OnInit {
     addIcons({ saveOutline });
   }
 
+  /**
+   * Al inicializar, busca los registros existentes del paciente. Si los hay, se asignan al modelo
+   * (formAntFam, formAntPer); si no, se inicializan con objetos limpios conteniendo su estructura base por defecto.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     this.loading = true;
     try {
@@ -62,8 +86,14 @@ export class TabClinica implements OnInit {
     }
   }
 
+  /** Disparado en cada keypress o toggle de UI para iluminar el botón de Guardar Cambios. */
   marcarCambios() { this.cambios = true; }
 
+  /**
+   * Hace efectivos los cambios de los dos formularios al mismo tiempo a la vez que resetea el flag de guardado.
+   *
+   * @returns {Promise<void>}
+   */
   async guardar() {
     this.guardando = true;
     try {
@@ -82,6 +112,14 @@ export class TabClinica implements OnInit {
     }
   }
 
+  /**
+   * Función unificadora para desplegar componentes Toast interactivos.
+   *
+   * @private
+   * @param {string} mensaje - El texto informativo.
+   * @param {string} color - El theme tipográfico para Ionic ('success'/'danger').
+   * @returns {Promise<void>}
+   */
   private async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastCtrl.create({ message: mensaje, duration: 2500, color, position: 'bottom' });
     await toast.present();

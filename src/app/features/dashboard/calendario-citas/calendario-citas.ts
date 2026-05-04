@@ -11,6 +11,14 @@ import { DocumentosService } from '../../../core/services/documentos';
 import { SupabaseService } from '../../../core/services/supabase';
 import { AuthService } from '../../../core/services/auth';
 
+/**
+ * Componente que muestra la vista principal de la agenda de citas del nutricionista,
+ * integrando el componente UniversalCalendar y permitiendo la facturación directa de citas.
+ *
+ * @export
+ * @class CalendarioCitas
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-calendario-citas',
   standalone: true,
@@ -19,11 +27,14 @@ import { AuthService } from '../../../core/services/auth';
 })
 export class CalendarioCitas implements OnInit {
   // Añadimos el ViewChild para acceder al calendario
+  /**
+   * Referencia al componente hijo UniversalCalendar para poder interactuar con él (ej. recargar el mes).
+   * @type {UniversalCalendar}
+   */
   @ViewChild(UniversalCalendar) calendarComponent!: UniversalCalendar;
 
   private menuCtrl = inject(MenuController);
   private cdr = inject(ChangeDetectorRef);
-
   private alertCtrl = inject(AlertController);
   private loadingCtrl = inject(LoadingController);
   private toastCtrl = inject(ToastController);
@@ -32,8 +43,16 @@ export class CalendarioCitas implements OnInit {
   private supabase = inject(SupabaseService).client;
   private authService = inject(AuthService);
 
+  /**
+   * Señal reactiva que indica si la página está cargando inicialmente.
+   * @type {import('@angular/core').WritableSignal<boolean>}
+   */
   cargandoPagina = signal(true);
 
+  /**
+   * Método del ciclo de vida de Angular. Se ejecuta al inicializar el componente.
+   * Simula un tiempo de carga inicial antes de mostrar el calendario completo.
+   */
   ngOnInit(): void {
     setTimeout(() => {
       this.cargandoPagina.set(false);
@@ -41,10 +60,19 @@ export class CalendarioCitas implements OnInit {
     }, 800);
   }
 
+  /**
+   * Obtiene el estado del menú lateral desde el componente Shell.
+   *
+   * @readonly
+   * @type {boolean}
+   */
   get collapsed() {
     return Shell.isCollapsed();
   }
 
+  /**
+   * Alterna la visibilidad del menú lateral (colapsado o expandido) dependiendo del ancho de la pantalla.
+   */
   toggleMenu() {
     if (window.innerWidth >= 992) {
       Shell.isCollapsed.set(!Shell.isCollapsed());
@@ -53,6 +81,13 @@ export class CalendarioCitas implements OnInit {
     }
   }
 
+  /**
+   * Inicia el proceso de facturación de una cita abriendo un cuadro de diálogo
+   * para confirmar el importe antes de generar el PDF.
+   *
+   * @param {Cita} cita - Objeto que contiene los detalles de la cita a facturar.
+   * @returns {Promise<void>}
+   */
   async generarFacturaDesdeCalendario(cita: Cita) {
     const alert = await this.alertCtrl.create({
       header: 'Generar Factura',
@@ -80,6 +115,15 @@ export class CalendarioCitas implements OnInit {
     await alert.present();
   }
 
+  /**
+   * Procesa la generación de la factura: crea el PDF, lo sube al almacenamiento,
+   * actualiza la base de datos para marcar la cita como facturada y refresca el calendario local.
+   *
+   * @private
+   * @param {Cita} cita - La cita que se va a facturar.
+   * @param {number} importe - El importe total a facturar.
+   * @returns {Promise<void>}
+   */
   private async procesarGeneracionFactura(cita: Cita, importe: number) {
     if (isNaN(importe) || importe <= 0) return;
 

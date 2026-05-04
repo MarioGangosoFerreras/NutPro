@@ -6,6 +6,13 @@ import { AuthService } from '../../../core/services/auth';
 import { Header } from '../../../shared/components/header/header';
 import { IonButton, IonContent, IonInput, IonSpinner, IonIcon } from '@ionic/angular/standalone';
 
+/**
+ * Componente que proporciona el formulario para la creación manual 
+ * de un nuevo paciente directamente por parte del nutricionista.
+ *
+ * @export
+ * @class NuevoPaciente
+ */
 @Component({
   selector: 'app-nuevo-paciente',
   imports: [
@@ -20,9 +27,12 @@ export class NuevoPaciente {
   nombre = '';
   apellidos = '';
 
+  /** Objeto File correspondiente a la imagen seleccionada para el avatar */
   avatarFile: File | null = null;
+  /** URL de vista previa base64 del avatar local antes de subirse */
   avatarPreview: string | null = null;
 
+  /** Objeto que almacena los diferentes campos de información personal y médica del paciente */
   paciente = {
     dni: '',
     fecha_nacimiento: '',
@@ -43,12 +53,25 @@ export class NuevoPaciente {
   loading = false;
   errorMessage = '';
 
+  /**
+   * Crea una instancia del componente NuevoPaciente.
+   *
+   * @param {PacientesService} pacientesService - Servicio para registrar el paciente en base de datos.
+   * @param {AuthService} authService - Servicio para interactuar con la sesión y usuario activo (el nutricionista).
+   * @param {Router} router - Servicio de navegación de Angular.
+   */
   constructor(
     private pacientesService: PacientesService,
     private authService: AuthService,
     private router: Router
   ) {}
 
+  /**
+   * Maneja el evento de selección de un archivo desde el explorador de archivos local,
+   * guardando el fichero en memoria y generando una vista previa en la variable `avatarPreview`.
+   *
+   * @param {*} event - Objeto del evento `change` del input de archivos.
+   */
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -61,6 +84,13 @@ export class NuevoPaciente {
     }
   }
 
+  /**
+   * Valida el formulario localmente, procesa las alergias/intolerancias
+   * y llama al servicio encargado de insertar tanto al usuario en autenticación 
+   * como el registro de paciente en base de datos y Cloudinary.
+   *
+   * @returns {Promise<void>}
+   */
   async guardar() {
     if (!this.nombre || !this.apellidos || !this.paciente.dni ||
       !this.paciente.fecha_nacimiento || !this.paciente.sexo ||

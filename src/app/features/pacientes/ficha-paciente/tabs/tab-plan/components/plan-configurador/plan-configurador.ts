@@ -10,6 +10,15 @@ import { calculatorOutline, saveOutline } from 'ionicons/icons';
 import { FichaClinicaService } from '../../../../../../../core/services/ficha-clinica';
 import { PlanNutricionalService } from '../../../../../../../core/services/plan-nutricional';
 
+/**
+ * Componente encargado de gestionar matemáticamente la parametrización base del paciente.
+ * Contiene inputs para aplicar factores de actividad u objetivos y genera
+ * las Kcal a mantener junto a sus variables de reparto de macronutrientes correspondientes.
+ *
+ * @export
+ * @class PlanConfiguradorComponent
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-plan-configurador',
   standalone: true,
@@ -21,10 +30,14 @@ import { PlanNutricionalService } from '../../../../../../../core/services/plan-
   templateUrl: './plan-configurador.html'
 })
 export class PlanConfiguradorComponent implements OnInit {
+  /** Se trae un reflejo de toda la información (usuario, datos nativos, genero...) . */
   @Input() paciente: any;
   
   // Setter para reaccionar cuando el plan llega desde la base de datos
   private _planActivo: any;
+  
+  /** * Asignador Reactivo: si ingresa un input ya poblado (no Null), fuerza a cargar e ignorar el auto-cálculo de 0.
+   */
   @Input() set planActivo(value: any) {
     this._planActivo = value;
     if (value) {
@@ -35,6 +48,7 @@ export class PlanConfiguradorComponent implements OnInit {
     return this._planActivo;
   }
 
+  /** Envío superior cuando el registro asincrónico fue un rotundo éxito. */
   @Output() guardado = new EventEmitter<any>();
 
   private fichaService = inject(FichaClinicaService);
@@ -57,10 +71,17 @@ export class PlanConfiguradorComponent implements OnInit {
   carbohidratos_g = 0; 
   grasas_g = 0;
 
+  /** Configura visualmente los vectores del marco e incrusta a memoria ionic general. */
   constructor() {
     addIcons({ calculatorOutline, saveOutline });
   }
 
+  /**
+   * Al ser desplegado o enfocado, auto-calcula su edad real hoy día con matemática sencilla,
+   * y llama al historico de medidas para intentar robarse la altura y el peso actual para dar su primer cálculo base automático.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     this.calcularEdad();
     
@@ -85,6 +106,11 @@ export class PlanConfiguradorComponent implements OnInit {
     }
   }
 
+  /**
+   * Sobrescribe y machaca los parámetros que hubieran por los extraídos netos desde Supabase.
+   *
+   * @param {*} plan - Constante estructurada extraída del plan ya existente.
+   */
   cargarPlan(plan: any) {
     this.tipo = plan.tipo;
     this.factor_actividad = plan.factor_actividad;
@@ -97,12 +123,19 @@ export class PlanConfiguradorComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  /**
+   * Método aritmético de diferencia de Años con comprobaciones para generar su valor biológico.
+   */
   calcularEdad() {
     if (!this.paciente.fecha_nacimiento) return;
     const nac = new Date(this.paciente.fecha_nacimiento);
     this.edad = new Date().getFullYear() - nac.getFullYear();
   }
 
+  /**
+   * Basado en la TMB (Mifflin-St Jeor), calcula el gasto base, lo multiplica por el factor escogido por combo box 
+   * y aplica un superavit (+400), déficit agresivo (-750), etc., calculando las Kcal resultantes automáticas.
+   */
   recalcular() {
     if (!this.peso || !this.altura || !this.edad) return;
 
@@ -133,6 +166,10 @@ export class PlanConfiguradorComponent implements OnInit {
     this.repartirMacrosPorDefecto();
   }
 
+  /**
+   * Formula un esqueleto lógico para dividir las macros estandarizadas por la literatura generalista
+   * (2g de prot x kilo, 1g de grasa x kilo), rellenando las kcal restantes con variables HC.
+   */
   repartirMacrosPorDefecto() {
     this.proteinas_g = Math.round(this.peso * 2.0);
     this.grasas_g = Math.round(this.peso * 1.0);
@@ -144,6 +181,12 @@ export class PlanConfiguradorComponent implements OnInit {
     this.carbohidratos_g = kcalRestantes > 0 ? Math.round(kcalRestantes / 4) : 0;
   }
 
+  /**
+   * Ordena persistir todo el JSON final al modelo "planes_nutricionales" mediante una directiva UPSERT
+   * desactivando el antiguo plan_activo, convirtiendo al nuevo en el actual.
+   *
+   * @returns {Promise<void>}
+   */
   async guardar() {
     this.guardando = true;
     try {

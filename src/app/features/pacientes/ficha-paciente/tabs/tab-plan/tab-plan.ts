@@ -31,6 +31,15 @@ import {
   restaurantOutline,
 } from 'ionicons/icons';
 
+/**
+ * Componente "Wrapper" que organiza en forma de tabs/segmentos lógicos
+ * todo el entorno que rodea a la dieta: el calculador, el menú actual
+ * y una hemeroteca de menús antiguos o pasados para previsualización o clonación.
+ *
+ * @export
+ * @class TabPlan
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-tab-plan',
   standalone: true,
@@ -57,7 +66,10 @@ import {
   templateUrl: './tab-plan.html',
 })
 export class TabPlan implements OnInit {
+  /** Paciente raíz del que dependemos mediante un scope superior. */
   @Input() paciente: any;
+
+  /** Estado de iteración Ionic del IonSegment UI. */
   vistaActiva: 'configuracion' | 'menu' | 'historial' = 'configuracion';
 
   planActivo: any = null;
@@ -70,6 +82,7 @@ export class TabPlan implements OnInit {
   menuPreview: any = null;
   entradasPreview: any[] = [];
 
+  /** Configuración array interior que subdivide horizontalmente los generadores. */
   dias = [
     { id: 1, nombre: 'Lunes' },
     { id: 2, nombre: 'Martes' },
@@ -80,6 +93,7 @@ export class TabPlan implements OnInit {
     { id: 7, nombre: 'Domingo' },
   ];
 
+  /** Configuración array interior que subdivide verticalmente. */
   tiposComida = [
     { id: 'desayuno', label: 'Desayuno' },
     { id: 'comida', label: 'Comida' },
@@ -91,14 +105,27 @@ export class TabPlan implements OnInit {
   private toastCtrl = inject(ToastController);
   private cdr = inject(ChangeDetectorRef);
 
+  /** Configura visualmente los vectores gráficos incorporándolos a memoria ionic global local. */
   constructor() {
     addIcons({ copyOutline, calendarOutline, eyeOutline, closeOutline, restaurantOutline });
   }
 
+  /**
+   * Al ser desplegado o enfocado, se auto-refresca disparando asíncronamente
+   * la obtención de todos los menús, y planificaciones de su historia activa y desactiva.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     await this.cargarDatos();
   }
 
+  /**
+   * Llama de forma asincrónica individual a los distintos endpoints/consultas de supabase y 
+   * puebla en memoria todas sus entidades de visualización.
+   *
+   * @returns {Promise<void>}
+   */
   async cargarDatos() {
     this.planActivo = await this.planService.getPlanActivo(this.paciente.id);
     this.historialPlanes = await this.planService.getHistorialPlanes(this.paciente.id);
@@ -106,6 +133,12 @@ export class TabPlan implements OnInit {
     this.cdr.detectChanges();
   }
 
+  /**
+   * Emisión desencadenada desde su hijo el `PlanConfigurador` cuando finaliza exitosamente un Upsert,
+   * asignando al instante al padre la nueva realidad forzando así a abrir la pestaña menú.
+   *
+   * @param {*} nuevoPlan - El nuevo JSON de datos guardado.
+   */
   onPlanGuardado(nuevoPlan: any) {
     this.planActivo = nuevoPlan;
     this.cargarDatos();
@@ -113,6 +146,13 @@ export class TabPlan implements OnInit {
   }
 
   // --- MÉTODOS DE VISTA PREVIA ---
+  /**
+   * Presenta una modalidad asíncrona superpuesta que hace una llamada extra 
+   * descargando exclusivamente las recetas (entradasMenu) de aquel mes y año seleccionado para observarlo sin editar.
+   *
+   * @param {*} menu - Menú original seleccionado del HTML *ngFor historial.
+   * @returns {Promise<void>}
+   */
   async abrirPreview(menu: any) {
     this.menuPreview = menu;
     this.modalPreviewAbierto = true;
@@ -128,12 +168,21 @@ export class TabPlan implements OnInit {
     }
   }
 
+  /** Baja el telón y la variable boleana modal y limpia residuos cacheados locales de consulta para no inflar la memoria ni corromper futuras previsualizaciones. */
   cerrarPreview() {
     this.modalPreviewAbierto = false;
     this.menuPreview = null;
     this.entradasPreview = [];
   }
 
+  /**
+   * Deconstruye el previw extraído extrayéndole solo los platos que concuerdan 
+   * al cruzar los for (día X y comida Y) en la visualización grid final modal de sólo lectura.
+   *
+   * @param {number} diaId - ID del L a D.
+   * @param {string} tipoComida - Formato String 'comida' | 'desayuno'.
+   * @returns {*} Variable de datos.
+   */
   obtenerEntradasPreview(diaId: number, tipoComida: string) {
     return this.entradasPreview.filter(
       (e) => e.dia_semana === diaId && e.tipo_comida === tipoComida,
@@ -141,6 +190,14 @@ export class TabPlan implements OnInit {
   }
 
   // --- MÉTODOS DE CLONACIÓN ---
+  /**
+   * Funcionalidad vital donde el profesional ahorra tiempo al machacar las entradas del menú "reciente"
+   * sobreponiendo iterativamente todas las antiguas copiadas al milímetro de otro menú en cuestión.
+   * Requiere sí o sí que exista un target plan activo donde sobreescribir.
+   *
+   * @param {*} menuViejo - ID del registro del objeto general contenedor de las recetas a reutilizar.
+   * @returns {Promise<void>}
+   */
   async clonarMenu(menuViejo: any) {
     if (!this.planActivo) {
       const toast = await this.toastCtrl.create({

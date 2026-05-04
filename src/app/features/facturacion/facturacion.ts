@@ -10,6 +10,15 @@ import { Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip }
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
 
+/**
+ * Componente principal del módulo de Facturación.
+ * Muestra métricas clave (KPIs), un gráfico de la evolución de los ingresos,
+ * y la lista de facturas emitidas, permitiendo marcar su estado de pago.
+ *
+ * @export
+ * @class Facturacion
+ * @implements {ViewWillEnter}
+ */
 @Component({
   selector: 'app-facturacion',
   standalone: true,
@@ -24,6 +33,7 @@ export class Facturacion implements ViewWillEnter {
   private toastCtrl = inject(ToastController);
 
   cargando = true;
+  /** Arreglo que almacena las facturas cargadas desde la base de datos */
   facturas: Documento[] = [];
 
   // KPIs
@@ -32,12 +42,22 @@ export class Facturacion implements ViewWillEnter {
   facturasMes = 0;
   ticketMedio = 0;
 
+  /** Instancia de la gráfica de Chart.js para su posterior destrucción y renderizado */
   chartInstance: Chart | null = null;
 
+  /**
+   * Crea una instancia del componente Facturacion y registra los iconos usados en la vista.
+   */
   constructor() {
     addIcons({ walletOutline, cashOutline, documentTextOutline, downloadOutline, trendingUpOutline, checkmarkCircle, timeOutline });
   }
 
+  /**
+   * Método del ciclo de vida de Ionic ejecutado justo antes de mostrar la vista.
+   * Carga las facturas del nutricionista actual, calcula los KPIs y renderiza la gráfica.
+   *
+   * @returns {Promise<void>}
+   */
   async ionViewWillEnter() {
     this.cargando = true;
     try {
@@ -58,6 +78,12 @@ export class Facturacion implements ViewWillEnter {
     }
   }
 
+  /**
+   * Calcula los Indicadores Clave de Rendimiento (KPIs) en base a las facturas actuales.
+   * Acumula los importes de las facturas cobradas para los ingresos y cuenta todas las facturas del mes.
+   *
+   * @returns {void}
+   */
   // 1. Modifica calcularKPIs para que solo sume lo PAGADO
   calcularKPIs() {
     const ahora = new Date();
@@ -73,7 +99,7 @@ export class Facturacion implements ViewWillEnter {
       const importe = f.importe || 0;
 
       if (fecha.getFullYear() === anioActual) {
-        // 👇 SOLO SUMAMOS AL TOTAL SI ESTÁ PAGADA
+        // SOLO SUMAMOS AL TOTAL SI ESTÁ PAGADA
         if (f.pagado) {
           this.ingresosAnio += importe;
           if (fecha.getMonth() === mesActual) {
@@ -91,6 +117,12 @@ export class Facturacion implements ViewWillEnter {
     this.ticketMedio = this.facturasMes > 0 ? (this.ingresosMes / this.facturasMes) : 0;
   }
 
+  /**
+   * Renderiza un gráfico de barras (Chart.js) que representa los ingresos reales (facturas cobradas) 
+   * agrupados por meses durante el año actual.
+   *
+   * @returns {void}
+   */
   // 2. Modifica el gráfico para que muestre solo lo COBRADO
   renderizarGrafico() {
     const canvas = document.getElementById('ingresosChart') as HTMLCanvasElement;
@@ -102,7 +134,7 @@ export class Facturacion implements ViewWillEnter {
 
     this.facturas.forEach(f => {
       const fecha = new Date(f.created_at);
-      // 👇 SOLO FILTRAMOS LOS PAGADOS PARA EL GRÁFICO
+      // SOLO FILTRAMOS LOS PAGADOS PARA EL GRÁFICO
       if (fecha.getFullYear() === anioActual && f.pagado) {
         ingresosCobrados[fecha.getMonth()] += (f.importe || 0);
       }
@@ -131,6 +163,13 @@ export class Facturacion implements ViewWillEnter {
     });
   }
 
+  /**
+   * Alterna el estado de pago de una factura en la base de datos y localmente.
+   * Al hacerlo, recalcula los KPIs y la gráfica, reflejando el cambio de ingresos reales.
+   *
+   * @param {Documento} factura - El objeto factura sobre el cual alterar el estado de pago.
+   * @returns {Promise<void>}
+   */
   // 3. Activa las funciones en togglePago
   async togglePago(factura: Documento) {
     const nuevoEstado = !factura.pagado;
@@ -140,7 +179,7 @@ export class Facturacion implements ViewWillEnter {
       // Actualizamos el objeto localmente
       factura.pagado = nuevoEstado;
 
-      // 👇 AHORA SÍ: Recalculamos todo para que el gráfico se mueva
+      // Recalculamos todo para que el gráfico se mueva
       this.calcularKPIs();
       this.renderizarGrafico();
 

@@ -26,6 +26,16 @@ import { PacientesService } from '../../core/services/pacientes';
 import { SupabaseService } from '../../core/services/supabase';
 import { Header } from '../../shared/components/header/header';
 
+/**
+ * Componente principal del módulo de mensajería (tipo WhatsApp Web).
+ * Permite tanto a nutricionistas como a pacientes comunicarse en tiempo real
+ * a través de un panel dividido (lista de contactos y sala de chat).
+ *
+ * @export
+ * @class Mensajes
+ * @implements {OnInit}
+ * @implements {OnDestroy}
+ */
 @Component({
   selector: 'app-mensajes',
   standalone: true,
@@ -43,6 +53,7 @@ import { Header } from '../../shared/components/header/header';
   styleUrls: ['./mensajes.css'],
 })
 export class Mensajes implements OnInit, OnDestroy {
+  /** Referencia al elemento del contenedor de mensajes para forzar el scroll inferior */
   @ViewChild('chatScroll') chatScroll!: ElementRef;
 
   private chatService = inject(ChatService);
@@ -57,18 +68,30 @@ export class Mensajes implements OnInit, OnDestroy {
   miPacienteId = '';
   rol = '';
 
+  /** Lista reactiva con todos los contactos (chats) disponibles */
   contactos = signal<any[]>([]);
+  /** Lista reactiva de los contactos tras aplicar filtros de búsqueda */
   contactosFiltrados = signal<any[]>([]);
+  /** Término de búsqueda actualmente introducido en el buscador */
   busquedaQuery = signal('');
 
+  /** Información del contacto que el usuario tiene abierto en el panel derecho */
   contactoActivo = signal<any>(null);
+  /** Identificador único del chat abierto actualmente */
   chatIdActivo = '';
+  /** Array reactivo de los mensajes dentro del chat activo */
   mensajes = signal<Mensaje[]>([]);
+  /** Texto enlazado al input del nuevo mensaje a enviar */
   nuevoMensaje = '';
 
+  /** Referencia a la suscripción del canal de mensajes en tiempo real para el chat activo */
   private realtimeChannel: any;
+  /** Referencia a la suscripción en tiempo real para mantener actualizada la lista de contactos */
   private listChannel: any;
 
+  /**
+   * Crea una instancia de Mensajes y registra los iconos de Ionic utilizados.
+   */
   constructor() {
     addIcons({
       sendOutline,
@@ -79,6 +102,13 @@ export class Mensajes implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Método de ciclo de vida de Angular. Inicializa el componente.
+   * Determina el rol del usuario, carga la lista de contactos correspondiente
+   * y se suscribe a los cambios globales para actualizar las notificaciones en la lista.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     const usuario = await this.authService.getUsuario();
     if (!usuario) return;
@@ -146,6 +176,12 @@ export class Mensajes implements OnInit, OnDestroy {
       .subscribe();
   }
 
+  /**
+   * Carga la lista de pacientes con los que el nutricionista puede hablar, 
+   * obteniendo simultáneamente el último mensaje y el contador de no leídos de cada chat.
+   *
+   * @returns {Promise<void>}
+   */
   async cargarContactosNutricionista() {
     const pacientes = await this.pacientesService.getPacientes(this.nutricionistaId);
     const chats = await this.chatService.getChatsNutricionista(this.nutricionistaId);
@@ -180,6 +216,12 @@ export class Mensajes implements OnInit, OnDestroy {
     this.contactosFiltrados.set(contactosMap);
   }
 
+  /**
+   * Carga el perfil del nutricionista asignado al paciente para crear el único
+   * contacto disponible en la vista de mensajes del paciente.
+   *
+   * @returns {Promise<void>}
+   */
   async cargarContactoNutricionista() {
     const miPerfil = await this.pacientesService.getMiPerfilDePaciente(this.miUsuarioId);
     if (!miPerfil || !miPerfil.nutricionista) return;
@@ -209,6 +251,11 @@ export class Mensajes implements OnInit, OnDestroy {
     this.contactosFiltrados.set([contactoNutri]);
   }
 
+  /**
+   * Filtra la lista de contactos en base al término introducido en la barra de búsqueda.
+   *
+   * @param {*} event - Objeto del evento de Ionic Searchbar.
+   */
   onBuscar(event: any) {
     const query = event.detail.value?.toLowerCase() || '';
     this.busquedaQuery.set(query);
@@ -223,6 +270,14 @@ export class Mensajes implements OnInit, OnDestroy {
     this.contactosFiltrados.set(filtrados);
   }
 
+  /**
+   * Maneja el evento de selección de un contacto en el panel izquierdo.
+   * Carga el historial del chat asociado, marca los mensajes como leídos
+   * y crea la suscripción en tiempo real para recibir mensajes nuevos de esa sala.
+   *
+   * @param {*} contacto - Objeto con la información del contacto seleccionado.
+   * @returns {Promise<void>}
+   */
   async seleccionarContacto(contacto: any) {
     if (this.realtimeChannel) {
       this.realtimeChannel.unsubscribe();
@@ -262,6 +317,11 @@ export class Mensajes implements OnInit, OnDestroy {
     this.scrollToBottom();
   }
 
+  /**
+   * Envía un nuevo mensaje al chat activo usando el texto en el input.
+   *
+   * @returns {Promise<void>}
+   */
   async enviar() {
     if (!this.nuevoMensaje.trim() || !this.chatIdActivo) return;
 
@@ -277,6 +337,11 @@ export class Mensajes implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Actualiza localmente el "último mensaje" de un contacto en el panel lateral.
+   *
+   * @param {string} texto - Contenido del mensaje que se acaba de enviar.
+   */
   actualizarUltimoMensajeLista(texto: string) {
     const current = this.contactoActivo();
     if (!current) return;
@@ -291,6 +356,9 @@ export class Mensajes implements OnInit, OnDestroy {
     this.onBuscar({ detail: { value: this.busquedaQuery() } });
   }
 
+  /**
+   * Ajusta automáticamente el scroll de la zona de chat hacia la parte inferior.
+   */
   scrollToBottom() {
     setTimeout(() => {
       if (this.chatScroll && this.chatScroll.nativeElement) {
@@ -299,6 +367,10 @@ export class Mensajes implements OnInit, OnDestroy {
     }, 100);
   }
 
+  /**
+   * Método de ciclo de vida invocado al destruir el componente.
+   * Elimina todas las suscripciones a canales en tiempo real activas.
+   */
   ngOnDestroy() {
     if (this.realtimeChannel) {
       this.realtimeChannel.unsubscribe();

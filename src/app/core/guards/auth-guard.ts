@@ -2,6 +2,14 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth';
 
+/**
+ * Guardia de autenticación que verifica si el usuario está autenticado y autorizado para acceder a la ruta.
+ * Comprueba la sesión del usuario, su existencia, y en caso de ser nutricionista, que esté verificado.
+ * Los administradores siempre tienen acceso.
+ * @param route La instantánea de la ruta activada.
+ * @param state El estado del enrutador.
+ * @returns Una promesa que resuelve a true si el acceso está permitido, false en caso contrario.
+ */
 export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);

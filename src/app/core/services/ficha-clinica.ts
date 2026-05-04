@@ -1,16 +1,35 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from './supabase';
 
+/**
+ * Servicio de gestión de Ficha Clínica.
+ * 
+ * Proporciona métodos para realizar operaciones CRUD en las diferentes secciones
+ * de la ficha clínica del paciente, incluyendo antecedentes familiares, antecedentes
+ * personales, encuesta alimentaria y mediciones.
+ */
 @Injectable({ providedIn: 'root' })
 export class FichaClinicaService {
   private supabase;
 
+  /**
+   * Constructor del servicio.
+   * 
+   * @param supabaseService - Servicio de Supabase inyectado.
+   */
   constructor(private supabaseService: SupabaseService) {
     this.supabase = this.supabaseService.client;
   }
 
   // ── ANTECEDENTES FAMILIARES ──────────────────────────────────────────────
 
+  /**
+   * Obtiene los antecedentes familiares de un paciente.
+   * 
+   * @param pacienteId - ID del paciente.
+   * @returns Objeto con los antecedentes familiares o null si no existen.
+   * @throws Error si ocurre un error en la consulta.
+   */
   async getAntecedentesFamiliares(pacienteId: string) {
     const { data, error } = await this.supabase
       .from('antecedentes_familiares')
@@ -21,6 +40,13 @@ export class FichaClinicaService {
     return data;
   }
 
+  /**
+   * Inserta o actualiza los antecedentes familiares de un paciente.
+   * 
+   * @param pacienteId - ID del paciente.
+   * @param datos - Objeto con los datos de antecedentes familiares a guardar.
+   * @throws Error si ocurre un error en la operación.
+   */
   async upsertAntecedentesFamiliares(pacienteId: string, datos: any) {
     // Extraemos solo los campos de la tabla (evitamos enviar id, timestamps, etc.)
     const payload = {
@@ -43,6 +69,13 @@ export class FichaClinicaService {
 
   // ── ANTECEDENTES PERSONALES ──────────────────────────────────────────────
 
+  /**
+   * Obtiene los antecedentes personales de un paciente.
+   * 
+   * @param pacienteId - ID del paciente.
+   * @returns Objeto con los antecedentes personales o null si no existen.
+   * @throws Error si ocurre un error en la consulta.
+   */
   async getAntecedentesPersonales(pacienteId: string) {
     const { data, error } = await this.supabase
       .from('antecedentes_personales')
@@ -53,6 +86,13 @@ export class FichaClinicaService {
     return data;
   }
 
+  /**
+   * Inserta o actualiza los antecedentes personales de un paciente.
+   * 
+   * @param pacienteId - ID del paciente.
+   * @param datos - Objeto con los datos de antecedentes personales a guardar.
+   * @throws Error si ocurre un error en la operación.
+   */
   async upsertAntecedentesPersonales(pacienteId: string, datos: any) {
     const payload = {
       paciente_id: pacienteId,
@@ -77,6 +117,13 @@ export class FichaClinicaService {
 
   // ── ENCUESTA ALIMENTARIA ─────────────────────────────────────────────────
 
+  /**
+   * Obtiene la encuesta alimentaria de un paciente.
+   * 
+   * @param pacienteId - ID del paciente.
+   * @returns Objeto con los datos de la encuesta alimentaria o null si no existe.
+   * @throws Error si ocurre un error en la consulta.
+   */
   async getEncuestaAlimentaria(pacienteId: string) {
     const { data, error } = await this.supabase
       .from('encuesta_alimentaria')
@@ -87,6 +134,13 @@ export class FichaClinicaService {
     return data;
   }
 
+  /**
+   * Inserta o actualiza la encuesta alimentaria de un paciente.
+   * 
+   * @param pacienteId - ID del paciente.
+   * @param datos - Objeto con los datos de la encuesta alimentaria a guardar.
+   * @throws Error si ocurre un error en la operación.
+   */
   async upsertEncuestaAlimentaria(pacienteId: string, datos: any) {
     // Nunca enviamos: id, imc (columna generada en BD)
     const payload = {
@@ -115,6 +169,13 @@ export class FichaClinicaService {
 
   // ── MEDICIONES ───────────────────────────────────────────────────────────
 
+  /**
+   * Obtiene todas las mediciones de un paciente ordenadas por fecha descendente.
+   * 
+   * @param pacienteId - ID del paciente.
+   * @returns Array con las mediciones del paciente, o array vacío si no existen.
+   * @throws Error si ocurre un error en la consulta.
+   */
   async getMediciones(pacienteId: string) {
     const { data, error } = await this.supabase
       .from('mediciones')
@@ -125,6 +186,13 @@ export class FichaClinicaService {
     return data || [];
   }
 
+  /**
+   * Añade una nueva medición para un paciente.
+   * 
+   * @param pacienteId - ID del paciente.
+   * @param datos - Objeto con los datos de la medición a insertar.
+   * @throws Error si ocurre un error en la operación.
+   */
   async addMedicion(pacienteId: string, datos: any) {
     const payload: any = {
       paciente_id: pacienteId,
@@ -146,6 +214,13 @@ export class FichaClinicaService {
     await this.supabase.from('mediciones').insert(payload);
   }
 
+  /**
+   * Actualiza una medición existente.
+   * 
+   * @param id - ID de la medición a actualizar.
+   * @param datos - Objeto con los datos de la medición a actualizar.
+   * @throws Error si ocurre un error en la operación.
+   */
   async updateMedicion(id: string, datos: any) {
     // imc e indice_cintura_cadera son columnas generadas: NO se envían
     const payload: any = {
@@ -168,6 +243,12 @@ export class FichaClinicaService {
     if (error) throw error;
   }
 
+  /**
+   * Elimina una medición.
+   * 
+   * @param id - ID de la medición a eliminar.
+   * @throws Error si ocurre un error en la operación.
+   */
   async deleteMedicion(id: string) {
     const { error } = await this.supabase.from('mediciones').delete().eq('id', id);
     if (error) throw error;

@@ -2,6 +2,18 @@ import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase';
 
+/**
+ * Interfaz que define la estructura de estadísticas del dashboard
+ * @interface EstadisticasDashboard
+ * @property {number} pacientesActivos - Número total de pacientes activos del nutricionista
+ * @property {number} pacientesNuevosEsteMes - Número de pacientes nuevos registrados en el mes actual
+ * @property {number} citasHoy - Número de citas programadas para hoy
+ * @property {string | null} proximaCita - Hora de la próxima cita (formato HH:MM) o null si no hay
+ * @property {number} mensajesSinLeer - Número de mensajes sin leer de pacientes
+ * @property {number} pacientesPendienteSeguimiento - Número de pacientes sin medición en los últimos 7 días
+ * @property {number} ingresosMes - Ingresos totales del mes actual en facturas pagadas
+ * @property {number} cobrosPendientes - Monto total de facturas sin pagar
+ */
 export interface EstadisticasDashboard {
   pacientesActivos: number;
   pacientesNuevosEsteMes: number;
@@ -13,16 +25,32 @@ export interface EstadisticasDashboard {
   cobrosPendientes: number;
 }
 
+/**
+ * Servicio de Dashboard
+ * Gestiona la obtención de estadísticas y datos del dashboard para nutricionistas
+ * @class DashboardService
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardService {
   private supabase: SupabaseClient;
 
+  /**
+   * Constructor del servicio
+   * @param {SupabaseService} supabaseService - Servicio de Supabase para acceso a base de datos
+   */
   constructor(private supabaseService: SupabaseService) {
     this.supabase = this.supabaseService.client;
   }
 
+  /**
+   * Obtiene todas las estadísticas del dashboard para un nutricionista
+   * Agrupa datos de pacientes, citas, mensajes e ingresos en una única llamada
+   * @async
+   * @param {string} nutricionistaId - ID del nutricionista
+   * @returns {Promise<EstadisticasDashboard>} Objeto con todas las estadísticas del dashboard
+   */
   async getStats(nutricionistaId: string): Promise<EstadisticasDashboard> {
     const [
       pacientesActivos,

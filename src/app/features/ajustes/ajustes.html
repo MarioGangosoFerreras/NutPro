@@ -1,3 +1,5 @@
+
+<!-- Ionic page layout: header toolbar with navigation controls and page title -->
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -15,6 +17,7 @@
 
 <ion-content class="ion-padding">
   <div class="ajustes-container">
+    <!-- Angular conditional: muestra el indicador de carga mientras se obtiene el perfil -->
     @if (cargandoPerfil) {
     <div class="loading-container">
       <div class="avocado-spinner">🥑</div>
@@ -31,6 +34,7 @@
       <ion-card-content>
         <div class="avatar-edit-container">
           <div class="avatar-preview-wrapper" (click)="fileInput.click()">
+            <!-- Angular conditional: muestra la vista previa del avatar si existe -->
             @if (avatarPreview || perfil.avatar_url) {
             <img [src]="avatarPreview || perfil.avatar_url" />
             } @else {
@@ -44,6 +48,7 @@
           <input type="file" #fileInput (change)="onAvatarChange($event)" hidden accept="image/*" />
         </div>
 
+        <!-- Grid de campos personales; usa ngModel para enlazar los valores del perfil al formulario -->
         <div class="edit-grid">
           <ion-item lines="none">
             <ion-label position="stacked">Nombre</ion-label>
@@ -62,6 +67,7 @@
             <ion-input type="tel" [(ngModel)]="perfil.telefono"></ion-input>
           </ion-item>
 
+          <!-- Angular conditional: campos adicionales solo para usuarios con rol de paciente -->
           @if (rol === 'paciente') {
           <ion-item lines="none">
             <ion-label position="stacked">DNI / NIE</ion-label>
@@ -86,6 +92,7 @@
           }
         </div>
 
+        <!-- Botón de guardar perfil visible solo para pacientes -->
         @if (rol === 'paciente') {
         <ion-button class="btn-save-master" expand="block" (click)="guardarPerfil()" [disabled]="guardandoPerfil">
           @if (guardandoPerfil) {
@@ -98,6 +105,7 @@
       </ion-card-content>
     </ion-card>
 
+    <!-- Secciones profesionales reservadas a nutricionistas y administradores -->
     @if (rol === 'nutricionista' || rol === 'admin') {
     <ion-card class="ajustes-card">
       <ion-card-header>
@@ -136,6 +144,7 @@
         <ion-card-title><ion-icon name="business-outline"></ion-icon> Centros de Consulta</ion-card-title>
       </ion-card-header>
       <ion-card-content>
+        <!-- Repite un bloque por cada centro usando un bucle estructural -->
         @for (centro of centros; track $index) {
         <div class="centro-item">
           <div class="centro-header">
@@ -191,6 +200,7 @@
     </ion-card>
     }
 
+    <!-- Sección de integraciones externas con estados dinámicos en los iconos y botones -->
     <ion-card class="ajustes-card">
       <ion-card-header>
         <ion-card-title><ion-icon name="link-outline"></ion-icon> Integraciones</ion-card-title>
@@ -213,6 +223,7 @@
       </ion-card-content>
     </ion-card>
 
+    <!-- Sección de seguridad; renderiza campos y mensajes según el modo de recuperación -->
     <ion-card class="ajustes-card">
       <ion-card-header>
         <ion-card-title><ion-icon name="lock-closed-outline"></ion-icon> Seguridad</ion-card-title>

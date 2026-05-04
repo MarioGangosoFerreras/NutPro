@@ -1,23 +1,42 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { SupabaseService } from './supabase';
 
+/**
+ * Representa un mensaje dentro de un chat.
+ */
 export interface Mensaje {
+  /** Identificador opcional del mensaje */
   id?: string;
+  /** Identificador del chat al que pertenece el mensaje */
   chat_id: string;
+
+  /** Identificador del remitente del mensaje */
   sender_id: string;
+  /** Contenido del mensaje */
   contenido: string;
+  /** Indica si el mensaje ha sido leído */
   leido: boolean;
+  /** Fecha y hora en la que se envió el mensaje */
   enviado_at?: string;
 }
 
+/**
+ * Servicio para la gestión de chats y mensajes con Supabase.
+ */
 @Injectable({ providedIn: 'root' })
 export class ChatService {
+  /** Cliente de Supabase inyectado para acceder a la API */
   private supabase = inject(SupabaseService).client;
 
-  // Signal Reactivo para el badge de la barra de navegación
+  /** Señal reactiva que contiene el total de mensajes no leídos para el badge */
   public unreadCountBadge = signal<number>(0);
 
-  // NUEVO: Actualiza el signal global adaptándose al rol del usuario
+  /**
+   * Actualiza el contador de mensajes no leídos adaptándose al rol del usuario.
+   *
+   * @param usuarioId Identificador del usuario actual.
+   * @param rol Rol del usuario (por ejemplo, 'nutricionista', 'admin' o 'paciente').
+   */
   async actualizarContadorBadge(usuarioId: string, rol: string) {
     let chatIds: string[] = [];
 
@@ -64,6 +83,13 @@ export class ChatService {
     this.unreadCountBadge.set(count || 0);
   }
 
+  /**
+   * Obtiene el conteo de mensajes no leídos por chat para los chats indicados.
+   *
+   * @param chatIds Lista de identificadores de chat.
+   * @param miUsuarioId Identificador del usuario actual para excluir sus propios mensajes.
+   * @returns Un objeto con el conteo de mensajes no leídos por chat.
+   */
   async getUnreadCountsPerChat(
     chatIds: string[],
     miUsuarioId: string,
@@ -88,6 +114,13 @@ export class ChatService {
     return unreadMap;
   }
 
+  /**
+   * Obtiene un chat existente entre nutricionista y paciente o crea uno nuevo si no existe.
+   *
+   * @param nutricionistaId Identificador del nutricionista.
+   * @param pacienteId Identificador del paciente.
+   * @returns El chat existente o creado.
+   */
   async getOrCreateChat(nutricionistaId: string, pacienteId: string) {
     let { data: chat, error } = await this.supabase
       .from('chats')
@@ -111,6 +144,12 @@ export class ChatService {
     return chat;
   }
 
+  /**
+   * Obtiene los mensajes de un chat ordenados por fecha de envío.
+   *
+   * @param chatId Identificador del chat.
+   * @returns Lista de mensajes del chat.
+   */
   async getMensajes(chatId: string): Promise<Mensaje[]> {
     const { data, error } = await this.supabase
       .from('mensajes')
@@ -122,6 +161,13 @@ export class ChatService {
     return data || [];
   }
 
+  /**
+   * Envía un mensaje dentro de un chat.
+   *
+   * @param chatId Identificador del chat.
+   * @param senderId Identificador del remitente.
+   * @param contenido Texto del mensaje.
+   */
   async enviarMensaje(chatId: string, senderId: string, contenido: string) {
     const { error } = await this.supabase.from('mensajes').insert({
       chat_id: chatId,
@@ -132,6 +178,13 @@ export class ChatService {
     if (error) throw error;
   }
 
+  /**
+   * Suscribe a cambios de mensajes en tiempo real para un chat.
+   *
+   * @param chatId Identificador del chat.
+   * @param callback Función que se ejecuta cuando llega un nuevo mensaje.
+   * @returns Suscripción al canal de Supabase.
+   */
   suscribirMensajes(chatId: string, callback: (mensaje: Mensaje) => void) {
     return this.supabase
       .channel(`chat-${chatId}`)
@@ -145,6 +198,12 @@ export class ChatService {
       .subscribe();
   }
 
+  /**
+   * Obtiene la lista de chats de un nutricionista junto con información del paciente y el último mensaje.
+   *
+   * @param nutricionistaId Identificador del nutricionista.
+   * @returns Lista de chats con datos asociados.
+   */
   async getChatsNutricionista(nutricionistaId: string) {
     const { data, error } = await this.supabase
       .from('chats')
@@ -174,6 +233,12 @@ export class ChatService {
     return data;
   }
 
+  /**
+   * Obtiene el total de mensajes no leídos para todos los chats de un nutricionista.
+   *
+   * @param nutricionistaId Identificador del nutricionista.
+   * @returns Total de mensajes no leídos.
+   */
   async getMensajesSinLeerTotales(nutricionistaId: string): Promise<number> {
     const { data: nutriData } = await this.supabase
       .from('nutricionistas')
@@ -205,6 +270,12 @@ export class ChatService {
     return count ?? 0;
   }
 
+  /**
+   * Marca como leídos los mensajes de un chat que no fueron enviados por el nutricionista.
+   *
+   * @param chatId Identificador del chat.
+   * @param nutriUsuarioId Identificador del usuario nutricionista.
+   */
   async marcarComoLeidos(chatId: string, nutriUsuarioId: string) {
     await this.supabase
       .from('mensajes')

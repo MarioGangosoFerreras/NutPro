@@ -5,6 +5,14 @@ import { IonButton, IonIcon, IonSpinner, IonItem, IonLabel, IonInput, IonTextare
 import { addIcons } from 'ionicons';
 import { saveOutline } from 'ionicons/icons';
 
+/**
+ * Componente que gestiona la pestaña de "Alimentación" dentro de la ficha de un paciente.
+ * Permite visualizar y editar la encuesta alimentaria y hábitos del paciente.
+ *
+ * @export
+ * @class TabAlimentacion
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-tab-alimentacion',
   imports: [
@@ -17,6 +25,7 @@ import { saveOutline } from 'ionicons/icons';
   styleUrl: './tab-alimentacion.css',
 })
 export class TabAlimentacion implements OnInit {
+  /** Identificador único del paciente asociado a esta pestaña. */
   @Input() pacienteId!: string;
 
   encuesta: any = null;
@@ -25,6 +34,13 @@ export class TabAlimentacion implements OnInit {
   cambios = false;
   formEncuesta: any = {};
 
+  /**
+   * Crea una instancia de TabAlimentacion y registra los iconos usados.
+   *
+   * @param {FichaClinicaService} fichaClinicaService - Servicio para consultar y actualizar datos clínicos.
+   * @param {ChangeDetectorRef} cdr - Referencia al detector de cambios para forzar actualizaciones de la UI.
+   * @param {ToastController} toastCtrl - Controlador para mostrar mensajes tipo toast en pantalla.
+   */
   constructor(
     private fichaClinicaService: FichaClinicaService,
     private cdr: ChangeDetectorRef,
@@ -33,6 +49,12 @@ export class TabAlimentacion implements OnInit {
     addIcons({ saveOutline });
   }
 
+  /**
+   * Inicializa el componente solicitando a la base de datos la encuesta
+   * alimentaria del paciente y configurando el formulario con dichos datos o valores por defecto.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     this.loading = true;
     try {
@@ -55,8 +77,17 @@ export class TabAlimentacion implements OnInit {
     }
   }
 
+  /**
+   * Establece el indicador de cambios a verdadero para habilitar el botón de guardado.
+   */
   marcarCambios() { this.cambios = true; }
 
+  /**
+   * Almacena los cambios realizados en el formulario en la base de datos
+   * y resetea el estado de cambios.
+   *
+   * @returns {Promise<void>}
+   */
   async guardar() {
     this.guardando = true;
     try {
@@ -72,6 +103,14 @@ export class TabAlimentacion implements OnInit {
     }
   }
 
+  /**
+   * Muestra un mensaje emergente tipo toast en la interfaz.
+   *
+   * @private
+   * @param {string} mensaje - El texto del mensaje.
+   * @param {string} color - Color asociado al tipo de mensaje ('success', 'danger', etc.).
+   * @returns {Promise<void>}
+   */
   private async mostrarToast(mensaje: string, color: string) {
     const toast = await this.toastCtrl.create({ message: mensaje, duration: 2500, color, position: 'bottom' });
     await toast.present();

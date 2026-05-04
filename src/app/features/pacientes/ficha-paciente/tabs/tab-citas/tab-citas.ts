@@ -31,6 +31,15 @@ import { PdfService } from '../../../../../core/services/pdf';
 import { SupabaseService } from '../../../../../core/services/supabase';
 import { DocumentosService } from '../../../../../core/services/documentos';
 
+/**
+ * Componente responsable de la pestaña "Citas" en la ficha del paciente.
+ * Permite cambiar entre una vista de lista o calendario y gestionar (crear, editar, borrar, facturar)
+ * las citas asociadas exclusivamente a este paciente.
+ *
+ * @export
+ * @class TabCitas
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-tab-citas',
   standalone: true,
@@ -48,8 +57,9 @@ import { DocumentosService } from '../../../../../core/services/documentos';
   templateUrl: './tab-citas.html',
 })
 export class TabCitas implements OnInit {
-  // Cambio principal: ahora recibimos el objeto 'paciente' completo
+  /** Objeto completo con la información del paciente. */
   @Input() paciente: any;
+  /** Identificador único del nutricionista vinculado a las citas. */
   @Input() nutricionistaId!: string;
 
   private citasService = inject(CitasService);
@@ -60,29 +70,49 @@ export class TabCitas implements OnInit {
   private ngZone = inject(NgZone);
   private pdfService = inject(PdfService);
   private docsService = inject(DocumentosService);
-
-  // Inyecciones que faltaban para generar la factura
   private loadingCtrl = inject(LoadingController);
   private toastCtrl = inject(ToastController);
   private supabase = inject(SupabaseService).client;
 
+  /** Alterna entre los modos visuales de las citas ('lista' o 'calendario'). */
   vistaActiva: 'lista' | 'calendario' = 'lista';
+  /** Lista local de citas obtenidas desde el servidor. */
   citas: Cita[] = [];
+  /** Bandera indicadora del estado de carga inicial. */
   cargando = true;
 
+  /**
+   * Crea la instancia de TabCitas y registra los iconos usados.
+   */
   constructor() {
     addIcons({ addCircleOutline, listOutline, calendarOutline });
   }
 
+  /**
+   * Inicializa la vista solicitando las citas correspondientes a este paciente.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     await this.cargarCitas();
   }
 
+  /**
+   * Manejador de eventos al cambiar entre la vista de calendario o la vista de lista.
+   *
+   * @param {*} e - Objeto del evento `ionChange` de `ion-segment`.
+   */
   onVistaChange(e: any) {
     this.vistaActiva = e.detail.value;
     this.cdr.markForCheck();
   }
 
+  /**
+   * Obtiene la lista de citas filtradas por el paciente actual a través del servicio,
+   * y fuerza una actualización de detección de cambios (debido al OnPush).
+   *
+   * @returns {Promise<void>}
+   */
   async cargarCitas() {
     this.ngZone.run(async () => {
       this.cargando = true;
@@ -100,6 +130,12 @@ export class TabCitas implements OnInit {
     });
   }
 
+  /**
+   * Abre el modal de creación/edición de una cita.
+   *
+   * @param {(Cita | string)} [dato] - Si es de tipo Cita es una edición, si es string es una fecha inicial preseleccionada, si es undefined es creación vacía.
+   * @returns {Promise<void>}
+   */
   async abrirModal(dato?: Cita | string) {
     // Comprobamos si el dato es un objeto Cita o un string de fecha
     const esCita = dato && typeof dato === 'object';
@@ -121,11 +157,24 @@ export class TabCitas implements OnInit {
     }
   }
 
+  /**
+   * Actualiza el estado de una cita pendiente a "confirmada".
+   *
+   * @param {Cita} cita - Objeto de la cita a confirmar.
+   * @returns {Promise<void>}
+   */
   async confirmar(cita: Cita) {
     await this.citasService.confirmarCita(cita.id!);
     await this.cargarCitas();
   }
 
+  /**
+   * Muestra un cuadro de confirmación para cancelar una cita. 
+   * Si se acepta, actualiza el estado a "cancelada" en base de datos.
+   *
+   * @param {Cita} cita - Objeto de la cita a cancelar.
+   * @returns {Promise<void>}
+   */
   async cancelar(cita: Cita) {
     const alert = await this.alertCtrl.create({
       header: 'Cancelar cita',
@@ -146,6 +195,13 @@ export class TabCitas implements OnInit {
     await alert.present();
   }
 
+  /**
+   * Muestra un cuadro de diálogo destructivo para eliminar definitivamente una cita.
+   * Tras la confirmación, se borra el registro permanentemente.
+   *
+   * @param {Cita} cita - Objeto de la cita a eliminar.
+   * @returns {Promise<void>}
+   */
   async eliminar(cita: Cita) {
     const alert = await this.alertCtrl.create({
       header: 'Eliminar cita',
@@ -165,6 +221,13 @@ export class TabCitas implements OnInit {
     await alert.present();
   }
 
+  /**
+   * Despliega un cuadro de diálogo para solicitar el importe correspondiente y,
+   * de ser confirmado, inicia el proceso de generación de la factura.
+   *
+   * @param {Cita} cita - La cita que está lista para ser facturada.
+   * @returns {Promise<void>}
+   */
   async crearFactura(cita: Cita) {
     const alert = await this.alertCtrl.create({
       header: 'Generar Factura',
@@ -192,6 +255,15 @@ export class TabCitas implements OnInit {
     await alert.present();
   }
 
+  /**
+   * Genera el PDF de la factura, la sube al bucket de almacenamiento, actualiza el estado
+   * de la cita a "facturada" y avisa al usuario mediante un Toast.
+   *
+   * @private
+   * @param {Cita} cita - La cita asociada a la factura.
+   * @param {number} importe - El importe introducido manualmente.
+   * @returns {Promise<void>}
+   */
   private async procesarGeneracionFactura(cita: Cita, importe: number) {
     if (isNaN(importe) || importe <= 0) return;
 
