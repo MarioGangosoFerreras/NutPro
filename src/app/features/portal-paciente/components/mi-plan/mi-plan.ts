@@ -9,6 +9,14 @@ import { addIcons } from 'ionicons';
 import { flameOutline } from 'ionicons/icons';
 import { MenuSemanalComponent } from '../../../pacientes/ficha-paciente/tabs/tab-plan/components/menu-semanal/menu-semanal';
 
+/**
+ * Vista donde el paciente puede consultar el plan nutricional 
+ * que le ha sido asignado y visualizar el menú semanal detallado.
+ *
+ * @export
+ * @class MiPlan
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-mi-plan',
   standalone: true,
@@ -25,8 +33,18 @@ export class MiPlan implements OnInit {
   planActivo = signal<any>(null);
   cargando = signal(true);
 
+  /**
+   * Crea una instancia de MiPlan y registra el icono de Ionic necesario en el template.
+   */
   constructor() { addIcons({ flameOutline }); }
 
+  /**
+   * Método de inicialización del componente.
+   * Descarga el perfil del paciente actual y solicita el plan nutricional activo 
+   * asociado a dicho perfil, actualizando las señales reactivas al finalizar.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     try {
       const usuario = await this.authService.getUsuario();

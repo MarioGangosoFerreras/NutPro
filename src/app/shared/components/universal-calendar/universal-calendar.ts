@@ -36,14 +36,31 @@ import { CitaCard } from '../cita-card/cita-card';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { ModalCitaComponent } from '../modal-cita/modal-cita';
 
+/** Múltiples formatos/layouts visuales que el componente permite adaptar. */
 export type CalendarMode = 'full' | 'dashboard' | 'patient';
 
+/**
+ * Estructura de modelado intermedio para clasificar objetos de cita en un día preciso del calendario.
+ *
+ * @interface DiaCal
+ */
 interface DiaCal {
   fecha: Date;
   esDelMes: boolean;
   citas: Cita[];
 }
 
+/**
+ * El Componente universal, robusto e inyectable que encapsula a lógica, dibujo (css grid) 
+ * y gestión de peticiones de citas mostradas al estilo cuadrícula-calendario (vista mensual).
+ * Responde y se amolda dependiendo del modo ('full', 'dashboard', 'patient').
+ *
+ * @export
+ * @class UniversalCalendar
+ * @implements {OnInit}
+ * @implements {OnDestroy}
+ * @implements {OnChanges}
+ */
 @Component({
   selector: 'app-universal-calendar',
   standalone: true,
@@ -52,15 +69,24 @@ interface DiaCal {
   styleUrls: ['./universal-calendar.css'],
 })
 export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
+  /** Modo de comportamiento que el CSS y el Typescript emplean para limitarse o expandirse. */
   @Input() mode: CalendarMode = 'full';
+  /** Base externa (para uso reactivo) si las citas se pasaran por prop en vez de bajarlas del server aquí. */
   @Input() citasInput: Cita[] = [];
+  /** Despierta los botones (o no) relativos a generación de facturas en caso de ser pasadas / completadas. */
   @Input() puedeFacturar = true;
+  /** Marca la diferencia de permisos de UI indicando si quien navega la app en la sesión es 'Paciente'. */
   @Input() esPaciente = false; // <-- NUEVO: Para identificar si estamos en el portal del paciente
 
+  /** Dispara instrucción delegada al contenedor padre para invocar la creación sobre una celda fecha en concreto. */
   @Output() nuevaCita = new EventEmitter<string>();
+  /** Informa qué elemento fue seleccionado para editar. */
   @Output() editarCita = new EventEmitter<Cita>();
+  /** Informa sobre un click (Modo Paciente/Dashboard general). */
   @Output() citaSeleccionada = new EventEmitter<Cita>();
+  /** Deriva al padre la petición de emitir documentación contable. */
   @Output() facturarCita = new EventEmitter<Cita>();
+  /** Delega acción de borrado total. */
   @Output() eliminarCita = new EventEmitter<Cita>();
 
   hoy = new Date();
@@ -72,6 +98,7 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   cargando = false;
   nutricionistaId = '';
 
+  /** Cabecera estandarizada para las cuadrículas HTML. */
   readonly DIAS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
   private channel?: RealtimeChannel;
@@ -81,6 +108,7 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   private router = inject(Router);
   private modalCtrl = inject(ModalController);
 
+  /** Configura importaciones gráficas del DOM SVG icons de ionic. */
   constructor() {
     addIcons({
       chevronBackOutline,
@@ -94,6 +122,13 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     });
   }
 
+  /**
+   * Se inicia detectando el "Modo". Si es externo (`patient`) espera los props asíncronos.
+   * En su defecto es autónomo: extrae UUID, carga citas de base de datos de manera
+   * masiva por su mes, modela la cuadrícula y finalmente se ancla al Websocket.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     if (this.mode === 'patient') {
       this.citas = this.citasInput;
@@ -107,6 +142,12 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Monitor pasivo. Interviene solo si se inyectan nuevos valores (citas) provenientes del padre 
+   * bajo el modo `patient` que depende de que sea él el que cambie.
+   *
+   * @param {SimpleChanges} changes - Cambios en props trackeados en Angular.
+   */
   ngOnChanges(changes: SimpleChanges) {
     if (changes['citasInput'] && this.mode === 'patient') {
       this.citas = this.citasInput;
@@ -118,10 +159,17 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /** Vacía variables persistentes (Canal supabase) para anular posibles leaks si se destruye la app. */
   ngOnDestroy() {
     this.channel?.unsubscribe();
   }
 
+  /**
+   * Extrae la suma total de citas agendadas desde la primera semana a la última
+   * del mes local actual renderizado. Dispara un remonte visual.
+   *
+   * @returns {Promise<void>}
+   */
   async cargarMes() {
     this.cargando = true;
     this.cdr.markForCheck();
@@ -139,10 +187,21 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Re-lanza una petición GET al server (cargarMes) cada vez que Supabase en la nube
+   * le reporte por su canal de Realtime que hubo insert o update ajenos.
+   *
+   * @private
+   */
   private suscribirRealtime() {
     this.channel = this.citasService.suscribirCambios(this.nutricionistaId, () => this.cargarMes());
   }
 
+  /**
+   * Matemáticas visuales de la vista de calendario. Llena con objetos Date falsos (grises)
+   * antes o después de la primera semana si el mes no empieza el lunes (1).
+   * Al final agrupa los 35-42 días concebidos en sets de 7 y los expone.
+   */
   construirCalendario() {
     const año = this.mesActual.getFullYear();
     const mes = this.mesActual.getMonth();
@@ -173,18 +232,32 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Retorna desde el conjunto global pre-cacheado de todo el mes un trozo
+   * acotando exclusivamente las del día provisto.
+   *
+   * @private
+   * @param {Date} fecha - Criterio para el `.filter`.
+   * @returns {Cita[]}
+   */
   private citasEnFecha(fecha: Date): Cita[] {
     return (this.citas ?? []).filter(
       (c) => new Date(c.fecha_hora).toDateString() === fecha.toDateString(),
     );
   }
 
+  /**
+   * Fija la marca verde iluminada y rellena los datos expuestos del recuadro inferior de citas.
+   *
+   * @param {Date} fecha - Nueva fecha destino.
+   */
   seleccionarFecha(fecha: Date) {
     this.diaSeleccionado = fecha;
     this.citasDelDia = this.citasEnFecha(fecha);
     this.cdr.markForCheck();
   }
 
+  /** Manipula la fecha global restando -1 al mes, obligando de paso a recalcular la matriz. */
   async mesAnterior() {
     this.mesActual = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth() - 1, 1);
     if (this.mode === 'patient') {
@@ -194,6 +267,7 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /** Manipula la fecha global sumando +1 al mes, obligando a rehacer los vectores HTML. */
   async mesSiguiente() {
     this.mesActual = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth() + 1, 1);
     if (this.mode === 'patient') {
@@ -203,6 +277,12 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Al interactuar en una fila de cita listada abajo en el detalle.
+   * Redirige u emite según en qué ambiente haya sido colocado el calendario componente.
+   *
+   * @param {Cita} cita - Referencia al objeto de reserva médica.
+   */
   onCitaClick(cita: Cita) {
     if (this.mode === 'patient') {
       this.citaSeleccionada.emit(cita);
@@ -211,6 +291,13 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Accionado al presionar "+ Añadir". Instancia un Popup/Overlay con el componente
+   * ModalCita pasándole los presets base requeridos (Día, mes y id) y en caso
+   * de ser guardado internamente lanza el trigger de repintado asíncrono para que asome el circulo naranja nuevo en tiempo real.
+   *
+   * @returns {Promise<void>}
+   */
   async onNuevaCita() {
     const targetDate = this.diaSeleccionado || this.hoy;
     const year = targetDate.getFullYear();
@@ -236,33 +323,68 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Comparador para agregar CSS "Hoy" a un recuadro.
+   * @param {Date} f
+   * @returns {boolean}
+   */
   esHoy(f: Date) {
     return f.toDateString() === this.hoy.toDateString();
   }
+  /**
+   * Comparador para agregar el borde CSS Verde "seleccionado" que enfoca detalles abajo.
+   * @param {Date} f
+   * @returns {boolean}
+   */
   esSeleccionado(f: Date) {
     return this.diaSeleccionado?.toDateString() === f.toDateString();
   }
 
+  /**
+   * Determina si para el día pasado como parámetro tiene dentro de su array interno
+   * un registro en un estado específico para poder pintarle un circulito ('dot').
+   * @param {DiaCal} dia
+   * @param {string} estado
+   * @returns {boolean}
+   */
   tieneEstado(dia: DiaCal, estado: string) {
     return dia.citas.some((c) => c.estado === estado);
   }
 
+  /**
+   * Devuelve color badge Ionic asociado al tipo de estado en texto.
+   * @param {string} estado
+   * @returns {string}
+   */
   colorEstado(estado: string) {
     return { pendiente: 'warning', confirmada: 'success', cancelada: 'danger' }[estado] ?? 'medium';
   }
 
+  /** Determina si es pertinente visualizar el texto superior "+ Añadir". */
   get mostrarBotonNueva() {
     return this.mode === 'patient' || this.mode === 'full';
   }
 
+  /** Determina el formato con el que escupirá la lista inferior al pinchar una casilla. */
   get usaCitaCard() {
     return this.mode === 'patient';
   }
 
+  /**
+   * Operador tiempo condicional de UI simple (No se pueden facturar cosas que no han sucedido en reloj cronológico aún).
+   * @param {Cita} cita
+   * @returns {boolean}
+   */
   citaPasada(cita: Cita): boolean {
     return new Date(cita.fecha_hora).getTime() < new Date().getTime();
   }
 
+  /**
+   * Detiene que el clic repercuta sobre el contenedor de Cita para
+   * interceptarlo por encima como un Output delegable de Event Emitter al padre.
+   * @param {Event} event - JS click event nativo DOM.
+   * @param {Cita} cita - Payload arrastrado.
+   */
   emitirFacturaEvent(event: Event, cita: Cita) {
     event.stopPropagation();
     this.facturarCita.emit(cita);

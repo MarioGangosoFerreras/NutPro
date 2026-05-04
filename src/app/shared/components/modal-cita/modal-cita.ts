@@ -23,6 +23,15 @@ import { PacientesService } from '../../../core/services/pacientes';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionicons/icons';
 
+/**
+ * Componente Modal para crear o editar una cita médica.
+ * Incluye lógica avanzada para calcular intervalos de horas disponibles, 
+ * buscar pacientes (si se crea desde el dashboard general) y validar duraciones.
+ *
+ * @export
+ * @class ModalCitaComponent
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-modal-cita',
   standalone: true,
@@ -48,10 +57,15 @@ import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionico
   styleUrls: ['./modal-cita.css'],
 })
 export class ModalCitaComponent implements OnInit {
+  /** Objeto con los datos de la cita existente (si estamos en modo edición). */
   @Input() cita?: Cita;
+  /** ID del paciente. Si se proporciona, se omite el buscador de pacientes. */
   @Input() pacienteId?: string;
+  /** ID del nutricionista que va a atender la consulta. */
   @Input() nutricionistaId!: string;
+  /** Bandera que indica si el propio paciente está creando/viendo este modal. */
   @Input() esPaciente = false;
+  /** Fecha inicial preseleccionada si el usuario tocó un día concreto en el calendario. */
   @Input() fechaSeleccionada?: string; // Recibe la fecha predeterminada desde el calendario
 
   private modalCtrl = inject(ModalController);
@@ -61,16 +75,21 @@ export class ModalCitaComponent implements OnInit {
 
   guardando = false;
 
-  // Variables del formulario
+  /**  Variables del formulario */
   fecha = '';
   hora = '';
   duracion = 30; // Por defecto empezamos en 30
+  /** Modalidad de la cita. */
   tipo: 'presencial' | 'videollamada' = 'presencial';
+  /** Estado del ciclo de vida de la cita. */
   estado: 'pendiente' | 'confirmada' | 'cancelada' = 'pendiente';
+  /** Observaciones adicionales. */
   notas = '';
+  /** URL de la sala de reuniones virtuales, si aplica. */
   urlVideo = '';
 
   // Opciones estándar de duración
+  /** Array de duraciones disponibles para poblar el elemento IonSelect. */
   opcionesDuracion = [
     { label: '30 min', value: 30 },
     { label: '45 min', value: 45 },
@@ -80,31 +99,59 @@ export class ModalCitaComponent implements OnInit {
 
   // CONSTANTES DE HORARIO Y MÁRGENES
   readonly MARGEN_MINUTOS = 0; // Citas consecutivas sin descanso (ej: 9:00 - 9:30 y 9:30 - 10:30)
-  readonly HORA_INICIO_MANANA = 9 * 60; // 09:00 (en minutos desde las 00:00)
-  readonly HORA_FIN_MANANA = 15 * 60; // 15:00
-  readonly HORA_INICIO_TARDE = 16 * 60; // 16:00
-  readonly HORA_FIN_TARDE = 21 * 60; // 21:00
+  readonly HORA_INICIO_MANANA = 9 * 60; 
+  readonly HORA_FIN_MANANA = 15 * 60; 
+  readonly HORA_INICIO_TARDE = 16 * 60; 
+  readonly HORA_FIN_TARDE = 21 * 60; 
 
+  /** Lista calculada de horas (strings) en las que se puede agendar una cita. */
   horasDisponibles: string[] = [];
+  /** Array temporal con las citas ya reservadas para el día que se ha seleccionado en el formulario. */
   citasDelDiaSeleccionado: any[] = [];
 
   // Lógica del buscador de pacientes
+  /** Señal con la lista completa de pacientes asociados al nutricionista. */
   pacientes = signal<any[]>([]);
+  /** Señal con los resultados del buscador. */
   pacientesFiltrados = signal<any[]>([]);
+  /** Almacena el ID del paciente seleccionado en el buscador interno. */
   pacienteSeleccionadoId = '';
+  /** Muestra en la UI el nombre del paciente tras seleccionarlo del buscador. */
   pacienteSeleccionadoNombre = '';
 
+  /**
+   * Determina si el modal está operando sobre una cita existente.
+   *
+   * @readonly
+   * @type {boolean}
+   */
   get esEdicion() {
     return !!this.cita?.id;
   }
+
+  /**
+   * Retorna el texto del encabezado del modal en función del modo (Crear/Editar).
+   *
+   * @readonly
+   * @type {string}
+   */
   get titulo() {
     return this.esEdicion ? 'Editar cita' : 'Nueva cita';
   }
 
+  /**
+   * Crea una instancia de ModalCitaComponent y registra los iconos usados.
+   */
   constructor() {
     addIcons({ checkmarkCircle, closeCircleOutline, personCircleOutline });
   }
 
+  /**
+   * Inicializa el formulario poblador los datos (si es edición) o las propiedades 
+   * iniciales. Carga también las citas del día para calcular huecos libres.
+   *
+   * @returns {Promise<void>}
+   */
   async ngOnInit() {
     this.pacienteSeleccionadoId = this.pacienteId || '';
 
@@ -133,6 +180,13 @@ export class ModalCitaComponent implements OnInit {
     }
   }
 
+  /**
+   * Consulta a la base de datos las horas ocupadas de un día específico 
+   * y desencadena el recálculo de los espacios disponibles en la agenda.
+   *
+   * @param {string} fechaIso - Fecha seleccionada en formato "YYYY-MM-DD".
+   * @returns {Promise<void>}
+   */
   async cargarCitasDelDia(fechaIso: string) {
     try {
       const todas = await this.citasService.getHorariosOcupadosNutricionista(this.nutricionistaId);
@@ -146,6 +200,14 @@ export class ModalCitaComponent implements OnInit {
     }
   }
 
+  /**
+   * Evento lanzado al cambiar el input del día en la UI.
+   * Vacía la hora actualmente escogida (si aplica) y consulta las citas del nuevo día.
+   *
+   * @param {*} event - Evento nativo de Ionic con el valor de la nueva fecha.
+   * @param {boolean} [esCargaInicial=false] - Define si la llamada se hace programáticamente durante el init.
+   * @returns {Promise<void>}
+   */
   async onFechaCambiada(event: any, esCargaInicial = false) {
     const val = event.detail?.value || event;
     if (!val) return;
@@ -155,6 +217,11 @@ export class ModalCitaComponent implements OnInit {
     await this.cargarCitasDelDia(this.fecha);
   }
 
+  /**
+   * Ejecuta el algoritmo de disponibilidad para trocear la jornada laboral en 
+   * fracciones (slots) de 15 minutos e invalidar aquellas donde exista superposición 
+   * con las citas que ya constan en base de datos.
+   */
   recalcularHoras() {
     if (!this.fecha) return;
 
@@ -192,6 +259,16 @@ export class ModalCitaComponent implements OnInit {
     this.cdr.detectChanges(); // FUERZA LA ACTUALIZACIÓN VISUAL
   }
 
+  /**
+   * Helper privado del algoritmo de disponibilidad. 
+   * Verifica si un bloque de minutos entra en colisión con algún intervalo ocupado.
+   *
+   * @private
+   * @param {number} start - Minutos transcurridos desde las 00:00 como inicio.
+   * @param {number} end - Minutos de fin de bloque.
+   * @param {{ start: number; end: number }[]} ocupados - Intervalos ya registrados que restringen la agenda.
+   * @returns {boolean} Retorna `true` si el espacio de tiempo está despejado.
+   */
   private esSlotLibre(
     start: number,
     end: number,
@@ -206,6 +283,13 @@ export class ModalCitaComponent implements OnInit {
     return true;
   }
 
+  /**
+   * Valida si el "select" de duración (ej. 60 min) tiene cabida a partir de la hora escogida, 
+   * mirando si no va a chocar frontalmente con la hora de inicio de la siguiente cita programada del día.
+   *
+   * @param {number} duracionCandidata - Minutos escogidos en el desplegable (30, 45, 60, 90).
+   * @returns {boolean} `true` si hay margen para asignar esa duración, `false` si invadiría la siguiente cita.
+   */
   // Valida si la duración seleccionada "cabe" antes de la próxima cita
   esDuracionValida(duracionCandidata: number): boolean {
     if (!this.hora) return true; // Si no ha elegido hora, no podemos saberlo
@@ -232,6 +316,13 @@ export class ModalCitaComponent implements OnInit {
     return finCandidato + this.MARGEN_MINUTOS <= proximaCitaStart;
   }
 
+  /**
+   * Convierte un sumatorio de minutos desde la medianoche en formato legible (ej. 540 -> '09:00').
+   *
+   * @private
+   * @param {number} m - Minutos transcurridos desde las 00:00.
+   * @returns {string} String formateado como "HH:mm".
+   */
   private minutosAHora(m: number): string {
     const horas = Math.floor(m / 60)
       .toString()
@@ -240,12 +331,23 @@ export class ModalCitaComponent implements OnInit {
     return `${horas}:${mins}`;
   }
 
+  /**
+   * Consulta y guarda todos los pacientes del nutricionista asignado para poblar 
+   * el buscador interno del modal en caso de que se haya lanzado desde el calendario general.
+   *
+   * @returns {Promise<void>}
+   */
   async cargarPacientes() {
     const data = await this.pacientesService.getPacientes(this.nutricionistaId);
     this.pacientes.set(data || []);
     this.pacientesFiltrados.set(data || []);
   }
 
+  /**
+   * Filtra dinámicamente el listado de pacientes del modal según el texto ingresado.
+   *
+   * @param {*} event - Evento "ionInput" del searchbar.
+   */
   filtrarPacientes(event: any) {
     const query = event.detail.value?.toLowerCase() || '';
     const filtrados = this.pacientes().filter((p) =>
@@ -254,20 +356,34 @@ export class ModalCitaComponent implements OnInit {
     this.pacientesFiltrados.set(filtrados);
   }
 
+  /**
+   * Reacciona a la selección de un paciente de la lista. Establece el ID y contrae la vista.
+   *
+   * @param {*} p - Entidad completa del paciente seleccionado.
+   */
   seleccionarPaciente(p: any) {
     this.pacienteSeleccionadoId = p.id;
     this.pacienteSeleccionadoNombre = `${p.usuario?.nombre} ${p.usuario?.apellidos}`;
   }
 
+  /** Elimina el paciente que se había preseleccionado de la vista para volver a mostrar el buscador. */
   quitarPaciente() {
     this.pacienteSeleccionadoId = '';
     this.pacienteSeleccionadoNombre = '';
   }
 
+  /** Descarta los cambios introducidos, cerrando la vista y respondiendo al padre con `cancelado`. */
   cancelar() {
     this.modalCtrl.dismiss(null, 'cancelado');
   }
 
+  /**
+   * Empaqueta el objeto "Cita" con todos sus campos completados en formato ISO,
+   * y llama al servicio inyectado para INSERTAR (`crearCita`) o ACTUALIZAR (`editarCita`)
+   * el registro persistente. Cierra la ventana devolviendo el role `guardado`.
+   *
+   * @returns {Promise<void>}
+   */
   async guardar() {
     if (!this.fecha || !this.hora || !this.pacienteSeleccionadoId) return;
 
