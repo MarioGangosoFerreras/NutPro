@@ -16,269 +16,243 @@
 <ion-content class="ion-padding">
   <div class="ajustes-container">
     @if (cargandoPerfil) {
-      <div class="loading-container">
-        <div class="avocado-spinner">🥑</div>
-        <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px">Cargando ajustes...</p>
-      </div>
+    <div class="loading-container">
+      <div class="avocado-spinner">🥑</div>
+      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px">Cargando ajustes...</p>
+    </div>
     } @else {
-      <ion-card class="ajustes-card">
-        <ion-card-header>
-          <ion-card-title>
-            <ion-icon name="person-circle-outline"></ion-icon> Datos Personales
-          </ion-card-title>
-        </ion-card-header>
+    <ion-card class="ajustes-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="person-circle-outline"></ion-icon> Mis Datos Personales
+        </ion-card-title>
+      </ion-card-header>
 
-        <ion-card-content>
-          <div class="avatar-edit-container">
-            <div class="avatar-preview-wrapper" (click)="fileInput.click()">
-              @if (avatarPreview || perfil.avatar_url) {
-                <img [src]="avatarPreview || perfil.avatar_url" />
-              } @else {
-                <div class="avatar-overlay" style="opacity: 1; background: var(--primary-soft)">
-                  <ion-icon name="camera-outline" style="color: var(--primary-medical)"></ion-icon>
-                </div>
-              }
-              <div class="avatar-overlay"><ion-icon name="camera-outline"></ion-icon></div>
-            </div>
-            <span class="avatar-hint">Cambiar foto de perfil</span>
-            <input
-              type="file"
-              #fileInput
-              (change)="onAvatarChange($event)"
-              hidden
-              accept="image/*"
-            />
-          </div>
-
-          <div class="edit-grid">
-            <ion-item lines="none">
-              <ion-label position="stacked">Nombre</ion-label>
-              <ion-input [(ngModel)]="perfil.nombre"></ion-input>
-            </ion-item>
-            <ion-item lines="none">
-              <ion-label position="stacked">Apellidos</ion-label>
-              <ion-input [(ngModel)]="perfil.apellidos"></ion-input>
-            </ion-item>
-            <ion-item lines="none">
-              <ion-label position="stacked">Email</ion-label>
-              <ion-input
-                [(ngModel)]="perfil.email"
-                disabled="true"
-                placeholder="No se puede cambiar aquí"
-              ></ion-input>
-            </ion-item>
-            <ion-item lines="none">
-              <ion-label position="stacked">Teléfono</ion-label>
-              <ion-input type="tel" [(ngModel)]="perfil.telefono"></ion-input>
-            </ion-item>
-          </div>
-        </ion-card-content>
-      </ion-card>
-
-      <ion-card class="ajustes-card">
-        <ion-card-header>
-          <ion-card-title
-            ><ion-icon name="medkit-outline"></ion-icon> Datos Profesionales</ion-card-title
-          >
-        </ion-card-header>
-        <ion-card-content>
-          <div class="edit-grid">
-            <ion-item lines="none">
-              <ion-label position="stacked">Nº Colegiado</ion-label>
-              <ion-input
-                [(ngModel)]="perfil.numero_colegiado"
-                placeholder="Ej: AND-1234"
-              ></ion-input>
-            </ion-item>
-            <ion-item lines="none">
-              <ion-label position="stacked">Titulación</ion-label>
-              <ion-select
-                [(ngModel)]="perfil.titulacion"
-                interface="popover"
-                placeholder="Selecciona..."
-              >
-                <ion-select-option value="dietista_nutricionista"
-                  >Dietista-Nutricionista</ion-select-option
-                >
-                <ion-select-option value="medico_digestivo">Médico Digestivo</ion-select-option>
-                <ion-select-option value="medico_endocrino">Médico Endocrino</ion-select-option>
-                <ion-select-option value="tecnico_superior_dietetica"
-                  >Técnico Superior en Dietética</ion-select-option
-                >
-                <ion-select-option value="otra">Otra profesión</ion-select-option>
-              </ion-select>
-            </ion-item>
-            <ion-item lines="none">
-              <ion-label position="stacked">Especialidad</ion-label>
-              <ion-input
-                [(ngModel)]="perfil.especialidad"
-                placeholder="Ej: Nutrición deportiva"
-              ></ion-input>
-            </ion-item>
-            <ion-item lines="none">
-              <ion-label position="stacked">Nombre de la clínica / empresa</ion-label>
-              <ion-input [(ngModel)]="perfil.nombre_empresa" placeholder="NutriClinic"></ion-input>
-            </ion-item>
-          </div>
-        </ion-card-content>
-      </ion-card>
-
-      <ion-card class="ajustes-card">
-        <ion-card-header>
-          <ion-card-title
-            ><ion-icon name="business-outline"></ion-icon> Centros de Consulta</ion-card-title
-          >
-        </ion-card-header>
-        <ion-card-content>
-          @for (centro of centros; track $index) {
-            <div class="centro-item">
-              <div class="centro-header">
-                <span class="centro-label">Centro {{ $index + 1 }}</span>
-                @if (centros.length > 1) {
-                  <ion-button
-                    fill="clear"
-                    size="small"
-                    color="danger"
-                    (click)="removeCentro($index)"
-                  >
-                    <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
-                }
-              </div>
-              <div class="edit-grid">
-                <ion-item lines="none">
-                  <ion-label position="stacked">Nombre del centro</ion-label>
-                  <ion-input
-                    [(ngModel)]="centro.nombre"
-                    placeholder="Ej: Clínica Norte"
-                  ></ion-input>
-                </ion-item>
-                <ion-item lines="none">
-                  <ion-label position="stacked">Dirección</ion-label>
-                  <ion-input
-                    [(ngModel)]="centro.direccion"
-                    placeholder="Calle, ciudad..."
-                  ></ion-input>
-                </ion-item>
-              </div>
-            </div>
-          }
-          <ion-button fill="outline" class="btn-add-centro" expand="block" (click)="addCentro()">
-            <ion-icon name="add-outline" slot="start"></ion-icon> Añadir otro centro
-          </ion-button>
-        </ion-card-content>
-      </ion-card>
-
-      <ion-card class="ajustes-card">
-        <ion-card-header>
-          <ion-card-title
-            ><ion-icon name="document-text-outline"></ion-icon> Facturación</ion-card-title
-          >
-        </ion-card-header>
-        <ion-card-content>
-          <div class="edit-grid">
-            <ion-item lines="none">
-              <ion-label position="stacked">DNI / NIF Fiscal</ion-label>
-              <ion-input [(ngModel)]="perfil.dni_fiscal" placeholder="12345678A"></ion-input>
-            </ion-item>
-            <ion-item lines="none" class="full-width">
-              <ion-label position="stacked">Dirección Fiscal</ion-label>
-              <ion-input
-                [(ngModel)]="perfil.direccion_fiscal"
-                placeholder="Dirección completa"
-              ></ion-input>
-            </ion-item>
-          </div>
-
-          <ion-button
-            class="btn-save-master"
-            expand="block"
-            (click)="guardarPerfil()"
-            [disabled]="guardandoPerfil"
-          >
-            @if (guardandoPerfil) {
-              <ion-spinner name="dots"></ion-spinner>
+      <ion-card-content>
+        <div class="avatar-edit-container">
+          <div class="avatar-preview-wrapper" (click)="fileInput.click()">
+            @if (avatarPreview || perfil.avatar_url) {
+            <img [src]="avatarPreview || perfil.avatar_url" />
             } @else {
-              <ion-icon slot="start" name="save-outline"></ion-icon> Guardar Cambios del Perfil
+            <div class="avatar-overlay" style="opacity: 1; background: var(--primary-soft)">
+              <ion-icon name="camera-outline" style="color: var(--primary-medical)"></ion-icon>
+            </div>
             }
-          </ion-button>
-        </ion-card-content>
-      </ion-card>
+            <div class="avatar-overlay"><ion-icon name="camera-outline"></ion-icon></div>
+          </div>
+          <span class="avatar-hint">Cambiar foto de perfil</span>
+          <input type="file" #fileInput (change)="onAvatarChange($event)" hidden accept="image/*" />
+        </div>
 
-      <ion-card class="ajustes-card">
-        <ion-card-header>
-          <ion-card-title><ion-icon name="link-outline"></ion-icon> Integraciones</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item lines="none" class="integracion-item">
-            <ion-icon
-              [name]="conectado ? 'checkmark-circle' : 'logo-google'"
-              slot="start"
-              [color]="conectado ? 'success' : 'medium'"
-            ></ion-icon>
-            <ion-label>
-              <h3>Google Calendar</h3>
-              <p>
-                {{
-                  conectado ? 'Conectado y sincronizando' : 'Sincroniza tus citas automáticamente'
-                }}
-              </p>
-            </ion-label>
-            <ion-button
-              slot="end"
-              [color]="conectado ? 'danger' : 'primary'"
-              fill="outline"
-              (click)="toggleConexion()"
-              class="btn-integration"
-            >
-              {{ conectado ? 'Desconectar' : 'Conectar' }}
-            </ion-button>
+        <div class="edit-grid">
+          <ion-item lines="none">
+            <ion-label position="stacked">Nombre</ion-label>
+            <ion-input [(ngModel)]="perfil.nombre"></ion-input>
           </ion-item>
-        </ion-card-content>
-      </ion-card>
+          <ion-item lines="none">
+            <ion-label position="stacked">Apellidos</ion-label>
+            <ion-input [(ngModel)]="perfil.apellidos"></ion-input>
+          </ion-item>
+          <ion-item lines="none" [ngClass]="{'full-width': rol === 'paciente'}">
+            <ion-label position="stacked">Email</ion-label>
+            <ion-input [(ngModel)]="perfil.email" disabled="true" placeholder="No se puede cambiar aquí"></ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label position="stacked">Teléfono</ion-label>
+            <ion-input type="tel" [(ngModel)]="perfil.telefono"></ion-input>
+          </ion-item>
 
-      <ion-card class="ajustes-card">
-        <ion-card-header>
-          <ion-card-title
-            ><ion-icon name="lock-closed-outline"></ion-icon> Seguridad</ion-card-title
-          >
-        </ion-card-header>
-        <ion-card-content>
-          <p class="section-desc">Actualiza la contraseña de tu cuenta.</p>
+          @if (rol === 'paciente') {
+          <ion-item lines="none">
+            <ion-label position="stacked">DNI / NIE</ion-label>
+            <ion-input [(ngModel)]="perfil.dni"></ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label position="stacked">Fecha de nacimiento</ion-label>
+            <ion-input type="date" [(ngModel)]="perfil.fecha_nacimiento"></ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label position="stacked">Sexo</ion-label>
+            <ion-select [(ngModel)]="perfil.sexo" interface="popover" placeholder="Selecciona...">
+              <ion-select-option value="masculino">Masculino</ion-select-option>
+              <ion-select-option value="femenino">Femenino</ion-select-option>
+              <ion-select-option value="otro">Otro</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item lines="none" class="full-width">
+            <ion-label position="stacked">Dirección Completa</ion-label>
+            <ion-input [(ngModel)]="perfil.direccion" placeholder="Calle, ciudad..."></ion-input>
+          </ion-item>
+          }
+        </div>
+
+        @if (rol === 'paciente') {
+        <ion-button class="btn-save-master" expand="block" (click)="guardarPerfil()" [disabled]="guardandoPerfil">
+          @if (guardandoPerfil) {
+          <ion-spinner name="dots"></ion-spinner>
+          } @else {
+          <ion-icon slot="start" name="save-outline"></ion-icon> Guardar Cambios del Perfil
+          }
+        </ion-button>
+        }
+      </ion-card-content>
+    </ion-card>
+
+    @if (rol === 'nutricionista' || rol === 'admin') {
+    <ion-card class="ajustes-card">
+      <ion-card-header>
+        <ion-card-title><ion-icon name="medkit-outline"></ion-icon> Datos Profesionales</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="edit-grid">
+          <ion-item lines="none">
+            <ion-label position="stacked">Nº Colegiado</ion-label>
+            <ion-input [(ngModel)]="perfil.numero_colegiado" placeholder="Ej: AND-1234"></ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label position="stacked">Titulación</ion-label>
+            <ion-select [(ngModel)]="perfil.titulacion" interface="popover" placeholder="Selecciona...">
+              <ion-select-option value="dietista_nutricionista">Dietista-Nutricionista</ion-select-option>
+              <ion-select-option value="medico_digestivo">Médico Digestivo</ion-select-option>
+              <ion-select-option value="medico_endocrino">Médico Endocrino</ion-select-option>
+              <ion-select-option value="tecnico_superior_dietetica">Técnico Superior en Dietética</ion-select-option>
+              <ion-select-option value="otra">Otra profesión</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label position="stacked">Especialidad</ion-label>
+            <ion-input [(ngModel)]="perfil.especialidad" placeholder="Ej: Nutrición deportiva"></ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label position="stacked">Nombre de la clínica / empresa</ion-label>
+            <ion-input [(ngModel)]="perfil.nombre_empresa" placeholder="NutriClinic"></ion-input>
+          </ion-item>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="ajustes-card">
+      <ion-card-header>
+        <ion-card-title><ion-icon name="business-outline"></ion-icon> Centros de Consulta</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        @for (centro of centros; track $index) {
+        <div class="centro-item">
+          <div class="centro-header">
+            <span class="centro-label">Centro {{ $index + 1 }}</span>
+            @if (centros.length > 1) {
+            <ion-button fill="clear" size="small" color="danger" (click)="removeCentro($index)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            }
+          </div>
           <div class="edit-grid">
-            <ion-item lines="none" class="full-width">
-              <ion-label position="stacked">Nueva contraseña</ion-label>
-              <ion-input
-                type="password"
-                [(ngModel)]="passwords.nueva"
-                placeholder="Mínimo 6 caracteres"
-              ></ion-input>
+            <ion-item lines="none">
+              <ion-label position="stacked">Nombre del centro</ion-label>
+              <ion-input [(ngModel)]="centro.nombre" placeholder="Ej: Clínica Norte"></ion-input>
             </ion-item>
-            <ion-item lines="none" class="full-width">
-              <ion-label position="stacked">Confirmar contraseña</ion-label>
-              <ion-input
-                type="password"
-                [(ngModel)]="passwords.confirmacion"
-                placeholder="Repite la contraseña"
-              ></ion-input>
+            <ion-item lines="none">
+              <ion-label position="stacked">Dirección</ion-label>
+              <ion-input [(ngModel)]="centro.direccion" placeholder="Calle, ciudad..."></ion-input>
             </ion-item>
           </div>
+        </div>
+        }
+        <ion-button fill="outline" class="btn-add-centro" expand="block" (click)="addCentro()">
+          <ion-icon name="add-outline" slot="start"></ion-icon> Añadir otro centro
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
 
-          <ion-button
-            class="btn-save-secondary"
-            expand="block"
-            color="dark"
-            (click)="cambiarPassword()"
-            [disabled]="cambiandoPassword || !passwords.nueva || !passwords.confirmacion"
-          >
-            @if (cambiandoPassword) {
-              <ion-spinner name="dots"></ion-spinner>
-            } @else {
-              Actualizar contraseña
-            }
+    <ion-card class="ajustes-card">
+      <ion-card-header>
+        <ion-card-title><ion-icon name="document-text-outline"></ion-icon> Facturación</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="edit-grid">
+          <ion-item lines="none">
+            <ion-label position="stacked">DNI / NIF Fiscal</ion-label>
+            <ion-input [(ngModel)]="perfil.dni_fiscal" placeholder="12345678A"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="full-width">
+            <ion-label position="stacked">Dirección Fiscal</ion-label>
+            <ion-input [(ngModel)]="perfil.direccion_fiscal" placeholder="Dirección completa"></ion-input>
+          </ion-item>
+        </div>
+
+        <ion-button class="btn-save-master" expand="block" (click)="guardarPerfil()" [disabled]="guardandoPerfil">
+          @if (guardandoPerfil) {
+          <ion-spinner name="dots"></ion-spinner>
+          } @else {
+          <ion-icon slot="start" name="save-outline"></ion-icon> Guardar Cambios del Perfil
+          }
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+    }
+
+    <ion-card class="ajustes-card">
+      <ion-card-header>
+        <ion-card-title><ion-icon name="link-outline"></ion-icon> Integraciones</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="section-desc">Vincula tu cuenta para sincronizar automáticamente tus consultas con tu calendario
+          personal.</p>
+        <ion-item lines="none" class="integracion-item">
+          <ion-icon [name]="conectado ? 'checkmark-circle' : 'logo-google'" slot="start"
+            [color]="conectado ? 'success' : 'medium'"></ion-icon>
+          <ion-label>
+            <h3>Google Calendar</h3>
+            <p>{{ conectado ? 'Conectado y sincronizando' : 'Sincroniza tus citas automáticamente' }}</p>
+          </ion-label>
+          <ion-button slot="end" [color]="conectado ? 'danger' : 'primary'" fill="outline" (click)="toggleConexion()"
+            class="btn-integration">
+            {{ conectado ? 'Desconectar' : 'Conectar' }}
           </ion-button>
-        </ion-card-content>
-      </ion-card>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="ajustes-card">
+      <ion-card-header>
+        <ion-card-title><ion-icon name="lock-closed-outline"></ion-icon> Seguridad</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="section-desc">
+          @if (isRecovering) {
+          Estás en modo recuperación. Establece tu nueva contraseña aquí.
+          } @else {
+          Actualiza la contraseña de tu cuenta.
+          }
+        </p>
+        <div class="edit-grid">
+          @if (!isRecovering) {
+          <ion-item lines="none" class="full-width">
+            <ion-label position="stacked">Contraseña actual *</ion-label>
+            <ion-input type="password" [(ngModel)]="passwords.actual" placeholder="Tu contraseña actual"></ion-input>
+          </ion-item>
+          }
+          <ion-item lines="none" class="full-width">
+            <ion-label position="stacked">Nueva contraseña *</ion-label>
+            <ion-input type="password" [(ngModel)]="passwords.nueva" placeholder="Mínimo 6 caracteres"></ion-input>
+          </ion-item>
+          <ion-item lines="none" class="full-width">
+            <ion-label position="stacked">Confirmar nueva contraseña *</ion-label>
+            <ion-input type="password" [(ngModel)]="passwords.confirmacion"
+              placeholder="Repite la contraseña"></ion-input>
+          </ion-item>
+        </div>
+
+        <ion-button class="btn-save-secondary" expand="block" color="dark" (click)="cambiarPassword()"
+          [disabled]="cambiandoPassword || !passwords.nueva || !passwords.confirmacion || (!isRecovering && !passwords.actual)">
+          @if (cambiandoPassword) {
+          <ion-spinner name="dots"></ion-spinner>
+          } @else {
+          Actualizar contraseña
+          }
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
     }
   </div>
 </ion-content>

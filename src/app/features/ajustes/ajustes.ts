@@ -28,6 +28,7 @@ import { GoogleCalendarService } from '../../core/services/google-calendar';
 import { AuthService } from '../../core/services/auth';
 import { SupabaseService } from '../../core/services/supabase';
 import { CloudinaryService } from '../../core/services/cloudinary';
+import { PacientesService } from '../../core/services/pacientes';
 import { MenuController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -85,6 +86,7 @@ export class AjustesPage implements ViewWillEnter, OnInit {
   private authService = inject(AuthService);
   private supabaseService = inject(SupabaseService);
   private cloudinaryService = inject(CloudinaryService);
+  private pacientesService = inject(PacientesService);
   private cdr = inject(ChangeDetectorRef);
   private menuCtrl = inject(MenuController);
   private toastCtrl = inject(ToastController);
@@ -97,10 +99,11 @@ export class AjustesPage implements ViewWillEnter, OnInit {
   guardandoPerfil = false;
   cambiandoPassword = false;
 
-  // ─── DATOS DEL PERFIL COMPLETOS ───
+  rol = '';
+
   perfil = {
     usuario_id: '',
-    nutricionista_id: '',
+    entidad_id: '',
     nombre: '',
     apellidos: '',
     email: '',
@@ -111,6 +114,10 @@ export class AjustesPage implements ViewWillEnter, OnInit {
     nombre_empresa: '',
     dni_fiscal: '',
     direccion_fiscal: '',
+    dni: '',
+    fecha_nacimiento: '',
+    sexo: '',
+    direccion: '',
     avatar_url: '',
   };
 
@@ -119,30 +126,24 @@ export class AjustesPage implements ViewWillEnter, OnInit {
   avatarFile: File | null = null;
   avatarPreview: string | null = null;
 
-  // Contraseñas
-  passwords = { nueva: '', confirmacion: '' };
+  // Añadimos el campo "actual" a las contraseñas
+  passwords = { actual: '', nueva: '', confirmacion: '' };
 
   constructor() {
     addIcons({
-      logoGoogle,
-      checkmarkCircle,
-      personCircleOutline,
-      cameraOutline,
-      lockClosedOutline,
-      saveOutline,
-      linkOutline,
-      eyeOutline,
-      eyeOffOutline,
-      medkitOutline,
-      businessOutline,
-      documentTextOutline,
-      addOutline,
-      trashOutline,
+      logoGoogle, checkmarkCircle, personCircleOutline, cameraOutline,
+      lockClosedOutline, saveOutline, linkOutline, eyeOutline, eyeOffOutline,
+      medkitOutline, businessOutline, documentTextOutline, addOutline, trashOutline,
     });
   }
 
   get collapsed() {
     return Shell.isCollapsed();
+  }
+
+  // Comprueba si viene del correo de recuperación
+  get isRecovering() {
+    return this.authService.isRecoveringPassword;
   }
 
   toggleMenu() {
@@ -162,15 +163,12 @@ export class AjustesPage implements ViewWillEnter, OnInit {
     this.cdr.detectChanges();
   }
 
-  // ─── LÓGICA DE PERFIL ───
-
   async cargarDatosPerfil() {
     this.cargandoPerfil = true;
     try {
       const authUser = await this.authService.getUser();
       if (!authUser.data.user) return;
 
-      // 1. Cargamos el usuario
       const { data: usuario, error: errU } = await this.supabase
         .from('usuarios')
         .select('*')
@@ -180,42 +178,55 @@ export class AjustesPage implements ViewWillEnter, OnInit {
       if (errU) throw errU;
 
       if (usuario) {
-        // 2. Cargamos el nutricionista vinculado
-        const { data: nutri, error: errN } = await this.supabase
-          .from('nutricionistas')
-          .select('*')
-          .eq('usuario_id', usuario.id)
-          .single();
+        this.rol = usuario.rol;
 
-        console.log('DEBUG: Usuario encontrado:', usuario.id);
-        console.log('DEBUG: Nutricionista encontrado:', nutri?.id);
+        if (this.rol === 'paciente') {
+          const pac = await this.pacientesService.getMiPerfilDePaciente(usuario.id);
+          if (pac) {
+            this.perfil = {
+              ...this.perfil,
+              usuario_id: usuario.id,
+              entidad_id: pac.id,
+              nombre: usuario.nombre || '',
+              apellidos: usuario.apellidos || '',
+              email: usuario.email || authUser.data.user.email || '',
+              telefono: pac.telefono || '',
+              dni: pac.dni || '',
+              fecha_nacimiento: pac.fecha_nacimiento || '',
+              sexo: pac.sexo || '',
+              direccion: pac.direccion || '',
+              avatar_url: usuario.avatar_url || '',
+            };
+          }
+        } else {
+          const { data: nutri, error: errN } = await this.supabase
+            .from('nutricionistas')
+            .select('*')
+            .eq('usuario_id', usuario.id)
+            .single();
 
-        if (!nutri) {
-          console.warn(
-            'CUIDADO: No se encontró fila en la tabla nutricionistas para este usuario.',
-          );
-        }
+          this.perfil = {
+            ...this.perfil,
+            usuario_id: usuario.id,
+            entidad_id: nutri?.id || '',
+            nombre: usuario.nombre || '',
+            apellidos: usuario.apellidos || '',
+            email: usuario.email || authUser.data.user.email || '',
+            telefono: nutri?.telefono || '',
+            numero_colegiado: nutri?.numero_colegiado || '',
+            titulacion: nutri?.titulacion || '',
+            especialidad: nutri?.especialidad || '',
+            nombre_empresa: nutri?.nombre_empresa || '',
+            dni_fiscal: nutri?.dni_fiscal || '',
+            direccion_fiscal: nutri?.direccion_fiscal || '',
+            avatar_url: usuario.avatar_url || '',
+          };
 
-        this.perfil = {
-          usuario_id: usuario.id,
-          nutricionista_id: nutri?.id || '',
-          nombre: usuario.nombre || '',
-          apellidos: usuario.apellidos || '',
-          email: usuario.email || authUser.data.user.email || '',
-          telefono: nutri?.telefono || '',
-          numero_colegiado: nutri?.numero_colegiado || '',
-          titulacion: nutri?.titulacion || '',
-          especialidad: nutri?.especialidad || '',
-          nombre_empresa: nutri?.nombre_empresa || '',
-          dni_fiscal: nutri?.dni_fiscal || '',
-          direccion_fiscal: nutri?.direccion_fiscal || '',
-          avatar_url: usuario.avatar_url || '',
-        };
-
-        if (nutri?.centros) {
-          this.centros = Array.isArray(nutri.centros)
-            ? nutri.centros
-            : [{ nombre: '', direccion: '' }];
+          if (nutri?.centros) {
+            this.centros = Array.isArray(nutri.centros)
+              ? nutri.centros
+              : [{ nombre: '', direccion: '' }];
+          }
         }
       }
     } catch (e) {
@@ -247,8 +258,8 @@ export class AjustesPage implements ViewWillEnter, OnInit {
   }
 
   async guardarPerfil() {
-    if (!this.perfil.usuario_id || !this.perfil.nutricionista_id) {
-      await this.mostrarToast('Error: No se identificó al nutricionista', 'danger');
+    if (!this.perfil.usuario_id || !this.perfil.entidad_id) {
+      await this.mostrarToast('Error: No se identificó al usuario correctamente', 'danger');
       return;
     }
 
@@ -259,48 +270,48 @@ export class AjustesPage implements ViewWillEnter, OnInit {
         if (url) this.perfil.avatar_url = url;
       }
 
-      // 1. Actualizar Usuarios
-      const { error: errUsr } = await this.supabase
-        .from('usuarios')
-        .update({
-          nombre: this.perfil.nombre,
-          apellidos: this.perfil.apellidos,
-          avatar_url: this.perfil.avatar_url,
-        })
-        .eq('id', this.perfil.usuario_id);
+      if (this.rol === 'paciente') {
+        await this.pacientesService.actualizarPaciente(this.perfil.entidad_id, {
+          ...this.perfil
+        });
+      } else {
+        const { error: errUsr } = await this.supabase
+          .from('usuarios')
+          .update({
+            nombre: this.perfil.nombre,
+            apellidos: this.perfil.apellidos,
+            avatar_url: this.perfil.avatar_url,
+          })
+          .eq('id', this.perfil.usuario_id);
 
-      if (errUsr) throw errUsr;
+        if (errUsr) throw errUsr;
 
-      // 2. Actualizar Nutricionistas (Añadimos .select() para confirmar)
-      const { data: dataNutri, error: errNutri } = await this.supabase
-        .from('nutricionistas')
-        .update({
-          telefono: this.perfil.telefono,
-          numero_colegiado: this.perfil.numero_colegiado,
-          titulacion: this.perfil.titulacion,
-          especialidad: this.perfil.especialidad,
-          nombre_empresa: this.perfil.nombre_empresa,
-          dni_fiscal: this.perfil.dni_fiscal,
-          direccion_fiscal: this.perfil.direccion_fiscal,
-          centros: this.centros,
-        })
-        .eq('id', this.perfil.nutricionista_id)
-        .select(); // <--- IMPORTANTE: Pedimos que nos devuelva la fila
+        const { data: dataNutri, error: errNutri } = await this.supabase
+          .from('nutricionistas')
+          .update({
+            telefono: this.perfil.telefono,
+            numero_colegiado: this.perfil.numero_colegiado,
+            titulacion: this.perfil.titulacion,
+            especialidad: this.perfil.especialidad,
+            nombre_empresa: this.perfil.nombre_empresa,
+            dni_fiscal: this.perfil.dni_fiscal,
+            direccion_fiscal: this.perfil.direccion_fiscal,
+            centros: this.centros,
+          })
+          .eq('id', this.perfil.entidad_id)
+          .select();
 
-      if (errNutri) throw errNutri;
+        if (errNutri) throw errNutri;
 
-      // SI DATA ES VACÍO, ES PORQUE EL RLS BLOQUEÓ LA OPERACIÓN
-      if (!dataNutri || dataNutri.length === 0) {
-        throw new Error(
-          'No tienes permisos suficientes para actualizar estos datos o la fila no existe.',
-        );
+        if (!dataNutri || dataNutri.length === 0) {
+          throw new Error('No tienes permisos suficientes para actualizar estos datos o la fila no existe.');
+        }
       }
-
-      console.log('DEBUG: Datos guardados correctamente en DB:', dataNutri[0]);
 
       this.avatarFile = null;
       this.avatarPreview = null;
       await this.mostrarToast('¡Perfil actualizado con éxito!', 'success');
+
       window.dispatchEvent(new Event('perfilActualizado'));
     } catch (e: any) {
       console.error('ERROR CRÍTICO AL GUARDAR:', e);
@@ -311,13 +322,18 @@ export class AjustesPage implements ViewWillEnter, OnInit {
     }
   }
 
-  // ─── LÓGICA DE CONTRASEÑA E INTEGRACIONES ───
-
+  // ─── ACTUALIZADO PARA SOLICITAR CONTRASEÑA ANTIGUA ───
   async cambiarPassword() {
+    if (!this.isRecovering && !this.passwords.actual) {
+      await this.mostrarToast('Debes introducir tu contraseña actual', 'warning');
+      return;
+    }
+
     if (this.passwords.nueva.length < 6) {
       await this.mostrarToast('La contraseña debe tener al menos 6 caracteres', 'warning');
       return;
     }
+
     if (this.passwords.nueva !== this.passwords.confirmacion) {
       await this.mostrarToast('Las contraseñas no coinciden', 'warning');
       return;
@@ -325,10 +341,21 @@ export class AjustesPage implements ViewWillEnter, OnInit {
 
     this.cambiandoPassword = true;
     try {
+      // Si NO está en modo recuperar, verificamos primero si la contraseña actual es la correcta
+      // La forma más eficiente con Supabase de hacer esto es forzar un SignIn
+      if (!this.isRecovering) {
+        const { error: authErr } = await this.authService.signIn(this.perfil.email, this.passwords.actual);
+        if (authErr) {
+          throw new Error('La contraseña actual es incorrecta');
+        }
+      }
+
       const { error } = await this.supabase.auth.updateUser({ password: this.passwords.nueva });
       if (error) throw error;
 
-      this.passwords = { nueva: '', confirmacion: '' };
+      this.passwords = { actual: '', nueva: '', confirmacion: '' };
+      this.authService.isRecoveringPassword = false; // Ya la hemos cambiado, desactivamos el modo
+
       await this.mostrarToast('Contraseña actualizada con éxito', 'success');
     } catch (e: any) {
       console.error(e);

@@ -7,9 +7,17 @@ import { SupabaseService } from './supabase';
 })
 export class AuthService {
   private supabase: SupabaseClient;
+  public isRecoveringPassword = false; // Detecta si venimos de recuperar contraseña
 
   constructor(private supabaseService: SupabaseService) {
     this.supabase = this.supabaseService.client;
+    
+    // Escuchamos los cambios de sesión de Supabase
+    this.supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        this.isRecoveringPassword = true;
+      }
+    });
   }
 
   async signIn(email: string, password: string) {
@@ -125,5 +133,12 @@ export class AuthService {
   async getUsuarioId(): Promise<string> {
     const usuario = await this.getUsuario();
     return usuario?.id ?? '';
+  }
+
+  // --- NUEVA FUNCIÓN PARA RECUPERAR CONTRASEÑA ---
+  async resetPasswordForEmail(email: string) {
+    return await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/ajustes`, // Redirige a los ajustes para que la cambie
+    });
   }
 }

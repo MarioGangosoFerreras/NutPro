@@ -4,16 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth';
 import {
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonItem,
-  IonLabel,
   IonInput,
   IonButton,
   IonSpinner,
-  IonText
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -34,15 +27,24 @@ export class Login {
   password = '';
   loading = false;
   errorMessage = '';
+  successMessage = ''; // Mensaje de éxito al enviar el correo
+  modoRecuperar = false;
 
   constructor(
     private authService: AuthService,
     private router: Router
   ) { }
 
+  toggleModoRecuperar() {
+    this.modoRecuperar = !this.modoRecuperar;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
   async onLogin() {
     this.loading = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
     const { error } = await this.authService.signIn(this.email, this.password);
 
@@ -51,7 +53,6 @@ export class Login {
     if (error) {
       this.errorMessage = 'Email o contraseña incorrectos';
     } else {
-      // Verificamos qué tipo de usuario acaba de entrar
       const usuario = await this.authService.getUsuario();
 
       if (usuario?.rol === 'paciente') {
@@ -59,6 +60,26 @@ export class Login {
       } else {
         this.router.navigate(['/dashboard']);
       }
+    }
+  }
+
+  async recuperarPassword() {
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    if (!this.email) {
+      this.errorMessage = 'Introduce tu correo electrónico primero';
+      return;
+    }
+
+    this.loading = true;
+    const { error } = await this.authService.resetPasswordForEmail(this.email);
+    this.loading = false;
+
+    if (error) {
+      this.errorMessage = 'Error al enviar el correo. Asegúrate de que el formato sea correcto.';
+    } else {
+      this.successMessage = '¡Listo! Te hemos enviado un enlace para recuperar tu contraseña al correo.';
     }
   }
 }

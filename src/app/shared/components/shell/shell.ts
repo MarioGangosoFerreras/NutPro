@@ -65,7 +65,7 @@ export class Shell implements OnInit {
       peopleOutline, calendarOutline, gridOutline, logOutOutline,
       menuOutline, closeOutline, chevronForwardOutline, settingsOutline,
       giftOutline, personCircleOutline, restaurantOutline, chatbubblesOutline,
-      walletOutline, homeOutline, trendingUpOutline, documentTextOutline
+      walletOutline, homeOutline, trendingUpOutline, documentTextOutline,
     });
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e: any) => {
       this.rutaActiva.set(e.urlAfterRedirects);
@@ -93,6 +93,7 @@ export class Shell implements OnInit {
           { label: 'Citas', icon: 'calendar-outline', route: '/portal-paciente/citas'},
           { label: 'Docs y Facturas', icon: 'document-text-outline', route: '/portal-paciente/documentos'},
           { label: 'Mensajes', icon: 'chatbubbles-outline', route: '/mensajes' },
+          { label: 'Ajustes', icon: 'settings-outline', route: '/ajustes' },
         ]);
       } else {
         // Asignamos la ruta base del nutricionista/admin
