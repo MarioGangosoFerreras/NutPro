@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase';
+import { environment } from '../../../environments/environment';
 
 /**
  * Servicio de gestión de pacientes
@@ -35,8 +36,6 @@ export class PacientesService {
    * @async
    * @param {string} nutricionistaId - ID del nutricionista
    * @returns {Promise<any[]>} Array de pacientes con datos del usuario relacionado, ordenados por fecha de creación descendente
-   * @example
-   * const pacientes = await pacientesService.getPacientes('nutricionista-123');
    */
   async getPacientes(nutricionistaId: string) {
     const { data, error } = await this.supabase
@@ -84,7 +83,7 @@ export class PacientesService {
       if (avatarFile) {
         const formData = new FormData();
         formData.append('file', avatarFile);
-        formData.append('upload_preset', 'nutpro_avatars'); // <--- USA TU PRESET (el que uses en editar)
+        formData.append('upload_preset', 'nutpro_avatars');
         formData.append('folder', 'nutpro/avatars');
 
         const res = await fetch('https://api.cloudinary.com/v1_1/dsvp0hgvd/image/upload', {
@@ -101,34 +100,66 @@ export class PacientesService {
         }
       }
 
-      // Paso 1: Crear usuario con la URL de Cloudinary
+      // PASO 1: Crear cuenta en Supabase Auth SIN cerrar la sesión del nutricionista
+      const tempSupabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
+        auth: {
+          persistSession: false, 
+          autoRefreshToken: false
+        }
+      });
+
+      // Usamos el DNI como contraseña predeterminada
+      const passwordPredeterminada = datos.dni.trim().toUpperCase();
+
+      const { data: authData, error: authError } = await tempSupabase.auth.signUp({
+        email: datos.email.trim(),
+        password: passwordPredeterminada,
+        options: {
+          data: {
+            // Pasamos los metadatos para que el Trigger de Supabase no falle
+            nombre: datos.nombre.trim(),
+            apellidos: datos.apellidos.trim(),
+            rol: 'paciente',
+            avatar_url: avatarUrl
+          }
+        }
+      });
+
+      if (authError) throw authError;
+      if (!authData.user) throw new Error("No se pudo crear el usuario en Auth");
+
+      const authUserId = authData.user.id;
+
+      // Paso 2: Crear usuario vinculado en tu tabla 'usuarios'
       const { data: usuario, error: errorUsuario } = await this.supabase
         .from('usuarios')
         .insert({
-          email: datos.email,
-          nombre: datos.nombre,
-          apellidos: datos.apellidos,
+          id: authUserId,
+          auth_user_id: authUserId,
+          email: datos.email.trim(),
+          nombre: datos.nombre.trim(),
+          apellidos: datos.apellidos.trim(),
           rol: 'paciente',
-          avatar_url: avatarUrl, // Aquí guardamos la URL de Cloudinary
+          avatar_url: avatarUrl,
         })
         .select()
         .single();
 
       if (errorUsuario) throw errorUsuario;
 
-      // Paso 2: Crear paciente vinculado
+      // Paso 3: Crear registro en la tabla 'pacientes'
       const { data: paciente, error: errorPaciente } = await this.supabase
         .from('pacientes')
         .insert({
           usuario_id: usuario.id,
           nutricionista_id: datos.nutricionista_id,
-          dni: datos.dni,
+          dni: datos.dni.trim().toUpperCase(),
           fecha_nacimiento: datos.fecha_nacimiento,
           sexo: datos.sexo,
           estado_civil: datos.estado_civil || null,
-          telefono: datos.telefono,
-          email: datos.email,
-          direccion: datos.direccion,
+          telefono: datos.telefono.trim(),
+          email: datos.email.trim(),
+          direccion: datos.direccion.trim(),
           ocupacion: datos.ocupacion || null,
           nacionalidad: datos.nacionalidad || null,
           motivo_consulta: datos.motivo_consulta,
@@ -139,6 +170,7 @@ export class PacientesService {
         .single();
 
       if (errorPaciente) {
+        // Rollback manual si falla la creación del perfil paciente
         await this.supabase.from('usuarios').delete().eq('id', usuario.id);
         throw errorPaciente;
       }
@@ -352,7 +384,8 @@ export class PacientesService {
   async getMiPerfilDePaciente(usuarioId: string) {
     const { data, error } = await this.supabase
       .from('pacientes')
-      .select(`
+      .select(
+        `
         *,
         usuario:usuario_id (
           nombre,
@@ -372,7 +405,8 @@ export class PacientesService {
             avatar_url
           )
         )
-      `)
+      `,
+      )
       .eq('usuario_id', usuarioId)
       .single();
 

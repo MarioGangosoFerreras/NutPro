@@ -7,7 +7,7 @@ import { Header } from '../../../shared/components/header/header';
 import { IonButton, IonContent, IonInput, IonSpinner, IonIcon } from '@ionic/angular/standalone';
 
 /**
- * Componente que proporciona el formulario para la creación manual 
+ * Componente que proporciona el formulario para la creación manual
  * de un nuevo paciente directamente por parte del nutricionista.
  *
  * @export
@@ -15,13 +15,9 @@ import { IonButton, IonContent, IonInput, IonSpinner, IonIcon } from '@ionic/ang
  */
 @Component({
   selector: 'app-nuevo-paciente',
-  imports: [
-    FormsModule, RouterLink,
-    Header, IonContent, IonInput, IonButton, IonSpinner,
-    IonIcon
-],
+  imports: [FormsModule, RouterLink, Header, IonContent, IonInput, IonButton, IonSpinner, IonIcon],
   templateUrl: './nuevo-paciente.html',
-  styleUrl: './nuevo-paciente.css'
+  styleUrl: './nuevo-paciente.css',
 })
 export class NuevoPaciente {
   nombre = '';
@@ -45,7 +41,7 @@ export class NuevoPaciente {
     nacionalidad: '',
     motivo_consulta: '',
     alergias: [] as string[],
-    intolerancias: [] as string[]
+    intolerancias: [] as string[],
   };
 
   alergiasInput = '';
@@ -63,7 +59,7 @@ export class NuevoPaciente {
   constructor(
     private pacientesService: PacientesService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   /**
@@ -86,16 +82,23 @@ export class NuevoPaciente {
 
   /**
    * Valida el formulario localmente, procesa las alergias/intolerancias
-   * y llama al servicio encargado de insertar tanto al usuario en autenticación 
+   * y llama al servicio encargado de insertar tanto al usuario en autenticación
    * como el registro de paciente en base de datos y Cloudinary.
    *
    * @returns {Promise<void>}
    */
   async guardar() {
-    if (!this.nombre || !this.apellidos || !this.paciente.dni ||
-      !this.paciente.fecha_nacimiento || !this.paciente.sexo ||
-      !this.paciente.telefono || !this.paciente.email ||
-      !this.paciente.direccion || !this.paciente.motivo_consulta) {
+    if (
+      !this.nombre ||
+      !this.apellidos ||
+      !this.paciente.dni ||
+      !this.paciente.fecha_nacimiento ||
+      !this.paciente.sexo ||
+      !this.paciente.telefono ||
+      !this.paciente.email ||
+      !this.paciente.direccion ||
+      !this.paciente.motivo_consulta
+    ) {
       this.errorMessage = 'Por favor rellena todos los campos obligatorios';
       return;
     }
@@ -111,24 +114,36 @@ export class NuevoPaciente {
     }
 
     this.paciente.alergias = this.alergiasInput
-      ? this.alergiasInput.split(',').map(a => a.trim()).filter(a => a)
+      ? this.alergiasInput
+          .split(',')
+          .map((a) => a.trim())
+          .filter((a) => a)
       : [];
     this.paciente.intolerancias = this.intoleracionesInput
-      ? this.intoleracionesInput.split(',').map(i => i.trim()).filter(i => i)
+      ? this.intoleracionesInput
+          .split(',')
+          .map((i) => i.trim())
+          .filter((i) => i)
       : [];
 
-    const { data, error } = await this.pacientesService.crearPaciente({
-      ...this.paciente,
-      nombre: this.nombre,
-      apellidos: this.apellidos,
-      nutricionista_id: nutricionistaId
-    }, this.avatarFile);
+    const { data, error } = await this.pacientesService.crearPaciente(
+      {
+        ...this.paciente,
+        nombre: this.nombre,
+        apellidos: this.apellidos,
+        nutricionista_id: nutricionistaId,
+      },
+      this.avatarFile,
+    );
 
     this.loading = false;
 
     if (error) {
       this.errorMessage = 'Error al guardar el paciente: ' + error.message;
     } else {
+      alert(
+        `✅ Paciente añadido correctamente.\n\nComunícale que ya puede acceder a su portal con su email y que su contraseña temporal es su DNI: ${this.paciente.dni}`,
+      );
       this.router.navigate(['/pacientes']);
     }
   }

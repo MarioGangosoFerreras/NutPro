@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+// src/app/features/auth/login/login.ts
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth';
@@ -9,13 +10,6 @@ import {
   IonSpinner,
 } from '@ionic/angular/standalone';
 
-/**
- * Componente encargado del inicio de sesión de los usuarios (pacientes y nutricionistas).
- * También gestiona la vista y lógica para la recuperación de contraseñas.
- *
- * @export
- * @class Login
- */
 @Component({
   selector: 'app-login',
   imports: [
@@ -37,61 +31,51 @@ export class Login {
   successMessage = '';
   modoRecuperar = false;
 
-  /**
-   * Crea una instancia del componente Login.
-   *
-   * @param {AuthService} authService - Servicio para manejar la autenticación en Supabase.
-   * @param {Router} router - Servicio de enrutamiento para navegar tras el login exitoso.
-   */
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef // 👈 Añadimos esto para forzar la actualización visual
   ) { }
 
-  /**
-   * Alterna entre el modo de inicio de sesión normal y el modo de recuperación de contraseña.
-   * También limpia los mensajes de error y éxito previos.
-   */
   toggleModoRecuperar() {
     this.modoRecuperar = !this.modoRecuperar;
     this.errorMessage = '';
     this.successMessage = '';
   }
 
-  /**
-   * Ejecuta el proceso de inicio de sesión utilizando el email y contraseña proporcionados.
-   * Si tiene éxito, redirige al usuario a su panel correspondiente según su rol (paciente o nutricionista).
-   *
-   * @returns {Promise<void>}
-   */
   async onLogin() {
     this.loading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges(); // Forzamos a que aparezca el spinner
 
-    const { error } = await this.authService.signIn(this.email, this.password);
+    try {
+      // Limpiamos espacios en el email por si el usuario copió y pegó con un espacio al final
+      const { error } = await this.authService.signIn(this.email.trim(), this.password);
 
-    this.loading = false;
-
-    if (error) {
-      this.errorMessage = 'Email o contraseña incorrectos';
-    } else {
-      const usuario = await this.authService.getUsuario();
-
-      if (usuario?.rol === 'paciente') {
-        this.router.navigate(['/portal-paciente']);
+      if (error) {
+        // Aquí es donde cae el error 400. Mostramos el error visual.
+        this.errorMessage = 'Email o contraseña incorrectos. Revisa tus datos.';
+        console.error('Login fallido:', error.message);
       } else {
-        this.router.navigate(['/dashboard']);
+        const usuario = await this.authService.getUsuario();
+
+        if (usuario?.rol === 'paciente') {
+          this.router.navigate(['/portal-paciente']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
       }
+    } catch (err: any) {
+      // Por si se cae el internet o hay un error inesperado
+      this.errorMessage = 'Ocurrió un error inesperado. Revisa tu conexión.';
+      console.error('Excepción en login:', err);
+    } finally {
+      this.loading = false;
+      this.cdr.detectChanges(); // 👈 Obligamos a la UI a quitar el spinner y mostrar el error
     }
   }
 
-  /**
-   * Solicita el envío de un correo electrónico para restablecer la contraseña del usuario.
-   * Dependiendo del resultado de la petición, muestra un mensaje de éxito o de error.
-   *
-   * @returns {Promise<void>}
-   */
   async recuperarPassword() {
     this.errorMessage = '';
     this.successMessage = '';
@@ -102,13 +86,21 @@ export class Login {
     }
 
     this.loading = true;
-    const { error } = await this.authService.resetPasswordForEmail(this.email);
-    this.loading = false;
+    this.cdr.detectChanges();
 
-    if (error) {
-      this.errorMessage = 'Error al enviar el correo. Asegúrate de que el formato sea correcto.';
-    } else {
-      this.successMessage = '¡Listo! Te hemos enviado un enlace para recuperar tu contraseña al correo.';
+    try {
+      const { error } = await this.authService.resetPasswordForEmail(this.email.trim());
+      
+      if (error) {
+        this.errorMessage = 'Error al enviar el correo. Asegúrate de que el formato sea correcto.';
+      } else {
+        this.successMessage = '¡Listo! Te hemos enviado un enlace para recuperar tu contraseña al correo.';
+      }
+    } catch (err) {
+      this.errorMessage = 'Error inesperado al conectar con el servidor.';
+    } finally {
+      this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 }
