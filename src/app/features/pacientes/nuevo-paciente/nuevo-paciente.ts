@@ -141,9 +141,7 @@ export class NuevoPaciente {
     if (error) {
       this.errorMessage = 'Error al guardar el paciente: ' + error.message;
     } else {
-      alert(
-        `✅ Paciente añadido correctamente.\n\nComunícale que ya puede acceder a su portal con su email y que su contraseña temporal es su DNI: ${this.paciente.dni}`,
-      );
+      alert(`✅ Paciente añadido correctamente.\n\nComunícale que ya puede acceder a su portal con su email y que su contraseña temporal es su DNI: ${this.paciente.dni.trim().toUpperCase()}`);
       this.router.navigate(['/pacientes']);
     }
   }

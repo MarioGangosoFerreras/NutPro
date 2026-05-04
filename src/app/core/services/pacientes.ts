@@ -68,12 +68,15 @@ export class PacientesService {
   }
 
   /**
-   * Crea un nuevo paciente junto con su usuario asociado
+   * Crea un nuevo paciente delegando la inserción en las tablas a un Trigger de Supabase.
+   * Utiliza un cliente secundario de Auth sin persistencia de sesión para evitar 
+   * desloguear al nutricionista actual.
+   * La contraseña inicial generada automáticamente es el DNI del paciente (sin espacios y en mayúsculas).
+   *
    * @async
-   * @param {any} datos - Objeto con los datos del paciente (nombre, apellidos, email, dni, fecha_nacimiento, sexo, etc.)
-   * @param {File | null} [avatarFile] - Archivo de imagen del avatar a subir a Cloudinary (opcional)
-   * @returns {Promise<{data: any | null, error: any}>} Objeto con los datos del paciente creado o error
-   * @throws {Error} Si hay error al crear el usuario o el paciente
+   * @param {any} datos - Objeto con los datos del paciente (nombre, apellidos, email, dni, nutricionista_id, etc.).
+   * @param {File | null} [avatarFile] - Archivo de imagen del avatar a subir a Cloudinary (opcional).
+   * @returns {Promise<{data: any | null, error: any}>} Promesa que resuelve con el objeto de usuario de Auth creado en `data`, o el `error` capturado.
    */
   async crearPaciente(datos: any, avatarFile?: File | null) {
     let avatarUrl = null;
@@ -94,7 +97,6 @@ export class PacientesService {
         if (res.ok) {
           const cloudData = await res.json();
           avatarUrl = cloudData.secure_url;
-          console.log('Imagen subida a Cloudinary con éxito:', avatarUrl);
         } else {
           console.error('Error en Cloudinary:', await res.text());
         }
@@ -103,79 +105,46 @@ export class PacientesService {
       // PASO 1: Crear cuenta en Supabase Auth SIN cerrar la sesión del nutricionista
       const tempSupabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
         auth: {
-          persistSession: false, 
-          autoRefreshToken: false
-        }
+          persistSession: false,
+          autoRefreshToken: false,
+        },
       });
 
-      // Usamos el DNI como contraseña predeterminada
+      // Usamos el DNI como contraseña predeterminada, quitando espacios y en mayúsculas
       const passwordPredeterminada = datos.dni.trim().toUpperCase();
 
+      // PASO 2: Le pasamos TODOS los datos al Trigger para que él inserte en 'usuarios' y 'pacientes'
       const { data: authData, error: authError } = await tempSupabase.auth.signUp({
         email: datos.email.trim(),
         password: passwordPredeterminada,
         options: {
           data: {
-            // Pasamos los metadatos para que el Trigger de Supabase no falle
             nombre: datos.nombre.trim(),
             apellidos: datos.apellidos.trim(),
             rol: 'paciente',
-            avatar_url: avatarUrl
-          }
-        }
+            avatar_url: avatarUrl,
+            // Añadimos todos los datos que tu Trigger necesita para la tabla 'pacientes'
+            nutricionista_id: datos.nutricionista_id,
+            dni: datos.dni.trim().toUpperCase(),
+            fecha_nacimiento: datos.fecha_nacimiento,
+            sexo: datos.sexo,
+            estado_civil: datos.estado_civil || null,
+            telefono: datos.telefono.trim(),
+            direccion: datos.direccion.trim(),
+            ocupacion: datos.ocupacion || null,
+            nacionalidad: datos.nacionalidad || null,
+            motivo_consulta: datos.motivo_consulta,
+            alergias: datos.alergias,
+            intolerancias: datos.intolerancias,
+          },
+        },
       });
 
       if (authError) throw authError;
-      if (!authData.user) throw new Error("No se pudo crear el usuario en Auth");
+      if (!authData.user) throw new Error('No se pudo crear el usuario en Auth');
 
-      const authUserId = authData.user.id;
-
-      // Paso 2: Crear usuario vinculado en tu tabla 'usuarios'
-      const { data: usuario, error: errorUsuario } = await this.supabase
-        .from('usuarios')
-        .insert({
-          id: authUserId,
-          auth_user_id: authUserId,
-          email: datos.email.trim(),
-          nombre: datos.nombre.trim(),
-          apellidos: datos.apellidos.trim(),
-          rol: 'paciente',
-          avatar_url: avatarUrl,
-        })
-        .select()
-        .single();
-
-      if (errorUsuario) throw errorUsuario;
-
-      // Paso 3: Crear registro en la tabla 'pacientes'
-      const { data: paciente, error: errorPaciente } = await this.supabase
-        .from('pacientes')
-        .insert({
-          usuario_id: usuario.id,
-          nutricionista_id: datos.nutricionista_id,
-          dni: datos.dni.trim().toUpperCase(),
-          fecha_nacimiento: datos.fecha_nacimiento,
-          sexo: datos.sexo,
-          estado_civil: datos.estado_civil || null,
-          telefono: datos.telefono.trim(),
-          email: datos.email.trim(),
-          direccion: datos.direccion.trim(),
-          ocupacion: datos.ocupacion || null,
-          nacionalidad: datos.nacionalidad || null,
-          motivo_consulta: datos.motivo_consulta,
-          alergias: datos.alergias,
-          intolerancias: datos.intolerancias,
-        })
-        .select()
-        .single();
-
-      if (errorPaciente) {
-        // Rollback manual si falla la creación del perfil paciente
-        await this.supabase.from('usuarios').delete().eq('id', usuario.id);
-        throw errorPaciente;
-      }
-
-      return { data: paciente, error: null };
+      // ¡Listo! Ya no necesitamos los insert/upsert manuales. El Trigger lo hizo por nosotros.
+      return { data: authData.user, error: null };
     } catch (err: any) {
       console.error('Error en el proceso:', err.message);
       return { data: null, error: err };
