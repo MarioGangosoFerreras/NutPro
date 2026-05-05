@@ -46,12 +46,14 @@ export class RegistroPaciente implements OnInit {
   maxDateNacimiento = '';
   minDateNacimiento = '';
 
+  datetimeId = 'datetime-' + Math.random().toString(36).substring(2, 9);
+
   /** Objeto que almacena todos los datos introducidos por el paciente en el formulario */
   datos = {
     nombre: '',
     apellidos: '',
     dni: '',
-    fecha_nacimiento: '',
+    fecha_nacimiento: '1990-01-01', // Fecha inicial para que el botón no esté vacío 
     sexo: '',
     direccion: '',
     motivo_consulta: '',

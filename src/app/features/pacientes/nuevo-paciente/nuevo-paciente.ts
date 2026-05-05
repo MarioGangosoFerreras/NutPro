@@ -37,10 +37,13 @@ export class NuevoPaciente implements OnInit {
   maxDateNacimiento = '';
   minDateNacimiento = '';
 
+  // 1. Añade el ID único al principio de la clase
+  datetimeId = 'datetime-' + Math.random().toString(36).substring(2, 9);
+
   /** Objeto que almacena los diferentes campos de información personal y médica del paciente */
   paciente = {
     dni: '',
-    fecha_nacimiento: '',
+    fecha_nacimiento: '1990-01-01', // Fecha inicial para que el botón no esté vacío 
     sexo: '',
     estado_civil: '',
     telefono: '',

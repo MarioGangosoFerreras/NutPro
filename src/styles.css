@@ -507,26 +507,35 @@ ion-select::part(icon) {
    ESTILOS PARA EL BOTÓN DEL CALENDARIO FLOTANTE
    ═══════════════════════════════════════════════════════════════ */
 
+/* Contenedor que imita el estilo de un ion-input */
+.datetime-container-global {
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 8px 16px !important; /* Espacio para que respire */
+  margin-top: 6px !important;
+  box-sizing: border-box !important;
+  min-height: 48px !important;
+  transition: all 0.25s ease;
+}
+
 /* Hacemos que el botón interno ocupe todo el espacio */
 ion-datetime-button {
-  width: 100%;
+  width: 100% !important;
 }
 
-/* Limpiamos la sombra y colores por defecto del botón nativo de Ionic */
+/* Limpiamos la sombra y colores por defecto, y lo FORZAMOS A LA IZQUIERDA */
 ion-datetime-button::part(native) {
-  background: transparent;
-  box-shadow: none;
-  padding: 0;
-  color: #1e293b;
-  font-size: 15px;
-  display: flex;
-  justify-content: flex-start;  /* Alineamos la fecha a la izquierda */
-  min-height: 24px;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   SOLUCIÓN AL BOTÓN DE GUARDAR OCULTO EN MODALES
-   ═══════════════════════════════════════════════════════════════ */
-ion-modal ion-content::part(scroll) {
-  padding-bottom: 80px !important; 
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: #1e293b !important;
+  font-size: 15px !important;
+  display: flex !important;
+  justify-content: flex-start !important; /* 🔥 Alineamos la fecha a la izquierda */
+  width: 100% !important; /* 🔥 Obligatorio para que el justify-content funcione */
+  min-height: 24px !important;
 }

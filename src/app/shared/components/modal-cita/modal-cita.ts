@@ -81,6 +81,8 @@ export class ModalCitaComponent implements OnInit {
 
   guardando = false;
 
+  // ID dinámico para evitar conflictos en el HTML
+  datetimeId = 'datetime-' + Math.random().toString(36).substring(2, 9);
   /** Variables del formulario */
   fecha = '';
   hora = '';
@@ -116,11 +118,12 @@ export class ModalCitaComponent implements OnInit {
 
   /**
    * Retorna la fecha mínima permitida para la cita.
-   * Si es edición, devolvemos 'undefined' para no romper el calendario de Ionic.
+   * Si es edición, devolvemos una fecha antigua (año 2000) para evitar que
+   * Ionic crashee al recibir un "undefined" o un texto vacío.
    */
-  get minDateCita(): string | undefined {
+  get minDateCita(): string {
     if (this.esEdicion) {
-      return undefined; // Importante: undefined, NO unas comillas vacías ''
+      return '2000-01-01'; // Evita el cuadrado vacío
     }
     const tzoffset = (new Date()).getTimezoneOffset() * 60000;
     return new Date(Date.now() - tzoffset).toISOString().split('T')[0];
@@ -135,6 +138,7 @@ export class ModalCitaComponent implements OnInit {
     if (!this.pacienteSeleccionadoId) this.cargarPacientes();
 
     if (this.cita) {
+      // 📝 MODO EDICIÓN
       const d = new Date(this.cita.fecha_hora);
       this.fecha = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       this.hora = d.toTimeString().slice(0, 5);
@@ -145,7 +149,10 @@ export class ModalCitaComponent implements OnInit {
       this.urlVideo = this.cita.url_videollamada ?? '';
       this.pacienteSeleccionadoId = this.cita.paciente_id;
     } else {
-      this.fecha = this.fechaSeleccionada || new Date().toISOString().split('T')[0];
+      // 📝 MODO CREACIÓN (Calculamos "hoy" en la zona horaria local de España)
+      const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+      const hoyLocal = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
+      this.fecha = this.fechaSeleccionada || hoyLocal;
     }
 
     if (this.fecha) await this.cargarCitasDelDia(this.fecha);
