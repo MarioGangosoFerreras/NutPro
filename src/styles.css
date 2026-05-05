@@ -473,7 +473,6 @@ ion-button .avocado-spinner {
 
 /* 2. Inputs, Textareas y Selects con espacio real (Padding) */
 ion-input, ion-select, ion-textarea {
-  padding: 14px 16px !important; /* Fuerza el espacio interno para que el texto no se pegue */
   --padding-start: 0 !important;
   --padding-end: 0 !important;
   --padding-top: 0 !important;

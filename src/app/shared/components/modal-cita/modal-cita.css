@@ -80,3 +80,33 @@ ion-datetime-button::part(native) {
   font-size: 15px;
   padding-left: 10px;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   CAMPOS DEL FORMULARIO (Duración, Tipo, Estado, Notas)
+   ═══════════════════════════════════════════════════════════════ */
+
+ion-item {
+  --background: #f8fafc;
+  --border-color: transparent;
+  --inner-border-width: 0;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin: 0 0 10px 0;
+}
+
+ion-item ion-label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+ion-item ion-select,
+ion-item ion-input,
+ion-item ion-textarea {
+  --color: #1e293b;
+  font-size: 15px;
+}
