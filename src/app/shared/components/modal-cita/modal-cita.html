@@ -31,30 +31,20 @@
   }
 
   <div style="margin-top: 16px; margin-bottom: 16px; padding: 0 16px;">
-    <label style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 6px;">
-      Fecha de la consulta
-    </label>
-    
-    <div class="datetime-container-global">
-      <ion-datetime-button [datetime]="datetimeId"></ion-datetime-button>
-    </div>
+  <label style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 6px;">
+    Fecha de la consulta
+  </label>
 
-    <ion-modal [keepContentsMounted]="true">
-      <ng-template>
-        <ion-datetime 
-          [id]="datetimeId" 
-          presentation="date" 
-          [(ngModel)]="fecha" 
-          [min]="minDateCita" 
-          (ionChange)="onFechaCambiada($event)"
-          color="primary"
-          [showDefaultButtons]="true"
-          doneText="Confirmar"
-          cancelText="Cancelar">
-        </ion-datetime>
-      </ng-template>
-    </ion-modal>
-  </div>
+  <ion-datetime
+    presentation="date"
+    [(ngModel)]="fecha"
+    [min]="minDateCita"
+    (ionChange)="onFechaCambiada($event)"
+    color="primary"
+    [showDefaultButtons]="false"
+    size="cover">
+  </ion-datetime>
+</div>
 
   @if (fecha) {
   <div style="margin: 16px 0;">
@@ -123,4 +113,4 @@
     @if (guardando) { <ion-spinner name="crescent"></ion-spinner> }
     @else { {{ esEdicion ? 'Guardar cambios' : 'Crear cita' }} }
   </ion-button>
-</ion-content>     
+</ion-content>

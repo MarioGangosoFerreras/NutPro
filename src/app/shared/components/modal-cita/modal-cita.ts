@@ -68,9 +68,7 @@ export class ModalCitaComponent implements OnInit {
 
   guardando = false;
   cargandoHoras = false; 
-  
-  datetimeId = 'datetime-' + Math.random().toString(36).substring(2, 9);
-  
+    
   fecha = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0];
   fechaLimpiaPrevia = ''; 
 
@@ -150,7 +148,7 @@ export class ModalCitaComponent implements OnInit {
       const fechaLimpia = fechaIso.split('T')[0]; 
       const todas = await this.citasService.getHorariosOcupadosNutricionista(this.nutricionistaId);
       this.citasDelDiaSeleccionado = todas.filter((c) => c.fecha_hora.startsWith(fechaLimpia));
-      this.recalcularHoras();
+      this.recalcularHoras(fechaLimpia);
     } catch (e) {
       console.error('Error al obtener horarios', e);
     } finally {
@@ -167,23 +165,19 @@ export class ModalCitaComponent implements OnInit {
 
     if (this.fechaLimpiaPrevia === nuevaFecha) return;
     
-    this.fechaLimpiaPrevia = nuevaFecha;
-    this.fecha = nuevaFecha; 
-    this.hora = ''; 
-    
-    // 🔥 SOLUCIÓN DOBLE CLIC: Retraso mágico de 200ms para que Ionic cierre su modal
-    setTimeout(() => {
-      this.ngZone.run(() => {
-        this.cargarCitasDelDia(nuevaFecha);
-      });
-    }, 200);
+    // 🔥 SOLUCIÓN DOBLE CLIC: Forzamos la zona de Angular de forma instantánea
+    this.ngZone.run(() => {
+      this.fechaLimpiaPrevia = nuevaFecha;
+      this.fecha = nuevaFecha; 
+      this.hora = ''; 
+      this.cargarCitasDelDia(nuevaFecha);
+    });
   }
 
-  recalcularHoras() {
+  recalcularHoras(fechaLimpia: string) {
     if (!this.fecha) return;
     
-    // 🔥 SOLUCIÓN HORAS: Limpiamos la fecha de la "T" para que esHoy funcione impecable
-    const fechaLimpia = this.fecha.split('T')[0];
+    // 🔥 SOLUCIÓN HORAS: Usamos la fecha limpia para que detecte correctamente si es HOY
     const duracionMinima = 30;
     const ahora = new Date();
     const tzoffset = ahora.getTimezoneOffset() * 60000;
