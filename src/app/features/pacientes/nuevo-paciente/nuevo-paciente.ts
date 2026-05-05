@@ -6,21 +6,17 @@ import { AuthService } from '../../../core/services/auth';
 import { Header } from '../../../shared/components/header/header';
 import { 
   IonButton, IonContent, IonInput, IonSpinner, IonIcon, 
-  IonDatetime, IonDatetimeButton, IonModal // <-- AÑADIDOS
+  IonDatetime, IonDatetimeButton, IonModal
 } from '@ionic/angular/standalone';
 
 /**
- * Componente que proporciona el formulario para la creación manual
- * de un nuevo paciente directamente por parte del nutricionista.
- *
- * @export
- * @class NuevoPaciente
+ * Componente para la creación manual de un nuevo paciente.
  */
 @Component({
   selector: 'app-nuevo-paciente',
   imports: [
     FormsModule, RouterLink, Header, IonContent, IonInput, IonButton, IonSpinner, IonIcon,
-    IonDatetime, IonDatetimeButton, IonModal // <-- AÑADIDOS
+    IonDatetime, IonDatetimeButton, IonModal
   ],
   templateUrl: './nuevo-paciente.html',
   styleUrl: './nuevo-paciente.css',
@@ -28,22 +24,18 @@ import {
 export class NuevoPaciente implements OnInit {
   nombre = '';
   apellidos = '';
-
-  /** Objeto File correspondiente a la imagen seleccionada para el avatar */
   avatarFile: File | null = null;
-  /** URL de vista previa base64 del avatar local antes de subirse */
   avatarPreview: string | null = null;
 
-  maxDateNacimiento = '';
-  minDateNacimiento = '';
+  // ✅ FIX: Inicialización segura
+  maxDateNacimiento = new Date().toISOString().split('T')[0];
+  minDateNacimiento = '1900-01-01';
 
-  // 1. Añade el ID único al principio de la clase
   datetimeId = 'datetime-' + Math.random().toString(36).substring(2, 9);
 
-  /** Objeto que almacena los diferentes campos de información personal y médica del paciente */
   paciente = {
     dni: '',
-    fecha_nacimiento: '1990-01-01', // Fecha inicial para que el botón no esté vacío 
+    fecha_nacimiento: '1990-01-01', 
     sexo: '',
     estado_civil: '',
     telefono: '',
@@ -61,27 +53,15 @@ export class NuevoPaciente implements OnInit {
   loading = false;
   errorMessage = '';
 
-  /**
-   * Crea una instancia del componente NuevoPaciente.
-   *
-   * @param {PacientesService} pacientesService - Servicio para registrar el paciente en base de datos.
-   * @param {AuthService} authService - Servicio para interactuar con la sesión y usuario activo (el nutricionista).
-   * @param {Router} router - Servicio de navegación de Angular.
-   */
   constructor(
     private pacientesService: PacientesService,
     private authService: AuthService,
     private router: Router,
   ) {}
 
-  /**
-   * Método del ciclo de vida de Angular.
-   * Configura las fechas máximas y mínimas para la fecha de nacimiento.
-   */
   ngOnInit() {
     const hoy = new Date();
     const tzoffset = hoy.getTimezoneOffset() * 60000;
-    
     this.maxDateNacimiento = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
 
     const minDate = new Date();
@@ -89,12 +69,6 @@ export class NuevoPaciente implements OnInit {
     this.minDateNacimiento = new Date(minDate.getTime() - tzoffset).toISOString().split('T')[0];
   }
 
-  /**
-   * Maneja el evento de selección de un archivo desde el explorador de archivos local,
-   * guardando el fichero en memoria y generando una vista previa en la variable `avatarPreview`.
-   *
-   * @param {*} event - Objeto del evento `change` del input de archivos.
-   */
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -107,24 +81,12 @@ export class NuevoPaciente implements OnInit {
     }
   }
 
-  /**
-   * Valida el formulario localmente, procesa las alergias/intolerancias
-   * y llama al servicio encargado de insertar tanto al usuario en autenticación
-   * como el registro de paciente en base de datos y Cloudinary.
-   *
-   * @returns {Promise<void>}
-   */
   async guardar() {
     if (
-      !this.nombre ||
-      !this.apellidos ||
-      !this.paciente.dni ||
-      !this.paciente.fecha_nacimiento ||
-      !this.paciente.sexo ||
-      !this.paciente.telefono ||
-      !this.paciente.email ||
-      !this.paciente.direccion ||
-      !this.paciente.motivo_consulta
+      !this.nombre || !this.apellidos || !this.paciente.dni ||
+      !this.paciente.fecha_nacimiento || !this.paciente.sexo ||
+      !this.paciente.telefono || !this.paciente.email ||
+      !this.paciente.direccion || !this.paciente.motivo_consulta
     ) {
       this.errorMessage = 'Por favor rellena todos los campos obligatorios';
       return;
@@ -141,19 +103,13 @@ export class NuevoPaciente implements OnInit {
     }
 
     this.paciente.alergias = this.alergiasInput
-      ? this.alergiasInput
-          .split(',')
-          .map((a) => a.trim())
-          .filter((a) => a)
+      ? this.alergiasInput.split(',').map((a) => a.trim()).filter((a) => a)
       : [];
     this.paciente.intolerancias = this.intoleracionesInput
-      ? this.intoleracionesInput
-          .split(',')
-          .map((i) => i.trim())
-          .filter((i) => i)
+      ? this.intoleracionesInput.split(',').map((i) => i.trim()).filter((i) => i)
       : [];
 
-    const { data, error } = await this.pacientesService.crearPaciente(
+    const { error } = await this.pacientesService.crearPaciente(
       {
         ...this.paciente,
         nombre: this.nombre,
@@ -168,7 +124,7 @@ export class NuevoPaciente implements OnInit {
     if (error) {
       this.errorMessage = 'Error al guardar el paciente: ' + error.message;
     } else {
-      alert(`✅ Paciente añadido correctamente.\n\nComunícale que ya puede acceder a su portal con su email y que su contraseña temporal es su DNI: ${this.paciente.dni.trim().toUpperCase()}`);
+      alert(`✅ Paciente añadido correctamente.\n\nContraseña temporal: su DNI.`);
       this.router.navigate(['/pacientes']);
     }
   }

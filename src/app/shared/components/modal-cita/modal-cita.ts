@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, inject, signal, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -26,15 +26,6 @@ import { PacientesService } from '../../../core/services/pacientes';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionicons/icons';
 
-/**
- * Componente Modal para crear o editar una cita médica.
- * Incluye lógica avanzada para calcular intervalos de horas disponibles, 
- * buscar pacientes (si se crea desde el dashboard general) y validar duraciones.
- *
- * @export
- * @class ModalCitaComponent
- * @implements {OnInit}
- */
 @Component({
   selector: 'app-modal-cita',
   standalone: true,
@@ -63,28 +54,26 @@ import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionico
   styleUrls: ['./modal-cita.css'],
 })
 export class ModalCitaComponent implements OnInit {
-  /** Objeto con los datos de la cita existente (si estamos en modo edición). */
   @Input() cita?: Cita;
-  /** ID del paciente. Si se proporciona, se omite el buscador de pacientes. */
   @Input() pacienteId?: string;
-  /** ID del nutricionista que va a atender la consulta. */
   @Input() nutricionistaId!: string;
-  /** Bandera que indica si el propio paciente está creando/viendo este modal. */
   @Input() esPaciente = false;
-  /** Fecha inicial preseleccionada si el usuario tocó un día concreto en el calendario. */
   @Input() fechaSeleccionada?: string;
 
   private modalCtrl = inject(ModalController);
   private citasService = inject(CitasService);
   private pacientesService = inject(PacientesService);
   private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   guardando = false;
-
-  // ID dinámico para evitar conflictos en el HTML
+  cargandoHoras = false; 
+  
   datetimeId = 'datetime-' + Math.random().toString(36).substring(2, 9);
-  /** Variables del formulario */
-  fecha = '';
+  
+  fecha = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0];
+  fechaLimpiaPrevia = ''; 
+
   hora = '';
   duracion = 30;
   tipo: 'presencial' | 'videollamada' = 'presencial';
@@ -116,14 +105,9 @@ export class ModalCitaComponent implements OnInit {
   get esEdicion() { return !!this.cita?.id; }
   get titulo() { return this.esEdicion ? 'Editar cita' : 'Nueva cita'; }
 
-  /**
-   * Retorna la fecha mínima permitida para la cita.
-   * Si es edición, devolvemos una fecha antigua (año 2000) para evitar que
-   * Ionic crashee al recibir un "undefined" o un texto vacío.
-   */
   get minDateCita(): string {
     if (this.esEdicion) {
-      return '2000-01-01'; // Evita el cuadrado vacío
+      return '2000-01-01'; 
     }
     const tzoffset = (new Date()).getTimezoneOffset() * 60000;
     return new Date(Date.now() - tzoffset).toISOString().split('T')[0];
@@ -138,7 +122,6 @@ export class ModalCitaComponent implements OnInit {
     if (!this.pacienteSeleccionadoId) this.cargarPacientes();
 
     if (this.cita) {
-      // 📝 MODO EDICIÓN
       const d = new Date(this.cita.fecha_hora);
       this.fecha = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       this.hora = d.toTimeString().slice(0, 5);
@@ -148,43 +131,65 @@ export class ModalCitaComponent implements OnInit {
       this.notas = this.cita.notas ?? '';
       this.urlVideo = this.cita.url_videollamada ?? '';
       this.pacienteSeleccionadoId = this.cita.paciente_id;
-    } else {
-      // 📝 MODO CREACIÓN (Calculamos "hoy" en la zona horaria local de España)
-      const tzoffset = (new Date()).getTimezoneOffset() * 60000;
-      const hoyLocal = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
-      this.fecha = this.fechaSeleccionada || hoyLocal;
+    } else if (this.fechaSeleccionada) {
+      this.fecha = this.fechaSeleccionada.split('T')[0]; 
     }
 
-    if (this.fecha) await this.cargarCitasDelDia(this.fecha);
+    if (this.fecha) {
+      this.fechaLimpiaPrevia = this.fecha.split('T')[0];
+      await this.cargarCitasDelDia(this.fechaLimpiaPrevia);
+    }
   }
 
   async cargarCitasDelDia(fechaIso: string) {
+    this.cargandoHoras = true;
+    this.horasDisponibles = [];
+    this.cdr.detectChanges(); 
+    
     try {
+      const fechaLimpia = fechaIso.split('T')[0]; 
       const todas = await this.citasService.getHorariosOcupadosNutricionista(this.nutricionistaId);
-      this.citasDelDiaSeleccionado = todas.filter((c) => c.fecha_hora.startsWith(fechaIso));
+      this.citasDelDiaSeleccionado = todas.filter((c) => c.fecha_hora.startsWith(fechaLimpia));
       this.recalcularHoras();
     } catch (e) {
       console.error('Error al obtener horarios', e);
     } finally {
-      this.cdr.detectChanges();
+      this.cargandoHoras = false;
+      this.cdr.detectChanges(); 
     }
   }
 
-  async onFechaCambiada(event: any) {
-    const val = event.detail?.value || event;
+  onFechaCambiada(event: any) {
+    const val = event.detail?.value;
     if (!val) return;
-    this.fecha = val.split('T')[0];
-    this.hora = '';
-    await this.cargarCitasDelDia(this.fecha);
+    
+    const nuevaFecha = val.split('T')[0];
+
+    if (this.fechaLimpiaPrevia === nuevaFecha) return;
+    
+    this.fechaLimpiaPrevia = nuevaFecha;
+    this.fecha = nuevaFecha; 
+    this.hora = ''; 
+    
+    // 🔥 SOLUCIÓN DOBLE CLIC: Retraso mágico de 200ms para que Ionic cierre su modal
+    setTimeout(() => {
+      this.ngZone.run(() => {
+        this.cargarCitasDelDia(nuevaFecha);
+      });
+    }, 200);
   }
 
   recalcularHoras() {
     if (!this.fecha) return;
+    
+    // 🔥 SOLUCIÓN HORAS: Limpiamos la fecha de la "T" para que esHoy funcione impecable
+    const fechaLimpia = this.fecha.split('T')[0];
     const duracionMinima = 30;
     const ahora = new Date();
     const tzoffset = ahora.getTimezoneOffset() * 60000;
     const hoyLocal = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
-    const esHoy = this.fecha === hoyLocal;
+    
+    const esHoy = fechaLimpia === hoyLocal;
     const minutosActuales = ahora.getHours() * 60 + ahora.getMinutes();
 
     const intervalosOcupados = this.citasDelDiaSeleccionado
@@ -209,6 +214,7 @@ export class ModalCitaComponent implements OnInit {
     verificarBloque(this.HORA_INICIO_MANANA, this.HORA_FIN_MANANA);
     verificarBloque(this.HORA_INICIO_TARDE, this.HORA_FIN_TARDE);
     this.horasDisponibles = slots;
+    
     if (this.hora && !this.horasDisponibles.includes(this.hora)) this.hora = '';
     this.cdr.detectChanges();
   }
@@ -274,7 +280,8 @@ export class ModalCitaComponent implements OnInit {
     if (!this.fecha || !this.hora || !this.pacienteSeleccionadoId) return;
     this.guardando = true;
     try {
-      const fecha_hora = new Date(`${this.fecha}T${this.hora}`).toISOString();
+      const fechaLimpia = this.fecha.split('T')[0];
+      const fecha_hora = new Date(`${fechaLimpia}T${this.hora}`).toISOString();
       const payload: Omit<Cita, 'id'> = {
         paciente_id: this.pacienteSeleccionadoId,
         nutricionista_id: this.nutricionistaId,

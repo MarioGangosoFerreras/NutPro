@@ -12,12 +12,7 @@ import { personAddOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth';
 
 /**
- * Componente que gestiona el registro de nuevos pacientes a través de un enlace de invitación.
- * Captura los datos personales y de acceso del paciente y los asocia al nutricionista que envió la invitación.
- *
- * @export
- * @class RegistroPaciente
- * @implements {OnInit}
+ * Componente que gestiona el registro de nuevos pacientes.
  */
 @Component({
   selector: 'app-registro-paciente',
@@ -43,17 +38,18 @@ export class RegistroPaciente implements OnInit {
   loading = signal(false);
   errorMessage = signal('');
 
-  maxDateNacimiento = '';
-  minDateNacimiento = '';
+  // ✅ FIX: Valores por defecto para evitar fallos de renderizado
+  maxDateNacimiento = new Date().toISOString().split('T')[0];
+  minDateNacimiento = '1900-01-01';
 
   datetimeId = 'datetime-' + Math.random().toString(36).substring(2, 9);
 
-  /** Objeto que almacena todos los datos introducidos por el paciente en el formulario */
+  /** Objeto que almacena los datos introducidos por el paciente */
   datos = {
     nombre: '',
     apellidos: '',
     dni: '',
-    fecha_nacimiento: '1990-01-01', // Fecha inicial para que el botón no esté vacío 
+    fecha_nacimiento: '1990-01-01', // Valor inicial sugerido
     sexo: '',
     direccion: '',
     motivo_consulta: '',
@@ -63,26 +59,16 @@ export class RegistroPaciente implements OnInit {
     confirmarPassword: ''
   };
 
-  /**
-   * Crea una instancia del componente y registra los iconos de Ionic a utilizar.
-   */
   constructor() {
     addIcons({ personAddOutline, checkmarkCircleOutline });
   }
 
-  /**
-   * Método del ciclo de vida de Angular. Se ejecuta al inicializar el componente.
-   * Extrae el ID del nutricionista (`ref`) de los parámetros de la URL para vincular al paciente.
-   *
-   * @returns {void}
-   */
   ngOnInit() {
     this.nutriId = this.route.snapshot.queryParamMap.get('ref') || '';
     if (!this.nutriId) {
       this.errorMessage.set('El enlace de invitación no es válido.');
     }
 
-    // Calcular fechas límite
     const hoy = new Date();
     const tzoffset = hoy.getTimezoneOffset() * 60000;
     this.maxDateNacimiento = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
@@ -92,12 +78,6 @@ export class RegistroPaciente implements OnInit {
     this.minDateNacimiento = new Date(minDate.getTime() - tzoffset).toISOString().split('T')[0];
   }
 
-  /**
-   * Getter que comprueba si todos los campos obligatorios del formulario han sido rellenados.
-   *
-   * @readonly
-   * @type {boolean}
-   */
   get formularioValido(): boolean {
     return !!(this.datos.nombre && this.datos.apellidos && this.datos.dni &&
       this.datos.fecha_nacimiento && this.datos.sexo && this.datos.direccion &&
@@ -105,12 +85,6 @@ export class RegistroPaciente implements OnInit {
       this.datos.password);
   }
 
-  /**
-   * Ejecuta el proceso de registro del paciente validando primero las contraseñas
-   * y luego creando la cuenta a través del servicio de autenticación con los metadatos requeridos.
-   *
-   * @returns {Promise<void>}
-   */
   async registrar() {
     if (this.datos.password !== this.datos.confirmarPassword) {
       this.mostrarToast('Las contraseñas no coinciden', 'warning');
@@ -153,14 +127,6 @@ export class RegistroPaciente implements OnInit {
     }
   }
 
-  /**
-   * Helper privado para mostrar una notificación toast en pantalla.
-   *
-   * @private
-   * @param {string} m - El mensaje a mostrar.
-   * @param {string} c - El color del toast (ej. 'success', 'warning', 'danger').
-   * @returns {Promise<void>}
-   */
   private async mostrarToast(m: string, c: string) {
     const t = await this.toastCtrl.create({ message: m, color: c, duration: 2500, position: 'bottom' });
     t.present();
