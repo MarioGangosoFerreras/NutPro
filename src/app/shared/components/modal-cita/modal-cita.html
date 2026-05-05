@@ -29,23 +29,32 @@
     }
   </div>
   }
-
-  <div style="margin-top: 16px; margin-bottom: 16px;">
-    <p class="selector-label">Fecha de la consulta</p>
-
-    <div class="datetime-button-wrapper">
+    
+    <div style="margin-top: 16px; margin-bottom: 16px;">
+    <label style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-left: 16px; display: block; margin-bottom: 6px;">
+      Fecha de la consulta
+    </label>
+    
+    <div class="datetime-container-global" style="margin: 0 16px; width: calc(100% - 32px);">
       <ion-datetime-button datetime="calendario-cita"></ion-datetime-button>
     </div>
-  </div>
 
-  <ion-modal [keepContentsMounted]="true">
-    <ng-template>
-      <ion-datetime id="calendario-cita" presentation="date" [(ngModel)]="fecha" [min]="minDateCita"
-        (ionChange)="onFechaCambiada($event)" color="primary" [showDefaultButtons]="true" doneText="Confirmar"
-        cancelText="Cancelar">
-      </ion-datetime>
-    </ng-template>
-  </ion-modal>
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime 
+          id="calendario-cita" 
+          presentation="date" 
+          [(ngModel)]="fecha" 
+          [min]="minDateCita" 
+          (ionChange)="onFechaCambiada($event)"
+          color="primary"
+          [showDefaultButtons]="true"
+          doneText="Confirmar"
+          cancelText="Cancelar">
+        </ion-datetime>
+      </ng-template>
+    </ion-modal>
+  </div>
 
   @if (fecha) {
   <div style="margin: 16px 0;">

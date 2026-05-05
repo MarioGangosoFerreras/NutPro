@@ -57,7 +57,7 @@ import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionico
     IonChip,
     IonDatetime,
     IonDatetimeButton,
-    IonModal
+    IonModal,
   ],
   templateUrl: './modal-cita.html',
   styleUrls: ['./modal-cita.css'],
@@ -115,10 +115,13 @@ export class ModalCitaComponent implements OnInit {
   get titulo() { return this.esEdicion ? 'Editar cita' : 'Nueva cita'; }
 
   /**
-   * Retorna la fecha mínima permitida (hoy) para evitar citas en el pasado.
+   * Retorna la fecha mínima permitida para la cita.
+   * Si es edición, devolvemos 'undefined' para no romper el calendario de Ionic.
    */
-  get minDateCita(): string {
-    if (this.esEdicion) return '';
+  get minDateCita(): string | undefined {
+    if (this.esEdicion) {
+      return undefined; // Importante: undefined, NO unas comillas vacías ''
+    }
     const tzoffset = (new Date()).getTimezoneOffset() * 60000;
     return new Date(Date.now() - tzoffset).toISOString().split('T')[0];
   }

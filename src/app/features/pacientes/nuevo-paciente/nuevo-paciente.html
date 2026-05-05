@@ -37,25 +37,39 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">DNI *</label>
-            <ion-input class="form-input" type="text" [(ngModel)]="paciente.dni" placeholder="12345678A"
-              fill="outline"></ion-input>
+            <ion-input
+              class="form-input"
+              type="text"
+              [(ngModel)]="paciente.dni"
+              placeholder="12345678A"
+              fill="outline"
+            ></ion-input>
           </div>
+          
           <div class="form-group">
             <label class="form-label">Fecha de nacimiento *</label>
+            
             <div class="datetime-container-global">
               <ion-datetime-button datetime="fecha-nac-nueva"></ion-datetime-button>
             </div>
+            
             <ion-modal [keepContentsMounted]="true">
               <ng-template>
-                <ion-datetime id="fecha-nac-nueva" presentation="date" [(ngModel)]="paciente.fecha_nacimiento"
-                  [max]="maxDateNacimiento" [min]="minDateNacimiento" color="primary" [showDefaultButtons]="true"
-                  doneText="Aceptar" cancelText="Cancelar">
+                <ion-datetime 
+                  id="fecha-nac-nueva" 
+                  presentation="date" 
+                  [(ngModel)]="paciente.fecha_nacimiento" 
+                  [max]="maxDateNacimiento" 
+                  [min]="minDateNacimiento" 
+                  color="primary"
+                  [showDefaultButtons]="true" 
+                  doneText="Aceptar" 
+                  cancelText="Cancelar">
                 </ion-datetime>
               </ng-template>
             </ion-modal>
           </div>
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Sexo *</label>

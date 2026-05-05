@@ -160,7 +160,7 @@ ion-note {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   INPUTS
+   INPUTS (Ajustes básicos)
    ═══════════════════════════════════════════════════════════════ */
 ion-input {
   --color: var(--ion-text-color);
@@ -381,7 +381,7 @@ ion-action-sheet {
    ═══════════════════════════════════════════════════════════════ */
 .avocado-spinner {
   display: inline-block;
-  font-size: 50px; /* Tamaño gigante para el centro de la pantalla */
+  font-size: 50px;
   line-height: 1;
   animation: giro-aguacate 1s linear infinite;
   transform-origin: center center;
@@ -392,15 +392,13 @@ ion-action-sheet {
   100% { transform: rotate(360deg); }
 }
 
-/* Si lo metes dentro de un botón, lo hacemos más pequeñito para que quepa */
 ion-button .avocado-spinner {
   font-size: 22px;
   margin-right: 8px;
 }
 
-/* Customización para los "LoadingController" nativos de Ionic (los pop-ups) */
 .aguacate-loading-overlay {
-  --spinner-color: transparent; /* Oculta el spinner nativo */
+  --spinner-color: transparent; 
 }
 .aguacate-loading-overlay .loading-wrapper {
   text-align: center;
@@ -408,7 +406,9 @@ ion-button .avocado-spinner {
   border-radius: 16px;
 }
 
-/* ─── ANIMACIÓN HAMBURGUESA ESCALONADA (De menor a mayor) ─── */
+/* ═══════════════════════════════════════════════════════════════
+   ANIMACIÓN HAMBURGUESA
+   ═══════════════════════════════════════════════════════════════ */
 .hamburger-container {
   width: 40px;
   height: 40px;
@@ -441,24 +441,13 @@ ion-button .avocado-spinner {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Estado normal (3 líneas del mismo tamaño) */
 .hamburger .line:nth-child(1) { top: 0px; width: 100%; }
 .hamburger .line:nth-child(2) { top: 6px; width: 100%; }
 .hamburger .line:nth-child(3) { top: 12px; width: 100%; }
 
-/* Estado activo: Escalonado (Arriba pequeña, medio media, abajo original) */
-.hamburger.is-active .line:nth-child(1) {
-  width: 10px; /* Pequeña (50% del tamaño original) */
-}
-
-.hamburger.is-active .line:nth-child(2) {
-  width: 15px; /* Media (75% del tamaño original) */
-  background: #40916c; /* Le damos un toque de luz al verde para más dinamismo */
-}
-
-.hamburger.is-active .line:nth-child(3) {
-  width: 100%; /* Original (100%) */
-}
+.hamburger.is-active .line:nth-child(1) { width: 10px; }
+.hamburger.is-active .line:nth-child(2) { width: 15px; background: #40916c; }
+.hamburger.is-active .line:nth-child(3) { width: 100%; }
 
 /* ═══════════════════════════════════════════════════════════════
    CONTENEDOR DE CARGA GLOBAL (Centrado perfecto)
@@ -467,90 +456,77 @@ ion-button .avocado-spinner {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Centrado exacto respecto al padre */
-  
+  transform: translate(-50%, -50%); 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 999; /* Para que siempre esté por encima de otros elementos */
+  z-index: 999; 
   width: 100%;
   height: 100%;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DISEÑO PROFESIONAL: INPUTS Y SELECTS CON PADDING
+   DISEÑO PROFESIONAL PARA FORMULARIOS (BORDES Y ESPACIOS)
    ═══════════════════════════════════════════════════════════════ */
 
-/* 1. Limpieza de líneas nativas */
-ion-item {
-  --border-color: transparent !important;
-  --inner-border-width: 0 !important;
-}
 
-/* 2. Padding real para que el texto no toque el borde */
+/* 2. Inputs, Textareas y Selects con espacio real (Padding) */
 ion-input, ion-select, ion-textarea {
-  padding: 12px 16px !important; /* Fuerza espacio entre borde y texto */
+  padding: 14px 16px !important; /* Fuerza el espacio interno para que el texto no se pegue */
   --padding-start: 0 !important;
   --padding-end: 0 !important;
-  background: #f8fafc;
+  --padding-top: 0 !important;
+  --padding-bottom: 0 !important;
+
+  background: #fcfcfc;
   border: 1.5px solid #e2e8f0 !important;
   border-radius: 12px !important;
   margin-top: 6px;
+  font-size: 15px !important;
+  width: 100%;
   color: #1e293b;
+  box-sizing: border-box !important;
+  transition: all 0.25s ease;
 }
 
-/* 3. Evitar que el botón "Guardar" se corte al final del scroll */
-ion-modal ion-content::part(scroll) {
-  padding-bottom: 60px !important; 
+/* Efecto al hacer clic en los campos */
+ion-input.has-focus, ion-select.has-focus, ion-textarea.has-focus {
+  background: #ffffff;
+  border-color: var(--np-green-400) !important;
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15);
 }
 
-/* 4. Estilo para el botón de fecha */
-ion-datetime-button {
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 4px;
+/* Despegar la flechita de los Selects del borde derecho */
+ion-select::part(icon) {
+  margin-left: 12px;
+  color: var(--np-green-400);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ESTILO GLOBAL PARA SELECTORES DE FECHA (ion-datetime-button)
+   ESTILOS PARA EL BOTÓN DEL CALENDARIO FLOTANTE
    ═══════════════════════════════════════════════════════════════ */
 
-/* Contenedor para que el botón respire y no esté pegado a otros elementos */
-.datetime-container-global {
-  margin: 10px 0;
-  width: 100%;
-}
-
-/* Botón principal con estética de input profesional */
+/* Hacemos que el botón interno ocupe todo el espacio */
 ion-datetime-button {
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
   width: 100%;
-  padding: 8px 4px;
-  transition: all 0.2s ease;
 }
 
-/* Estilo del texto dentro del botón */
+/* Limpiamos la sombra y colores por defecto del botón nativo de Ionic */
 ion-datetime-button::part(native) {
   background: transparent;
   box-shadow: none;
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
+  padding: 0;
   color: #1e293b;
   font-size: 15px;
-  padding-left: 12px;
+  display: flex;
+  justify-content: flex-start;  /* Alineamos la fecha a la izquierda */
+  min-height: 24px;
 }
 
-/* Efecto visual al abrirlo */
-ion-datetime-button.datetime-ready {
-  border-color: var(--np-green-400);
-}
-
-/* Fix global para que los botones de "Guardar" al final de los modales no se corten */
+/* ═══════════════════════════════════════════════════════════════
+   SOLUCIÓN AL BOTÓN DE GUARDAR OCULTO EN MODALES
+   ═══════════════════════════════════════════════════════════════ */
 ion-modal ion-content::part(scroll) {
-  padding-bottom: 80px !important;
+  padding-bottom: 80px !important; 
 }

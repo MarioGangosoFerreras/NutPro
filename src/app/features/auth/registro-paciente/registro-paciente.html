@@ -43,20 +43,31 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                
                 <div class="form-group">
                     <label class="form-label">Fecha Nac. *</label>
+                    
                     <div class="datetime-container-global">
                         <ion-datetime-button datetime="fecha-nac-reg"></ion-datetime-button>
                     </div>
+
                     <ion-modal [keepContentsMounted]="true">
                         <ng-template>
-                            <ion-datetime id="fecha-nac-reg" presentation="date" [(ngModel)]="datos.fecha_nacimiento"
-                                [max]="maxDateNacimiento" [min]="minDateNacimiento" color="primary"
-                                [showDefaultButtons]="true" doneText="Aceptar" cancelText="Cancelar">
+                            <ion-datetime 
+                                id="fecha-nac-reg" 
+                                presentation="date" 
+                                [(ngModel)]="datos.fecha_nacimiento" 
+                                [max]="maxDateNacimiento" 
+                                [min]="minDateNacimiento" 
+                                color="primary" 
+                                [showDefaultButtons]="true" 
+                                doneText="Aceptar" 
+                                cancelText="Cancelar">
                             </ion-datetime>
                         </ng-template>
                     </ion-modal>
                 </div>
+
                 <div class="form-group">
                     <label class="form-label">Sexo *</label>
                     <ion-select class="form-input" [(ngModel)]="datos.sexo" interface="popover" placeholder="Elige">

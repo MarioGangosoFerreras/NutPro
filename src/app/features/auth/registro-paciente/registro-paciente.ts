@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonContent, IonInput, IonButton, IonSpinner, IonIcon,
   ToastController, IonItem, IonLabel, IonText, IonSelect, IonSelectOption,
-  IonDatetime, IonDatetimeButton, IonModal // <-- AÑADIDOS
+  IonDatetime, IonDatetimeButton, IonModal
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personAddOutline, checkmarkCircleOutline } from 'ionicons/icons';
@@ -26,8 +26,10 @@ import { AuthService } from '../../../core/services/auth';
     CommonModule, FormsModule, RouterLink, IonContent, IonInput,
     IonButton, IonSpinner, IonText,
     IonSelect, IonSelectOption,
-    IonDatetime, IonDatetimeButton, IonModal // <-- AÑADIDOS
-  ],
+    IonDatetime, IonDatetimeButton, IonModal,
+    IonItem,
+    IonLabel
+],
   templateUrl: './registro-paciente.html',
   styleUrl: './registro-paciente.css'
 })
@@ -49,10 +51,10 @@ export class RegistroPaciente implements OnInit {
     nombre: '',
     apellidos: '',
     dni: '',
-    fecha_nacimiento: '', 
-    sexo: '',             
-    direccion: '',        
-    motivo_consulta: '', 
+    fecha_nacimiento: '',
+    sexo: '',
+    direccion: '',
+    motivo_consulta: '',
     email: '',
     telefono: '',
     password: '',
@@ -75,13 +77,12 @@ export class RegistroPaciente implements OnInit {
   ngOnInit() {
     this.nutriId = this.route.snapshot.queryParamMap.get('ref') || '';
     if (!this.nutriId) {
-      this.errorMessage.set('El enlace de invitación no es válido. Contacta con tu nutricionista.');
+      this.errorMessage.set('El enlace de invitación no es válido.');
     }
 
-    // Configurar fechas límites
+    // Calcular fechas límite
     const hoy = new Date();
     const tzoffset = hoy.getTimezoneOffset() * 60000;
-    
     this.maxDateNacimiento = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
 
     const minDate = new Date();
@@ -128,10 +129,10 @@ export class RegistroPaciente implements OnInit {
           nombre: this.datos.nombre.trim(),
           apellidos: this.datos.apellidos.trim(),
           dni: this.datos.dni.trim(),
-          fecha_nacimiento: this.datos.fecha_nacimiento, 
-          sexo: this.datos.sexo,                         
-          direccion: this.datos.direccion.trim(),        
-          motivo_consulta: this.datos.motivo_consulta.trim(), 
+          fecha_nacimiento: this.datos.fecha_nacimiento,
+          sexo: this.datos.sexo,
+          direccion: this.datos.direccion.trim(),
+          motivo_consulta: this.datos.motivo_consulta.trim(),
           telefono: this.datos.telefono.trim(),
           rol: 'paciente',
           nutricionista_id: this.nutriId
