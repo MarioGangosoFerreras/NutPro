@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PacientesService } from '../../../core/services/pacientes';
 import { AuthService } from '../../../core/services/auth';
 import { Header } from '../../../shared/components/header/header';
-import { IonButton, IonContent, IonInput, IonSpinner, IonIcon } from '@ionic/angular/standalone';
+import { 
+  IonButton, IonContent, IonInput, IonSpinner, IonIcon, 
+  IonDatetime, IonDatetimeButton, IonModal // <-- AÑADIDOS
+} from '@ionic/angular/standalone';
 
 /**
  * Componente que proporciona el formulario para la creación manual
@@ -15,11 +18,14 @@ import { IonButton, IonContent, IonInput, IonSpinner, IonIcon } from '@ionic/ang
  */
 @Component({
   selector: 'app-nuevo-paciente',
-  imports: [FormsModule, RouterLink, Header, IonContent, IonInput, IonButton, IonSpinner, IonIcon],
+  imports: [
+    FormsModule, RouterLink, Header, IonContent, IonInput, IonButton, IonSpinner, IonIcon,
+    IonDatetime, IonDatetimeButton, IonModal // <-- AÑADIDOS
+  ],
   templateUrl: './nuevo-paciente.html',
   styleUrl: './nuevo-paciente.css',
 })
-export class NuevoPaciente {
+export class NuevoPaciente implements OnInit {
   nombre = '';
   apellidos = '';
 
@@ -27,6 +33,9 @@ export class NuevoPaciente {
   avatarFile: File | null = null;
   /** URL de vista previa base64 del avatar local antes de subirse */
   avatarPreview: string | null = null;
+
+  maxDateNacimiento = '';
+  minDateNacimiento = '';
 
   /** Objeto que almacena los diferentes campos de información personal y médica del paciente */
   paciente = {
@@ -61,6 +70,21 @@ export class NuevoPaciente {
     private authService: AuthService,
     private router: Router,
   ) {}
+
+  /**
+   * Método del ciclo de vida de Angular.
+   * Configura las fechas máximas y mínimas para la fecha de nacimiento.
+   */
+  ngOnInit() {
+    const hoy = new Date();
+    const tzoffset = hoy.getTimezoneOffset() * 60000;
+    
+    this.maxDateNacimiento = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
+
+    const minDate = new Date();
+    minDate.setFullYear(hoy.getFullYear() - 120);
+    this.minDateNacimiento = new Date(minDate.getTime() - tzoffset).toISOString().split('T')[0];
+  }
 
   /**
    * Maneja el evento de selección de un archivo desde el explorador de archivos local,

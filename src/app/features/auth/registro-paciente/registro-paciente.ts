@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonContent, IonInput, IonButton, IonSpinner, IonIcon,
-  ToastController, IonItem, IonLabel, IonText, IonSelect, IonSelectOption
+  ToastController, IonItem, IonLabel, IonText, IonSelect, IonSelectOption,
+  IonDatetime, IonDatetimeButton, IonModal // <-- AÑADIDOS
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personAddOutline, checkmarkCircleOutline } from 'ionicons/icons';
@@ -24,7 +25,8 @@ import { AuthService } from '../../../core/services/auth';
   imports: [
     CommonModule, FormsModule, RouterLink, IonContent, IonInput,
     IonButton, IonSpinner, IonText,
-    IonSelect, IonSelectOption // <--- Importamos los select
+    IonSelect, IonSelectOption,
+    IonDatetime, IonDatetimeButton, IonModal // <-- AÑADIDOS
   ],
   templateUrl: './registro-paciente.html',
   styleUrl: './registro-paciente.css'
@@ -38,6 +40,9 @@ export class RegistroPaciente implements OnInit {
   nutriId = '';
   loading = signal(false);
   errorMessage = signal('');
+
+  maxDateNacimiento = '';
+  minDateNacimiento = '';
 
   /** Objeto que almacena todos los datos introducidos por el paciente en el formulario */
   datos = {
@@ -72,6 +77,16 @@ export class RegistroPaciente implements OnInit {
     if (!this.nutriId) {
       this.errorMessage.set('El enlace de invitación no es válido. Contacta con tu nutricionista.');
     }
+
+    // Configurar fechas límites
+    const hoy = new Date();
+    const tzoffset = hoy.getTimezoneOffset() * 60000;
+    
+    this.maxDateNacimiento = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
+
+    const minDate = new Date();
+    minDate.setFullYear(hoy.getFullYear() - 120);
+    this.minDateNacimiento = new Date(minDate.getTime() - tzoffset).toISOString().split('T')[0];
   }
 
   /**
@@ -80,7 +95,6 @@ export class RegistroPaciente implements OnInit {
    * @readonly
    * @type {boolean}
    */
-  // Comprobamos que todo esté relleno
   get formularioValido(): boolean {
     return !!(this.datos.nombre && this.datos.apellidos && this.datos.dni &&
       this.datos.fecha_nacimiento && this.datos.sexo && this.datos.direccion &&

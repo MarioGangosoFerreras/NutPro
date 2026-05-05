@@ -11,10 +11,10 @@
       <div class="avatar-upload-section">
         <div class="avatar-circle" (click)="fileInput.click()">
           @if (avatarPreview) {
-            <img [src]="avatarPreview" alt="Preview" />
+          <img [src]="avatarPreview" alt="Preview" />
           } @else {
-            <ion-icon name="camera-outline"></ion-icon>
-            <span>Añadir foto</span>
+          <ion-icon name="camera-outline"></ion-icon>
+          <span>Añadir foto</span>
           }
         </div>
         <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
@@ -25,44 +25,34 @@
 
         <div class="form-group">
           <label class="form-label">Nombre *</label>
-          <ion-input
-            class="form-input"
-            type="text"
-            [(ngModel)]="nombre"
-            placeholder="Nombre"
-            fill="outline"
-          ></ion-input>
+          <ion-input class="form-input" type="text" [(ngModel)]="nombre" placeholder="Nombre"
+            fill="outline"></ion-input>
         </div>
         <div class="form-group">
           <label class="form-label">Apellidos *</label>
-          <ion-input
-            class="form-input"
-            type="text"
-            [(ngModel)]="apellidos"
-            placeholder="Apellidos"
-            fill="outline"
-          ></ion-input>
+          <ion-input class="form-input" type="text" [(ngModel)]="apellidos" placeholder="Apellidos"
+            fill="outline"></ion-input>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">DNI *</label>
-            <ion-input
-              class="form-input"
-              type="text"
-              [(ngModel)]="paciente.dni"
-              placeholder="12345678A"
-              fill="outline"
-            ></ion-input>
+            <ion-input class="form-input" type="text" [(ngModel)]="paciente.dni" placeholder="12345678A"
+              fill="outline"></ion-input>
           </div>
           <div class="form-group">
             <label class="form-label">Fecha de nacimiento *</label>
-            <ion-input
-              class="form-input"
-              type="date"
-              [(ngModel)]="paciente.fecha_nacimiento"
-              fill="outline"
-            ></ion-input>
+            <div class="datetime-container-global">
+              <ion-datetime-button datetime="fecha-nac-nueva"></ion-datetime-button>
+            </div>
+            <ion-modal [keepContentsMounted]="true">
+              <ng-template>
+                <ion-datetime id="fecha-nac-nueva" presentation="date" [(ngModel)]="paciente.fecha_nacimiento"
+                  [max]="maxDateNacimiento" [min]="minDateNacimiento" color="primary" [showDefaultButtons]="true"
+                  doneText="Aceptar" cancelText="Cancelar">
+                </ion-datetime>
+              </ng-template>
+            </ion-modal>
           </div>
         </div>
 
@@ -92,57 +82,32 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Teléfono *</label>
-            <ion-input
-              class="form-input"
-              type="tel"
-              [(ngModel)]="paciente.telefono"
-              placeholder="600000000"
-              fill="outline"
-            ></ion-input>
+            <ion-input class="form-input" type="tel" [(ngModel)]="paciente.telefono" placeholder="600000000"
+              fill="outline"></ion-input>
           </div>
           <div class="form-group">
             <label class="form-label">Email *</label>
-            <ion-input
-              class="form-input"
-              type="email"
-              [(ngModel)]="paciente.email"
-              placeholder="paciente@email.com"
-              fill="outline"
-            ></ion-input>
+            <ion-input class="form-input" type="email" [(ngModel)]="paciente.email" placeholder="paciente@email.com"
+              fill="outline"></ion-input>
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Dirección *</label>
-          <ion-input
-            class="form-input"
-            type="text"
-            [(ngModel)]="paciente.direccion"
-            placeholder="Calle, número, ciudad"
-            fill="outline"
-          ></ion-input>
+          <ion-input class="form-input" type="text" [(ngModel)]="paciente.direccion" placeholder="Calle, número, ciudad"
+            fill="outline"></ion-input>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Ocupación</label>
-            <ion-input
-              class="form-input"
-              type="text"
-              [(ngModel)]="paciente.ocupacion"
-              placeholder="Profesión"
-              fill="outline"
-            ></ion-input>
+            <ion-input class="form-input" type="text" [(ngModel)]="paciente.ocupacion" placeholder="Profesión"
+              fill="outline"></ion-input>
           </div>
           <div class="form-group">
             <label class="form-label">Nacionalidad</label>
-            <ion-input
-              class="form-input"
-              type="text"
-              [(ngModel)]="paciente.nacionalidad"
-              placeholder="Española"
-              fill="outline"
-            ></ion-input>
+            <ion-input class="form-input" type="text" [(ngModel)]="paciente.nacionalidad" placeholder="Española"
+              fill="outline"></ion-input>
           </div>
         </div>
       </div>
@@ -152,40 +117,27 @@
 
         <div class="form-group">
           <label class="form-label">Motivo de consulta *</label>
-          <textarea
-            class="form-textarea"
-            [(ngModel)]="paciente.motivo_consulta"
-            placeholder="Describe el motivo de consulta..."
-          ></textarea>
+          <textarea class="form-textarea" [(ngModel)]="paciente.motivo_consulta"
+            placeholder="Describe el motivo de consulta..."></textarea>
         </div>
 
         <div class="form-group">
           <label class="form-label">Alergias</label>
-          <ion-input
-            class="form-input"
-            type="text"
-            [(ngModel)]="alergiasInput"
-            placeholder="Ej: gluten, lactosa (separadas por comas)"
-            fill="outline"
-          ></ion-input>
+          <ion-input class="form-input" type="text" [(ngModel)]="alergiasInput"
+            placeholder="Ej: gluten, lactosa (separadas por comas)" fill="outline"></ion-input>
         </div>
 
         <div class="form-group">
           <label class="form-label">Intolerancias</label>
-          <ion-input
-            class="form-input"
-            type="text"
-            [(ngModel)]="intoleracionesInput"
-            placeholder="Ej: fructosa (separadas por comas)"
-            fill="outline"
-          ></ion-input>
+          <ion-input class="form-input" type="text" [(ngModel)]="intoleracionesInput"
+            placeholder="Ej: fructosa (separadas por comas)" fill="outline"></ion-input>
         </div>
       </div>
 
       @if (errorMessage) {
-        <div class="error-box">
-          <span>{{ errorMessage }}</span>
-        </div>
+      <div class="error-box">
+        <span>{{ errorMessage }}</span>
+      </div>
       }
 
       <div class="form-actions">
@@ -194,9 +146,9 @@
         </ion-button>
         <ion-button expand="block" class="btn-primary" [disabled]="loading" (click)="guardar()">
           @if (loading) {
-            <ion-spinner name="crescent"></ion-spinner>
+          <ion-spinner name="crescent"></ion-spinner>
           } @else {
-            Guardar paciente
+          Guardar paciente
           }
         </ion-button>
       </div>

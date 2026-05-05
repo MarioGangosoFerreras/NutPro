@@ -52,3 +52,31 @@
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ESTILOS DEL BOTÓN DEL CALENDARIO
+   ═══════════════════════════════════════════════════════════════ */
+.datetime-button-wrapper {
+  margin: 0 16px; /* Lo alineamos con el resto de los inputs */
+}
+
+/* Le damos la misma estética que los inputs: fondo gris, borde, esquinas redondas */
+ion-datetime-button {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  width: 100%;
+  padding: 6px 4px;
+}
+
+/* Modificamos el botón interno que genera Ionic para que ocupe todo el ancho */
+ion-datetime-button::part(native) {
+  background: transparent;
+  box-shadow: none;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  color: #1e293b;
+  font-size: 15px;
+  padding-left: 10px;
+}

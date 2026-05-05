@@ -76,7 +76,7 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   /** Despierta los botones (o no) relativos a generación de facturas en caso de ser pasadas / completadas. */
   @Input() puedeFacturar = true;
   /** Marca la diferencia de permisos de UI indicando si quien navega la app en la sesión es 'Paciente'. */
-  @Input() esPaciente = false; // <-- NUEVO: Para identificar si estamos en el portal del paciente
+  @Input() esPaciente = false;
 
   /** Dispara instrucción delegada al contenedor padre para invocar la creación sobre una celda fecha en concreto. */
   @Output() nuevaCita = new EventEmitter<string>();
@@ -198,10 +198,10 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
-   * Matemáticas visuales de la vista de calendario. Llena con objetos Date falsos (grises)
-   * antes o después de la primera semana si el mes no empieza el lunes (1).
-   * Al final agrupa los 35-42 días concebidos en sets de 7 y los expone.
-   */
+    * Matemáticas visuales de la vista de calendario. Llena con objetos Date falsos (grises)
+    * antes o después de la primera semana si el mes no empieza el lunes (1).
+    * Al final agrupa los 35-42 días concebidos en sets de 7 y los expone.
+    */
   construirCalendario() {
     const año = this.mesActual.getFullYear();
     const mes = this.mesActual.getMonth();
@@ -362,7 +362,22 @@ export class UniversalCalendar implements OnInit, OnDestroy, OnChanges {
 
   /** Determina si es pertinente visualizar el texto superior "+ Añadir". */
   get mostrarBotonNueva() {
-    return this.mode === 'patient' || this.mode === 'full';
+    if (this.mode !== 'patient' && this.mode !== 'full') return false;
+
+    // 🛡️ PROTECCIÓN UX: Ocultar el botón "+ Añadir" si el día seleccionado ya es pasado
+    if (this.diaSeleccionado) {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0); // Quitamos la hora para comparar solo días
+
+      const seleccionado = new Date(this.diaSeleccionado);
+      seleccionado.setHours(0, 0, 0, 0);
+
+      if (seleccionado.getTime() < hoy.getTime()) {
+        return false; // El día ya ha pasado, no se pueden pedir citas
+      }
+    }
+
+    return true;
   }
 
   /** Determina el formato con el que escupirá la lista inferior al pinchar una casilla. */

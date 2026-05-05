@@ -1,134 +1,97 @@
 <ion-content class="ion-padding">
   @if (!pacienteId && !esEdicion) {
-    <div class="selector-paciente-container">
-      <span class="selector-label">Seleccionar Paciente *</span>
-
-      @if (pacienteSeleccionadoId) {
-        <ion-item lines="none" class="paciente-seleccionado">
-          <ion-icon name="checkmark-circle" slot="start" color="success"></ion-icon>
-          <ion-label>
-            <h2>{{ pacienteSeleccionadoNombre }}</h2>
-          </ion-label>
-          <ion-button fill="clear" color="medium" (click)="quitarPaciente()">
-            <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
-          </ion-button>
-        </ion-item>
-      } @else {
-        <ion-searchbar
-          placeholder="Buscar paciente por nombre..."
-          (ionInput)="filtrarPacientes($event)"
-          [debounce]="250"
-          class="custom-searchbar"
-        >
-        </ion-searchbar>
-
-        <ion-list class="lista-pacientes-buscador">
-          @for (p of pacientesFiltrados(); track p.id) {
-            <ion-item button (click)="seleccionarPaciente(p)" lines="full">
-              <ion-avatar slot="start" class="avatar-pequeno">
-                @if (p.usuario?.avatar_url) {
-                  <img [src]="p.usuario.avatar_url" />
-                } @else {
-                  <ion-icon name="person-circle-outline"></ion-icon>
-                }
-              </ion-avatar>
-              <ion-label>{{ p.usuario?.nombre }} {{ p.usuario?.apellidos }}</ion-label>
-            </ion-item>
-          }
-          @if (pacientesFiltrados().length === 0) {
-            <ion-item lines="none">
-              <ion-label color="medium" class="ion-text-center"
-                >No se encontraron pacientes</ion-label
-              >
-            </ion-item>
-          }
-        </ion-list>
+  <div class="selector-paciente-container">
+    <span class="selector-label">Seleccionar Paciente *</span>
+    @if (pacienteSeleccionadoId) {
+    <ion-item lines="none" class="paciente-seleccionado">
+      <ion-icon name="checkmark-circle" slot="start" color="success"></ion-icon>
+      <ion-label>
+        <h2>{{ pacienteSeleccionadoNombre }}</h2>
+      </ion-label>
+      <ion-button fill="clear" color="medium" (click)="quitarPaciente()">
+        <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+    } @else {
+    <ion-searchbar placeholder="Buscar paciente..." (ionInput)="filtrarPacientes($event)" [debounce]="250"
+      class="custom-searchbar"></ion-searchbar>
+    <ion-list class="lista-pacientes-buscador">
+      @for (p of pacientesFiltrados(); track p.id) {
+      <ion-item button (click)="seleccionarPaciente(p)" lines="full">
+        <ion-avatar slot="start" class="avatar-pequeno">
+          <img *ngIf="p.usuario?.avatar_url" [src]="p.usuario.avatar_url" />
+          <ion-icon *ngIf="!p.usuario?.avatar_url" name="person-circle-outline"></ion-icon>
+        </ion-avatar>
+        <ion-label>{{ p.usuario?.nombre }} {{ p.usuario?.apellidos }}</ion-label>
+      </ion-item>
       }
-    </div>
+    </ion-list>
+    }
+  </div>
   }
 
-  <ion-item>
-    <ion-label position="stacked">Fecha</ion-label>
-    <ion-input type="date" [(ngModel)]="fecha" (ionChange)="onFechaCambiada($event)"></ion-input>
-  </ion-item>
+  <div style="margin-top: 16px; margin-bottom: 16px;">
+    <p class="selector-label">Fecha de la consulta</p>
+
+    <div class="datetime-button-wrapper">
+      <ion-datetime-button datetime="calendario-cita"></ion-datetime-button>
+    </div>
+  </div>
+
+  <ion-modal [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime id="calendario-cita" presentation="date" [(ngModel)]="fecha" [min]="minDateCita"
+        (ionChange)="onFechaCambiada($event)" color="primary" [showDefaultButtons]="true" doneText="Confirmar"
+        cancelText="Cancelar">
+      </ion-datetime>
+    </ng-template>
+  </ion-modal>
 
   @if (fecha) {
-    <div style="margin-top: 16px; margin-bottom: 16px">
-      <p
-        style="
-          font-size: 12px;
-          font-weight: 600;
-          color: #64748b;
-          margin-left: 16px;
-          text-transform: uppercase;
-        "
-      >
-        Horas disponibles
-      </p>
-
-      <div style="display: flex; flex-wrap: wrap; gap: 10px; padding: 0 16px">
-        @for (h of horasDisponibles; track h) {
-          <ion-chip
-            [color]="hora === h ? 'primary' : 'medium'"
-            [outline]="hora !== h"
-            (click)="hora = h"
-            style="font-weight: 600; cursor: pointer"
-          >
-            <ion-label>{{ h }}</ion-label>
-          </ion-chip>
-        }
-
-        @if (horasDisponibles.length === 0) {
-          <p style="color: #ef4444; font-size: 13px; width: 100%; margin-left: 16px">
-            No hay horas disponibles para esta duración.
-          </p>
-        }
-      </div>
+  <div style="margin: 16px 0;">
+    <p class="selector-label">Horas disponibles</p>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px;">
+      @for (h of horasDisponibles; track h) {
+      <ion-chip [color]="hora === h ? 'primary' : 'medium'" [outline]="hora !== h" (click)="hora = h">
+        <ion-label>{{ h }}</ion-label>
+      </ion-chip>
+      }
     </div>
+  </div>
   }
 
   <ion-item>
-    <ion-label position="stacked">Duración de la consulta</ion-label>
-    <ion-select [(ngModel)]="duracion">
+    <ion-label position="stacked">Duración</ion-label>
+    <ion-select [(ngModel)]="duracion" interface="popover">
       @for (opt of opcionesDuracion; track opt.value) {
-        <ion-select-option [value]="opt.value" [disabled]="!esDuracionValida(opt.value)">
-          {{ opt.label }}
-          @if (!esDuracionValida(opt.value)) {
-            (No disponible)
-          }
-        </ion-select-option>
+      <ion-select-option [value]="opt.value" [disabled]="!esDuracionValida(opt.value)">{{ opt.label
+        }}</ion-select-option>
       }
     </ion-select>
   </ion-item>
 
   <ion-item>
     <ion-label position="stacked">Tipo</ion-label>
-    <ion-select [(ngModel)]="tipo">
+    <ion-select [(ngModel)]="tipo" interface="popover">
       <ion-select-option value="presencial">Presencial</ion-select-option>
       <ion-select-option value="videollamada">Videollamada</ion-select-option>
     </ion-select>
   </ion-item>
 
   @if (tipo === 'videollamada' && !esPaciente) {
-    <ion-item>
-      <ion-label position="stacked">URL videollamada</ion-label>
-      <ion-input
-        type="url"
-        [(ngModel)]="urlVideo"
-        placeholder="https://meet.google.com/..."
-      ></ion-input>
-    </ion-item>
+  <ion-item><ion-label position="stacked">URL videollamada</ion-label><ion-input type="url"
+      [(ngModel)]="urlVideo"></ion-input></ion-item>
   }
 
   @if (!esPaciente) {
-    <ion-item>
-      <ion-label position="stacked">Estado</ion-label>
-      <ion-select [(ngModel)]="estado">
-        <ion-select-option value="pendiente">Pendiente</ion-select-option>
-        <ion-select-option value="confirmada">Confirmada</ion-select-option>
-        <ion-select-option value="cancelada">Cancelada</ion-select-option>
-      </ion-select>
-    </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Estado</ion-label>
+    <ion-select [(ngModel)]="estado" interface="popover">
+      <ion-select-option value="pendiente">Pendiente</ion-select-option>
+      <ion-select-option value="confirmada">Confirmada</ion-select-option>
+      <ion-select-option value="cancelada">Cancelada</ion-select-option>
+    </ion-select>
+  </ion-item>
   }
 
   <ion-item>
@@ -136,16 +99,8 @@
     <ion-textarea [(ngModel)]="notas" rows="3" placeholder="Observaciones..."></ion-textarea>
   </ion-item>
 
-  <ion-button
-    expand="block"
-    class="ion-margin-top"
-    (click)="guardar()"
-    [disabled]="guardando || !fecha || !hora"
-  >
-    @if (guardando) {
-      <ion-spinner name="crescent"></ion-spinner>
-    } @else {
-      {{ esEdicion ? 'Guardar cambios' : 'Crear cita' }}
-    }
+  <ion-button expand="block" class="ion-margin-top" (click)="guardar()" [disabled]="guardando || !fecha || !hora">
+    @if (guardando) { <ion-spinner name="crescent"></ion-spinner> }
+    @else { {{ esEdicion ? 'Guardar cambios' : 'Crear cita' }} }
   </ion-button>
 </ion-content>
