@@ -1,0 +1,201 @@
+<app-header titulo="Mi Panel"></app-header>
+
+<ion-content class="ion-padding" color="light">
+  @if (cargando()) {
+    <div class="loading-container">
+      <div class="avocado-spinner">🥑</div>
+      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px">Cargando tu portal...</p>
+    </div>
+  } @else if (paciente()) {
+    <div class="welcome-header">
+      <h2>¡Hola, {{ paciente().usuario?.nombre }}!</h2>
+      <p>Este es tu resumen para hoy.</p>
+    </div>
+
+    <div class="top-row-container">
+      <ion-card class="dash-card nutri-card-top">
+        <ion-card-content>
+          <div class="nutri-profile-main">
+            <ion-avatar class="nutri-avatar-v2">
+              <img [src]="nutricionista()?.usuario?.avatar_url || 'img/Logo_app.png'" />
+            </ion-avatar>
+            <div class="nutri-info-v2">
+              <h3>
+                {{ nutricionista()?.usuario?.nombre }} {{ nutricionista()?.usuario?.apellidos }}
+              </h3>
+              <ion-badge color="success">Nutricionista</ion-badge>
+            </div>
+          </div>
+          <div class="nutri-contact-inline">
+            <div class="contact-item-v2" *ngIf="nutricionista()?.usuario?.email">
+              <ion-icon name="mail-outline"></ion-icon
+              ><span>{{ nutricionista()?.usuario?.email }}</span>
+            </div>
+            <div class="contact-item-v2" *ngIf="nutricionista()?.telefono">
+              <ion-icon name="call-outline"></ion-icon><span>{{ nutricionista()?.telefono }}</span>
+            </div>
+          </div>
+          <ion-button expand="block" class="btn-chat-primary" [routerLink]="['/mensajes']">
+            <ion-icon slot="start" name="chatbubbles-outline"></ion-icon>Abrir Chat
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      @if (proximaCita()) {
+        <ion-card class="dash-card appointment-card-v2">
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="calendar-outline"></ion-icon> PRÓXIMA CITA
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content class="appointment-content-pad">
+            <div class="appointment-layout">
+              <div class="date-badge-v2">
+                <span class="day">{{ proximaCita()!.fecha_hora | date: 'dd' }}</span>
+                <span class="month">{{ proximaCita()!.fecha_hora | date: 'MMM' | uppercase }}</span>
+              </div>
+              <div class="details-v2" style="flex: 1">
+                <strong>{{ proximaCita()!.fecha_hora | date: 'HH:mm' }}h</strong>
+
+                @if (proximaCita()!.tipo === 'videollamada' && proximaCita()!.url_videollamada) {
+                  <ion-button
+                    expand="block"
+                    size="small"
+                    [href]="proximaCita()!.url_videollamada"
+                    target="_blank"
+                    color="success"
+                    style="margin-top: 10px; --border-radius: 8px"
+                  >
+                    <ion-icon slot="start" name="videocam-outline"></ion-icon>
+                    Unirse ahora
+                  </ion-button>
+                } @else {
+                  <p>
+                    <ion-icon
+                      [name]="
+                        proximaCita()!.tipo === 'videollamada'
+                          ? 'videocam-outline'
+                          : 'location-outline'
+                      "
+                    ></ion-icon>
+                    {{ proximaCita()!.tipo | titlecase }}
+                  </p>
+                }
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      } @else {
+        <ion-card class="dash-card appointment-card-v2">
+          <ion-card-header
+            ><ion-card-title
+              ><ion-icon name="calendar-outline"></ion-icon> PRÓXIMA CITA</ion-card-title
+            ></ion-card-header
+          >
+          <ion-card-content class="placeholder-content">
+            <div class="no-date-icon"><ion-icon name="calendar-clear-outline"></ion-icon></div>
+            <div class="no-date-text">
+              <strong>Sin cita agendada</strong>
+              <ion-button size="small" style="margin-top: 8px" (click)="pedirCita()">
+                Agendar cita
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      }
+    </div>
+
+    <div class="section-title">Mis objetivos de hoy</div>
+    <app-habitos-tracker
+      [habitos]="habitos()"
+      (onToggle)="handleHabitoToggle($event)"
+    ></app-habitos-tracker>
+
+    <div class="section-title">Qué comer hoy</div>
+    <ion-card class="dash-card menu-today-card">
+      <ion-card-content class="ion-no-padding">
+        <ion-list lines="full">
+          @for (comida of tiposComida; track comida.id) {
+            @let entrada = getEntradaPorTipo(comida.id);
+            <ion-item [button]="!!entrada" (click)="abrirReceta(entrada?.receta)" detail="false">
+              <div slot="start" class="meal-image-container">
+                <img
+                  *ngIf="entrada?.receta?.imagen_url"
+                  [src]="entrada.receta.imagen_url"
+                  class="meal-real-img"
+                />
+                <div *ngIf="!entrada?.receta?.imagen_url" class="meal-icon-placeholder">
+                  {{ comida.icon }}
+                </div>
+              </div>
+              <ion-label>
+                <h3 class="meal-type">{{ comida.label }}</h3>
+                <p class="meal-name" [class.empty]="!entrada">
+                  {{ entrada?.receta?.nombre || 'No asignado' }}
+                </p>
+              </ion-label>
+              <div slot="end" class="meal-action" *ngIf="entrada">
+                <ion-badge color="light">{{ entrada.receta?.calorias_kcal }} kcal</ion-badge>
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+              </div>
+            </ion-item>
+          }
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  }
+  <ion-modal [isOpen]="modalRecetaAbierto()" (didDismiss)="cerrarReceta()" initialBreakpoint="0.85" [breakpoints]="[0, 0.85, 1]">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar>
+          <ion-title>Detalle del Plato</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarReceta()">
+              <ion-icon name="close-circle" class="btn-close-icon"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      
+      <ion-content class="ion-padding modal-bg">
+        @if (recetaSeleccionada(); as receta) {
+          <div class="receta-hero">
+            @if (receta.imagen_url) {
+              <img [src]="receta.imagen_url" class="receta-img-full" />
+            } @else {
+              <div class="receta-img-placeholder">
+                <ion-icon name="restaurant-outline"></ion-icon>
+              </div>
+            }
+          </div>
+          
+          <h2 class="receta-title-modal">{{ receta.nombre }}</h2>
+          
+          <div class="macros-grid">
+            <div class="macro-box">
+              <span class="macro-val kcal">{{ receta.calorias_kcal || 0 }}</span>
+              <span class="macro-lbl">kcal</span>
+            </div>
+            <div class="macro-box">
+              <span class="macro-val prot">{{ receta.proteina_g || 0 }}g</span>
+              <span class="macro-lbl">Prot</span>
+            </div>
+            <div class="macro-box">
+              <span class="macro-val carbs">{{ receta.carbohidratos_g || 0 }}g</span>
+              <span class="macro-lbl">Carbs</span>
+            </div>
+            <div class="macro-box">
+              <span class="macro-val grasa">{{ receta.grasa_g || 0 }}g</span>
+              <span class="macro-lbl">Grasa</span>
+            </div>
+          </div>
+          
+          <div class="instrucciones-box">
+            <h3 class="instrucciones-title">Preparación paso a paso</h3>
+            <p class="instrucciones-texto">{{ receta.instrucciones || 'Tu nutricionista no ha añadido instrucciones específicas para esta receta. ¡Disfrútala!' }}</p>
+          </div>
+        }
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

@@ -1,0 +1,47 @@
+.evolucion-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.welcome-header {
+  margin-bottom: 24px;
+  padding: 5px;
+}
+
+.welcome-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.welcome-header p {
+  color: #64748b;
+  margin: 4px 0 0;
+  font-size: 15px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+}
+
+.mediciones-wrapper {
+  background: transparent;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+}
+
+.empty-state ion-icon {
+  font-size: 54px;
+  opacity: 0.5;
+  margin-bottom: 10px;
+}

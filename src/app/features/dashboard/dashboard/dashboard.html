@@ -1,0 +1,69 @@
+<app-header titulo="Panel de Control"></app-header>
+
+<ion-content class="ion-padding" color="light">
+
+  @if (cargandoPagina()) {
+  <div class="loading-container">
+    <div class="avocado-spinner">🥑</div>
+    <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px;">
+      Preparando tu panel nutricional...
+    </p>
+  </div>
+  } @else {
+
+  <app-estadisticas-dashboard />
+
+  <div class="dashboard-main">
+    <div class="dashboard-main__pacientes">
+      <app-lista-pacientes-preview />
+
+      <ion-card class="dashboard-card pending-invoice-card">
+        <ion-card-header>
+          <div class="header-flex">
+            <ion-card-title>
+              <ion-icon name="cash-outline" color="warning"></ion-icon>
+              Pendientes de facturar
+            </ion-card-title>
+            @if (citasPendientes().length > 0) {
+            <ion-badge color="warning">
+              {{ citasPendientes().length }}
+            </ion-badge>
+            }
+          </div>
+        </ion-card-header>
+
+        <ion-card-content class="ion-no-padding">
+          @if (citasPendientes().length > 0) {
+          <ion-list lines="full" class="ion-no-margin">
+            @for (cita of citasPendientes(); track cita.id) {
+            <ion-item class="pending-item">
+              <ion-label>
+                <h3 style="font-weight: 600; color: #1e293b;">
+                  {{ cita.pacientes?.usuarios?.nombre }} {{ cita.pacientes?.usuarios?.apellidos }}
+                </h3>
+                <p style="font-size: 12px; color: #64748b;">
+                  {{ cita.fecha_hora | date:'dd/MM/yyyy - HH:mm' }}h · {{ cita.tipo | titlecase }}
+                </p>
+              </ion-label>
+              <ion-button slot="end" fill="outline" color="primary" size="small" (click)="facturarCita(cita)">
+                <ion-icon slot="start" name="receipt-outline"></ion-icon>
+                Facturar
+              </ion-button>
+            </ion-item>
+            }
+          </ion-list>
+          } @else {
+          <div class="empty-state">
+            <p>¡Todo al día! No hay citas pendientes de emitir factura.</p>
+          </div>
+          }
+        </ion-card-content>
+      </ion-card>
+    </div>
+    <div class="dashboard-main__calendario">
+      <app-universal-calendar mode="dashboard"></app-universal-calendar>
+    </div>
+  </div>
+  }
+
+</ion-content>

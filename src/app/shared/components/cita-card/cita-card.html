@@ -1,0 +1,97 @@
+<div class="cita-card" [class]="'cita-card--' + cita.estado">
+  <div class="cita-card__header">
+    <div class="cita-card__tipo">
+      <ion-icon [name]="icono"></ion-icon>
+      <span>{{ cita.tipo | titlecase }}</span>
+
+      @if (!esPaciente) {
+        @if (citaPasada() && !cita.facturada && cita.estado === 'confirmada') {
+          <ion-badge color="danger" style="font-size: 10px; margin-left: 8px"
+            >Sin facturar</ion-badge
+          >
+        }
+        @if (cita.facturada) {
+          <ion-badge color="success" style="font-size: 10px; margin-left: 8px">Facturada</ion-badge>
+        }
+      }
+    </div>
+    <ion-badge [color]="colorEstado">{{ cita.estado }}</ion-badge>
+  </div>
+
+  <div class="cita-card__fecha">
+    <ion-icon name="time-outline"></ion-icon>
+    <span>{{ cita.fecha_hora | date: 'd MMM · HH:mm' : '' : 'es' }}</span>
+    <span class="cita-card__duracion">· {{ cita.duracion_min }} min</span>
+  </div>
+
+  @if (cita.tipo === 'videollamada') {
+    <div
+      class="cita-card__online-info"
+      style="margin-top: 10px; padding: 10px; background: #f0f4f8; border-radius: 8px"
+    >
+      @if (cita.url_videollamada) {
+        <p style="margin: 0 0 8px 0; font-size: 12px; color: #2d6a4f; font-weight: 600">
+          <ion-icon
+            name="videocam-outline"
+            style="vertical-align: middle; margin-right: 4px"
+          ></ion-icon>
+          La sesión será online
+        </p>
+        <ion-button
+          expand="block"
+          size="small"
+          [href]="cita.url_videollamada"
+          target="_blank"
+          color="success"
+          style="margin: 0"
+        >
+          <ion-icon slot="start" name="link-outline"></ion-icon>
+          Unirse a la reunión
+        </ion-button>
+      } @else {
+        <p style="margin: 0; font-size: 12px; color: #64748b; font-style: italic">
+          <ion-icon
+            name="information-circle-outline"
+            style="vertical-align: middle; margin-right: 4px"
+          ></ion-icon>
+          El nutricionista adjuntará el enlace pronto.
+        </p>
+      }
+    </div>
+  }
+
+  @if (mostrarAcciones) {
+    <div class="cita-card__acciones">
+      @if (cita.estado === 'pendiente' && !cita.facturada) {
+        <ion-button fill="clear" color="success" size="small" (click)="confirmar.emit(cita)">
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          Confirmar
+        </ion-button>
+        <ion-button fill="clear" color="warning" size="small" (click)="cancelar.emit(cita)">
+          <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+          Cancelar
+        </ion-button>
+      }
+
+      @if (cita.estado !== 'cancelada' && !cita.facturada) {
+        <ion-button fill="clear" size="small" (click)="editar.emit(cita)">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
+          Editar
+        </ion-button>
+      }
+
+      @if (!cita.facturada && permitirFacturar && cita.estado === 'confirmada') {
+        <ion-button fill="clear" color="primary" size="small" (click)="facturar.emit(cita)">
+          <ion-icon slot="start" name="document-text-outline"></ion-icon>
+          Factura
+        </ion-button>
+      }
+
+      @if (!cita.facturada) {
+        <ion-button fill="clear" color="danger" size="small" (click)="eliminar.emit(cita)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      }
+    </div>
+  }
+</div>

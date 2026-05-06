@@ -1,0 +1,25 @@
+<ion-header class="header">
+  <ion-toolbar class="header-toolbar">
+    
+    <ion-buttons slot="start">
+      <div class="hamburger-container" (click)="toggleMenu()">
+        <div class="hamburger" [class.is-active]="!collapsed">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </div>
+      </div>
+    </ion-buttons>
+
+    <ion-title>{{ titulo }}</ion-title>
+
+    <div class="header-actions" slot="end">
+      <ion-button fill="clear" class="action-btn">
+        <ion-icon name="notifications-outline"></ion-icon>
+        @if (notificaciones > 0) {
+          <ion-badge color="danger">{{ notificaciones }}</ion-badge>
+        }
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-header>

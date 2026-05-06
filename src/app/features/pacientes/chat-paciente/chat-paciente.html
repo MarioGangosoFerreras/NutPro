@@ -1,0 +1,50 @@
+<ion-header class="chat-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/pacientes"></ion-back-button>
+    </ion-buttons>
+    
+    @if (paciente()) {
+      <div class="header-paciente" [routerLink]="['/pacientes', pacienteId]">
+        <ion-avatar class="header-avatar">
+          @if (paciente().usuario?.avatar_url) {
+            <img [src]="paciente().usuario.avatar_url" />
+          } @else {
+            <ion-icon name="person-circle-outline" class="avatar-placeholder"></ion-icon>
+          }
+        </ion-avatar>
+        <div class="header-info">
+          <span class="header-nombre">{{ paciente().usuario?.nombre }} {{ paciente().usuario?.apellidos }}</span>
+          <span class="header-sub">Ver ficha del paciente</span>
+        </div>
+      </div>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding chat-content">
+  <div class="mensajes-container">
+    @for (msg of mensajes(); track msg.id) {
+      <div class="mensaje-bubble" [class.mio]="msg.sender_id === miUsuarioId">
+        <p>{{ msg.contenido }}</p>
+        <span class="hora">{{ msg.enviado_at | date:'HH:mm' }}</span>
+      </div>
+    }
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar class="input-toolbar">
+    <div class="chat-input-wrapper">
+      <ion-input
+        [(ngModel)]="nuevoMensaje"
+        (keyup.enter)="enviar()"
+        placeholder="Escribe un mensaje..."
+        class="chat-input">
+      </ion-input>
+      <ion-button fill="clear" (click)="enviar()" [disabled]="!nuevoMensaje.trim()">
+        <ion-icon slot="icon-only" name="send-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,94 @@
+<app-header titulo="Mis Pacientes"></app-header>
+
+<ion-content color="light">
+
+  <div class="ion-no-border">
+    <ion-toolbar style="--background: transparent;">
+      <ion-searchbar placeholder="Buscar paciente..." (ionInput)="onBusqueda($event)" [debounce]="300">
+      </ion-searchbar>
+    </ion-toolbar>
+  </div>
+
+  <div class="ion-padding">
+
+    @if (loading()) {
+    <div class="loading-container">
+      <div class="avocado-spinner">🥑</div>
+      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px;">
+        Cargando pacientes...
+      </p>
+    </div>
+    } @else {
+
+    @if (busquedaActiva()) {
+    <div class="busqueda-banner">
+      <ion-icon name="search-outline" class="busqueda-icon"></ion-icon>
+      <span>Resultados para <strong>{{ busquedaActiva() }}</strong></span>
+      <button class="btn-limpiar" (click)="limpiarBusqueda()">✕ Limpiar</button>
+    </div>
+    }
+
+    @if (pacientesFiltrados().length === 0 && !busquedaActiva()) {
+    <div class="empty-container">
+      <ion-icon name="person-outline" class="empty-icon"></ion-icon>
+      <p>No tienes pacientes todavía</p>
+      <ion-button shape="round" (click)="nuevoPaciente()">Añadir primer paciente</ion-button>
+    </div>
+    }
+
+    @if (pacientesFiltrados().length === 0 && busquedaActiva()) {
+    <div class="empty-container">
+      <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+      <p>No se encontraron pacientes para <strong>{{ busquedaActiva() }}</strong></p>
+      <ion-button fill="outline" shape="round" (click)="limpiarBusqueda()">Ver todos</ion-button>
+    </div>
+    }
+
+    @if (pacientesFiltrados().length > 0) {
+    <ion-list lines="none">
+      @for (paciente of pacientesFiltrados(); track paciente.id) {
+      <ion-item button (click)="verPaciente(paciente.id)" class="paciente-item" detail="false">
+        <ion-avatar slot="start">
+          @if (paciente.usuario?.avatar_url) {
+          <img [src]="paciente.usuario.avatar_url + '?v=' + version" alt="Foto" />
+          } @else {
+          <div class="avatar-placeholder">
+            <ion-icon name="person-outline" class="avatar-icon"></ion-icon>
+          </div>
+          }
+        </ion-avatar>
+
+        <ion-label>
+          <h2>{{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}</h2>
+          <p>
+            <ion-icon name="mail-outline"></ion-icon>
+            {{ paciente.email }}
+          </p>
+          <p>
+            <ion-icon name="call-outline"></ion-icon>
+            {{ paciente.telefono }}
+          </p>
+        </ion-label>
+
+        <ion-badge slot="end">{{ calcularEdad(paciente.fecha_nacimiento) }} años</ion-badge>
+      </ion-item>
+      }
+    </ion-list>
+    }
+    }
+  </div>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button>
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button color="light" (click)="nuevoPaciente()" title="Añadir manualmente">
+        <ion-icon name="person-outline"></ion-icon>
+      </ion-fab-button>
+
+      <ion-fab-button color="primary" (click)="copiarEnlaceInvitacion()" title="Copiar enlace invitación">
+        <ion-icon name="share-social-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
+</ion-content>

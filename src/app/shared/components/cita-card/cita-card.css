@@ -1,0 +1,72 @@
+.cita-card {
+  background: var(--ion-card-background, #fff);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--ion-color-medium);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.cita-card--pendiente  { border-left-color: var(--ion-color-warning); }
+.cita-card--confirmada { border-left-color: var(--ion-color-success); }
+.cita-card--cancelada  { border-left-color: var(--ion-color-danger); opacity: 0.6; }
+
+.cita-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.cita-card__tipo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ion-color-medium);
+}
+
+.cita-card__tipo ion-icon {
+  font-size: 16px;
+}
+
+.cita-card__fecha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.cita-card__fecha ion-icon {
+  font-size: 14px;
+  color: var(--ion-color-primary);
+}
+
+.cita-card__duracion {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+.cita-card__paciente {
+  font-size: 13px;
+  color: var(--ion-color-medium);
+  margin-bottom: 4px;
+}
+
+.cita-card__notas {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin: 4px 0 0;
+  font-style: italic;
+}
+
+.cita-card__acciones {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--ion-color-light-shade);
+}

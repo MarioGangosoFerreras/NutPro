@@ -1,0 +1,179 @@
+:host {
+  --primary-medical: #2d6a4f;
+  --primary-soft: #e8f5e9;
+  --border-color: #e2e8f0;
+  display: block;
+}
+
+.ajustes-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+.ajustes-card {
+  background: white;
+  border-radius: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f1f5f9;
+}
+
+.ajustes-card ion-card-title {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--primary-medical);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  gap: 8px;
+}
+
+.ajustes-card ion-card-title ion-icon { font-size: 22px; }
+
+.section-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+
+/* ─── GRID DE EDICIÓN ─── */
+.edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.full-width { grid-column: 1 / -1; }
+
+ion-item {
+  --background: #ffffff;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+ion-label[position="stacked"] {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  margin-bottom: 8px !important;
+}
+
+ion-input, ion-select {
+  --padding-start: 12px;
+  background: #fcfcfc;
+  border: 1.5px solid #eef2f6;
+  border-radius: 10px;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+/* Evitar fondo gris en los items deshabilitados */
+ion-input[disabled] { opacity: 0.6; }
+
+/* ─── CENTROS DE CONSULTA ─── */
+.centro-item {
+  background: #fcfcfc;
+  border: 1.5px solid #eef2f6;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.centro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.centro-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-medical);
+  text-transform: uppercase;
+}
+
+.btn-add-centro {
+  --border-radius: 10px;
+  --border-width: 1.5px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* ─── EDITOR DE AVATAR ─── */
+.avatar-edit-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.avatar-preview-wrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  position: relative;
+  border: 4px solid white;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.avatar-preview-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.avatar-preview-wrapper:hover .avatar-overlay { opacity: 1; }
+.avatar-overlay ion-icon { color: white; font-size: 28px; }
+.avatar-hint { font-size: 12px; font-weight: 600; color: var(--primary-medical); margin-top: 10px; }
+
+/* ─── INTEGRACIONES ─── */
+.integracion-item {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 8px 4px;
+  border: 1px solid #e2e8f0;
+}
+.btn-integration { --border-radius: 10px; font-weight: 600; height: 38px; }
+
+/* ─── BOTONES GENERALES ─── */
+.btn-save-master {
+  margin-top: 24px;
+  --background: var(--primary-medical);
+  --border-radius: 12px;
+  font-weight: 700;
+  height: 52px;
+  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.2);
+}
+
+.btn-save-secondary {
+  margin-top: 20px;
+  --border-radius: 12px;
+  font-weight: 700;
+  height: 48px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+@media (max-width: 600px) {
+  .edit-grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,119 @@
+.login-content {
+    /* Usamos el fondo global de Ionic que definiste en styles.css */
+    --background: var(--ion-background-color);
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+    padding: 24px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: var(--np-radius-card, 24px);
+    padding: 40px 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+.logo-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.login-logo {
+    height: 64px;
+    width: auto;
+    margin-bottom: 12px;
+}
+
+.brand-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+/* Usamos los colores definidos en styles.css */
+.nut {
+    color: var(--np-amber-600);
+}
+
+.pro {
+    color: var(--np-green-600);
+}
+
+.brand-subtitle {
+    color: var(--ion-color-medium);
+    font-size: 14px;
+    margin: 4px 0 0;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ion-text-color);
+    margin-bottom: 6px;
+}
+
+.form-input {
+    --border-radius: var(--np-radius-input, 12px);
+    --border-color: var(--ion-border-color);
+    --border-width: 1.5px;
+    --padding-start: 14px;
+    --padding-end: 14px;
+    --background: var(--ion-color-light-tint, #fafafa);
+    font-size: 14px;
+}
+
+.error-box {
+    background: var(--np-coral-50);
+    border: 1px solid var(--np-coral-400);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.btn-primary {
+    --border-radius: var(--np-radius-btn, 12px);
+    --background: var(--np-green-600);
+    --background-activated: var(--np-green-800);
+    height: 52px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 20px;
+}
+
+.divider {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.divider span {
+    font-size: 13px;
+    color: var(--ion-color-medium);
+}
+
+.btn-secondary {
+    --border-radius: var(--np-radius-btn, 12px);
+    --color: var(--np-green-600);
+    --border-color: var(--np-green-600);
+    height: 52px;
+    font-size: 15px;
+    font-weight: 600;
+}

@@ -1,0 +1,44 @@
+<app-header titulo="Mi Dieta"></app-header>
+
+<ion-content class="ion-padding" color="light">
+  @if (cargando()) {
+    <div class="loading-container">
+      <div class="avocado-spinner">🥑</div>
+      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px">Cargando tu menú...</p>
+    </div>
+  } @else if (planActivo(); as plan) {
+
+    <ion-card class="dash-card">
+      <ion-card-content class="plan-resumen">
+        <div class="plan-stat">
+          <ion-icon name="flame-outline" color="danger"></ion-icon>
+          <div class="stat-info">
+            <span>Objetivo diario</span>
+            <strong>{{ plan.calorias_objetivo || 0 }} kcal</strong>
+          </div>
+        </div>
+        <div class="plan-macros">
+          <ion-badge color="primary">Prot: {{ plan.proteinas_g || 0 }}g</ion-badge>
+          <ion-badge color="tertiary">Carbs: {{ plan.carbohidratos_g || 0 }}g</ion-badge>
+          <ion-badge color="warning">Grasas: {{ plan.grasas_g || 0 }}g</ion-badge>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <app-menu-semanal
+      [planId]="planActivo().id"
+      [pacienteId]="paciente().id"
+      [paciente]="paciente()"
+      [planActivo]="planActivo()"
+      [caloriasObjetivo]="planActivo().calorias_objetivo"
+      [modoLectura]="true">
+    </app-menu-semanal>
+
+  } @else {
+    <div class="empty-state">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <h3>Sin plan activo</h3>
+      <p>Tu menú aparecerá aquí en cuanto esté listo.</p>
+    </div>
+  }
+</ion-content>

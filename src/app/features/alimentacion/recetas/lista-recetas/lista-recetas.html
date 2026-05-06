@@ -1,0 +1,192 @@
+<app-header titulo="Recetas"></app-header>
+
+<ion-content>
+  <div class="ion-no-border">
+    <ion-toolbar>
+      <ion-searchbar
+        placeholder="Buscar receta..."
+        (ionInput)="onBusqueda($event)"
+        [debounce]="300"
+      >
+      </ion-searchbar>
+    </ion-toolbar>
+
+    <ion-toolbar>
+      <ion-segment [value]="filtroActivo()" (ionChange)="onFiltro($event)" scrollable>
+        @for (filtro of filtros; track filtro.valor) {
+          <ion-segment-button [value]="filtro.valor">
+            <ion-label>{{ filtro.label }}</ion-label>
+          </ion-segment-button>
+        }
+      </ion-segment>
+    </ion-toolbar>
+  </div>
+
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (cargando()) {
+    <div class="loading-container">
+      <div class="avocado-spinner">🥑</div>
+      <p style="color: #2d6a4f; font-weight: 600; margin-top: 10px">
+        Buscando tus mejores platos...
+      </p>
+    </div>
+  } @else {
+    @if (recetasFiltradas().length === 0 && !busqueda()) {
+      <div class="empty-state">
+        <div class="empty-state-icon-wrapper">
+          <ion-icon name="restaurant-outline"></ion-icon>
+        </div>
+        <p>No hay recetas todavía</p>
+        <span>Crea tu primera receta y empieza a registrar tus comidas</span>
+        <ion-button routerLink="/alimentacion/recetas/nueva" fill="outline">
+          Crear primera receta
+        </ion-button>
+      </div>
+    }
+
+    @for (receta of recetasFiltradas(); track receta.id) {
+      <ion-card>
+        <div class="card-layout">
+          @if (receta.imagen_url) {
+            <div class="card-imagen-wrapper">
+              <img [src]="receta.imagen_url" alt="{{ receta.nombre }}" class="card-imagen" />
+            </div>
+          } @else {
+            <div class="card-sin-imagen">
+              <ion-icon name="restaurant-outline"></ion-icon>
+            </div>
+          }
+
+          <div class="card-contenido">
+            <div class="card-header-row">
+              <ion-card-title>{{ receta.nombre }}</ion-card-title>
+              <ion-icon
+                [name]="receta.visibilidad === 'publica' ? 'globe-outline' : 'lock-closed-outline'"
+                [color]="receta.visibilidad === 'publica' ? 'success' : 'medium'"
+              >
+              </ion-icon>
+            </div>
+
+            <ion-card-subtitle>
+              @if (receta.tiempo_prep_min) {
+                <ion-icon name="time-outline"></ion-icon> {{ receta.tiempo_prep_min }} min ·
+              }
+              {{ receta.raciones }} {{ receta.raciones === 1 ? 'ración' : 'raciones' }}
+            </ion-card-subtitle>
+
+            <div class="macros-row">
+              @let macros = getMacrosPorRacion(receta);
+              <div class="macro macro-kcal">
+                <span class="macro-valor">{{ macros.kcal }}</span>
+                <span class="macro-label">kcal</span>
+              </div>
+              <div class="macro macro-prot">
+                <span class="macro-valor">{{ macros.prot }}g</span>
+                <span class="macro-label">prot</span>
+              </div>
+              <div class="macro macro-carbs">
+                <span class="macro-valor">{{ macros.carbs }}g</span>
+                <span class="macro-label">carbs</span>
+              </div>
+              <div class="macro macro-grasa">
+                <span class="macro-valor">{{ macros.grasa }}g</span>
+                <span class="macro-label">grasa</span>
+              </div>
+            </div>
+
+            <div class="acciones-row">
+              <ion-button
+                fill="clear"
+                size="small"
+                [routerLink]="['/alimentacion/recetas', receta.id]"
+              >
+                <ion-icon slot="start" name="eye-outline"></ion-icon>
+                Ver
+              </ion-button>
+
+              @if (receta.creado_por === miUsuarioId) {
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  [routerLink]="['/alimentacion/recetas/editar', receta.id]"
+                  color="primary"
+                >
+                  <ion-icon slot="start" name="create-outline"></ion-icon>
+                  Editar
+                </ion-button>
+              }
+
+              <ion-button
+                fill="clear"
+                size="small"
+                color="danger"
+                (click)="gestionarAccionEliminar(receta)"
+              >
+                <ion-icon slot="start" name="trash-outline"></ion-icon>
+                {{ receta.visibilidad === 'publica' ? 'Ocultar' : 'Eliminar' }}
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </ion-card>
+    }
+
+    @if (recetasOcultas().length > 0) {
+      <div class="ion-padding">
+        <ion-button
+          fill="clear"
+          expand="block"
+          (click)="verOcultas.set(!verOcultas())"
+          color="medium"
+        >
+          <ion-icon
+            [name]="verOcultas() ? 'eye-off-outline' : 'eye-outline'"
+            slot="start"
+          ></ion-icon>
+          {{
+            verOcultas()
+              ? 'Ocultar recetas desactivadas'
+              : 'Ver recetas ocultas (' + recetasOcultas().length + ')'
+          }}
+        </ion-button>
+
+        @if (verOcultas()) {
+          <div class="ocultas-container" style="opacity: 0.8">
+            @for (receta of recetasOcultas(); track receta.id) {
+              <ion-card style="background: #f4f4f4; margin: 4px 12px">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    padding: 8px 16px;
+                    justify-content: space-between;
+                  "
+                >
+                  <ion-label>
+                    <h3 style="color: #666; font-weight: 600; margin: 0">{{ receta.nombre }}</h3>
+                    <p style="font-size: 11px; margin: 0">
+                      Publicada originalmente por la comunidad
+                    </p>
+                  </ion-label>
+                  <ion-button fill="outline" size="small" (click)="desocultar(receta.id)">
+                    <ion-icon slot="start" name="refresh-outline"></ion-icon>
+                    Restaurar
+                  </ion-button>
+                </div>
+              </ion-card>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button routerLink="/alimentacion/recetas/nueva">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

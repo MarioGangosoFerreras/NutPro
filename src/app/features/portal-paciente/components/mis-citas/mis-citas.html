@@ -1,0 +1,13 @@
+<app-header titulo="Mis Citas"></app-header>
+<ion-content class="ion-padding" color="light">
+  <div class="container">
+    <app-universal-calendar
+      mode="patient"
+      [citasInput]="citas()"
+      [puedeFacturar]="false"
+      [esPaciente]="true"
+      (nuevaCita)="pedirCita($event)"
+    >
+    </app-universal-calendar>
+  </div>
+</ion-content>

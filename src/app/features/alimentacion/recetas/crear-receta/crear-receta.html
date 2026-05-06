@@ -1,0 +1,425 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/alimentacion/recetas"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ modoEdicion() ? 'Editar receta' : 'Crear receta' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+
+  <!-- Inputs ocultos para selección de imagen en web/PWA.
+       En plataformas nativas nunca se activan (usamos Capacitor Camera). -->
+  <input id="file-camara-receta" type="file" accept="image/*" capture="environment" style="display: none"
+    (change)="onFileInputChange($event)" />
+
+  <input id="file-galeria-receta" type="file" accept="image/*" style="display: none"
+    (change)="onFileInputChange($event)" />
+
+  <!-- Diálogo de selección de imagen (solo web/PWA) -->
+  @if (mostrarDialogoImagen()) {
+  <div class="dialogo-imagen-overlay" (click)="cerrarDialogoImagen()">
+    <div class="dialogo-imagen-sheet" (click)="$event.stopPropagation()">
+      <p class="dialogo-titulo">Añadir foto de la receta</p>
+
+      <button class="dialogo-opcion" (click)="elegirCamaraWeb()">
+        <ion-icon name="camera-outline"></ion-icon>
+        <span>Tomar foto</span>
+      </button>
+
+      <button class="dialogo-opcion" (click)="elegirGaleriaWeb()">
+        <ion-icon name="image-outline"></ion-icon>
+        <span>Elegir de la galería</span>
+      </button>
+
+      <button class="dialogo-cancelar" (click)="cerrarDialogoImagen()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Modal cámara web (getUserMedia) -->
+  @if (mostrarModalCamara()) {
+  <div class="camara-modal-overlay">
+    <div class="camara-modal">
+      <div class="camara-header">
+        <span>Tomar foto</span>
+        <button class="camara-cerrar" (click)="cerrarModalCamara()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+      <video id="camara-preview" class="camara-video" autoplay playsinline muted></video>
+      <div class="camara-footer">
+        <button class="camara-capturar" (click)="capturarFotoWeb()">
+          <ion-icon name="camera-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Datos básicos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="imagen-upload-wrapper">
+        @if (imagenUrl()) {
+        <div class="imagen-preview-container">
+          <img [src]="imagenUrl()" class="imagen-preview" alt="Imagen de la receta" />
+
+          <div class="imagen-overlay">
+            <ion-button class="imagen-cambiar-btn" fill="clear" color="light" (click)="abrirSelectorImagen()">
+              <ion-icon slot="start" name="camera-reverse-outline"></ion-icon>
+              Cambiar foto
+            </ion-button>
+          </div>
+
+          <ion-button class="imagen-quitar-btn" fill="solid" color="danger" (click)="quitarImagen()">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+        } @else {
+        <div class="upload-label" [class.uploading]="subiendoImagen()" (click)="abrirSelectorImagen()">
+          @if (subiendoImagen()) {
+          <ion-spinner name="crescent" color="primary"></ion-spinner>
+          <span class="upload-title" style="margin-top: 10px;">Subiendo imagen...</span>
+          } @else {
+          <div class="upload-icon-container">
+            <ion-icon name="image-outline"></ion-icon>
+            <div class="upload-badge"><ion-icon name="add-outline"></ion-icon></div>
+          </div>
+          <span class="upload-title">Añadir foto a la receta</span>
+          <span class="upload-subtitle">Toma una foto o elige de tu galería</span>
+          }
+        </div>
+        }
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Nombre de la receta *</ion-label>
+        <ion-input placeholder="Ej: Tortitas de avena y plátano" [value]="nombre()"
+          (ionInput)="nombre.set($event.detail.value ?? '')">
+        </ion-input>
+      </ion-item>
+
+      <div class="row-dos-columnas">
+        <ion-item>
+          <ion-label position="stacked">Raciones</ion-label>
+          <ion-input type="number" [value]="raciones()" (ionInput)="raciones.set($any($event).detail.value ?? '')"
+            min="1">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Tiempo (min)</ion-label>
+          <ion-input type="number" placeholder="Opcional" [value]="tiempo_prep_min()"
+            (ionInput)="tiempo_prep_min.set($any($event).detail.value ?? '')" min="1">
+          </ion-input>
+        </ion-item>
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Visibilidad</ion-label>
+        <ion-select [value]="visibilidad()" (ionChange)="visibilidad.set($event.detail.value)">
+          <ion-select-option value="privada">Privada (solo yo)</ion-select-option>
+          <ion-select-option value="publica">Pública (todos los nutricionistas)</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Tipo de comida</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="chips-selector">
+        @for (tipo of tiposComida; track tipo) {
+        <ion-chip [color]="tiposComidaSeleccionados().includes(tipo) ? 'primary' : 'medium'"
+          [outline]="!tiposComidaSeleccionados().includes(tipo)" (click)="toggleTipoComida(tipo)">
+          <ion-label>{{ tipo }}</ion-label>
+        </ion-chip>
+        }
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Etiquetas dietéticas</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="chips-selector">
+        @for (etiqueta of etiquetas; track etiqueta) {
+        <ion-chip [color]="etiquetasSeleccionadas().includes(etiqueta) ? 'success' : 'medium'"
+          [outline]="!etiquetasSeleccionadas().includes(etiqueta)" (click)="toggleEtiqueta(etiqueta)">
+          <ion-label>{{ etiqueta }}</ion-label>
+        </ion-chip>
+        }
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Ingredientes</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if (!foodSeleccionado()) {
+      <div class="modo-toggle">
+        <ion-button [fill]="!modoManual() ? 'solid' : 'outline'" size="small" (click)="modoManual.set(false)">
+          <ion-icon slot="start" name="search-outline"></ion-icon>
+          Buscar
+        </ion-button>
+        <ion-button [fill]="modoManual() ? 'solid' : 'outline'" size="small" (click)="modoManual.set(true)">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
+          Añadir manualmente
+        </ion-button>
+      </div>
+
+      @if (!modoManual()) {
+      <ion-searchbar placeholder="Buscar alimento..." [value]="busquedaQuery()" (ionInput)="onBuscarAlimento($event)"
+        [debounce]="0">
+      </ion-searchbar>
+
+      @if (buscando()) {
+      <div class="buscando-spinner">
+        <ion-spinner name="crescent"></ion-spinner>
+        <span>Buscando en base de datos...</span>
+      </div>
+      }
+
+      @if (resultadosBusqueda().length > 0) {
+      <ion-list>
+        @for (food of resultadosBusqueda(); track food.id) {
+        <ion-item button (click)="seleccionarFood(food)" detail>
+          <ion-label>
+            <h3>{{ food.nombre }}</h3>
+            <p>
+              {{ food.calorias_kcal }} kcal · P: {{ food.proteina_g }}g · C:
+              {{ food.carbohidratos_g }}g · G: {{ food.grasa_g }}g
+              <ion-note>(por 100g)</ion-note>
+            </p>
+          </ion-label>
+
+          <ion-badge slot="end" [color]="food.fuente === 'off' ? 'medium' : 'primary'"
+            style="font-size: 10px; font-weight: 600">
+            {{ formatFuente(food.fuente) }}
+          </ion-badge>
+        </ion-item>
+        }
+      </ion-list>
+      }
+      }
+
+      @if (modoManual()) {
+      <div class="manual-form">
+        <p class="manual-hint">
+          El alimento se guardará en tu base de datos para usarlo en futuras recetas.
+        </p>
+
+        <ion-item>
+          <ion-label position="stacked">Nombre del alimento *</ion-label>
+          <ion-input placeholder="Ej: Yogur de coco casero" [value]="manualNombre()"
+            (ionInput)="manualNombre.set($event.detail.value ?? '')">
+          </ion-input>
+        </ion-item>
+
+        <p class="manual-hint macros-hint">Valores nutricionales por 100g</p>
+
+        <div class="row-dos-columnas">
+          <ion-item>
+            <ion-label position="stacked">Calorías (kcal)</ion-label>
+            <ion-input type="number" [value]="manualCalorias()"
+              (ionInput)="manualCalorias.set(+($any($event).detail.value ?? 0))" min="0">
+            </ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Proteínas (g)</ion-label>
+            <ion-input type="number" [value]="manualProteina()"
+              (ionInput)="manualProteina.set(+($any($event).detail.value ?? 0))" min="0">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="row-dos-columnas">
+          <ion-item>
+            <ion-label position="stacked">Carbohidratos (g)</ion-label>
+            <ion-input type="number" [value]="manualCarbs()"
+              (ionInput)="manualCarbs.set(+($any($event).detail.value ?? 0))" min="0">
+            </ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked">Grasas (g)</ion-label>
+            <ion-input type="number" [value]="manualGrasa()"
+              (ionInput)="manualGrasa.set(+($any($event).detail.value ?? 0))" min="0">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <ion-item>
+          <ion-label position="stacked">Fibra (g)</ion-label>
+          <ion-input type="number" [value]="manualFibra()"
+            (ionInput)="manualFibra.set(+($any($event).detail.value ?? 0))" min="0">
+          </ion-input>
+        </ion-item>
+
+        <ion-button expand="block" class="ion-margin-top" [disabled]="!manualNombre().trim() || guardandoManual()"
+          (click)="guardarIngredienteManual()">
+          @if (guardandoManual()) {
+          <ion-spinner name="crescent" slot="start"></ion-spinner>
+          } @else {
+          <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+          }
+          Guardar y añadir a la receta
+        </ion-button>
+      </div>
+      }
+      }
+
+      @if (foodSeleccionado(); as food) {
+      <div class="configurar-ingrediente">
+        <div class="food-seleccionado-header">
+          <strong>{{ food.nombre }}</strong>
+          <ion-button fill="clear" size="small" (click)="cancelarSeleccion()">
+            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        <ion-item>
+          <ion-label position="stacked">Cantidad (gramos)</ion-label>
+          <ion-input type="number" [value]="cantidadGramos()"
+            (ionInput)="cantidadGramos.set($any($event).detail.value ?? '')" min="1">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Medida casera (opcional)</ion-label>
+          <ion-input placeholder="Ej: 1 cucharada sopera, 1 vaso..." [value]="cantidadTexto()"
+            (ionInput)="cantidadTexto.set($event.detail.value ?? '')">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-checkbox slot="start" [checked]="esOpcional()" (ionChange)="esOpcional.set($event.detail.checked)">
+          </ion-checkbox>
+          <ion-label>Ingrediente opcional</ion-label>
+        </ion-item>
+
+        @if (macrosPreview(); as preview) {
+        <div class="macros-preview">
+          <span>{{ preview.calorias }} kcal</span>
+          <span>P: {{ preview.proteina }}g</span>
+          <span>C: {{ preview.carbohidratos }}g</span>
+          <span>G: {{ preview.grasa }}g</span>
+        </div>
+        }
+
+        <ion-button expand="block" (click)="confirmarIngrediente()">
+          <ion-icon slot="start" name="add-outline"></ion-icon>
+          Añadir ingrediente
+        </ion-button>
+      </div>
+      }
+
+      @if (ingredientes().length > 0) {
+      <div class="ingredientes-lista">
+        @for (ing of ingredientes(); track ing.food_item_id; let i = $index) {
+        <div class="ingrediente-row">
+          <div class="ingrediente-info" style="flex: 1">
+            <span class="ingrediente-nombre">
+              {{ ing.nombre }}
+              @if (ing.es_opcional) {
+              <ion-note>(opcional)</ion-note>
+              }
+            </span>
+            @if (ing.cantidad_texto) {
+            <span class="ingrediente-medida">{{ ing.cantidad_texto }}</span>
+            }
+          </div>
+
+          <div class="ingrediente-acciones">
+            <ion-input type="number" class="cantidad-input" [value]="ing.cantidad_g"
+              (ionChange)="actualizarCantidad(i, $any($event).detail.value ?? '')" min="1">
+            </ion-input>
+            <span class="gramos-label">g</span>
+            <ion-button fill="clear" color="danger" size="small" (click)="quitarIngrediente(i)">
+              <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </ion-card-content>
+  </ion-card>
+
+  @if (ingredientes().length > 0) {
+  <ion-card class="macros-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="nutrition-outline"></ion-icon>
+        Información nutricional
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="macros-tabs">
+        <div class="macro-tab">
+          <span class="macro-titulo">TOTAL</span>
+          <div class="macro-fila">
+            <span>Calorías</span><strong>{{ macrosTotales().calorias }} kcal</strong>
+          </div>
+          <div class="macro-fila">
+            <span>Proteínas</span><strong>{{ macrosTotales().proteina }}g</strong>
+          </div>
+          <div class="macro-fila">
+            <span>Carbohidratos</span><strong>{{ macrosTotales().carbohidratos }}g</strong>
+          </div>
+          <div class="macro-fila">
+            <span>Grasas</span><strong>{{ macrosTotales().grasa }}g</strong>
+          </div>
+        </div>
+
+        <div class="separador"></div>
+
+        <div class="macro-tab">
+          <span class="macro-titulo">POR RACIÓN (÷{{ raciones() }})</span>
+          <div class="macro-fila">
+            <span>Calorías</span><strong>{{ macrosPorRacion().calorias }} kcal</strong>
+          </div>
+          <div class="macro-fila">
+            <span>Proteínas</span><strong>{{ macrosPorRacion().proteina }}g</strong>
+          </div>
+          <div class="macro-fila">
+            <span>Carbohidratos</span><strong>{{ macrosPorRacion().carbohidratos }}g</strong>
+          </div>
+          <div class="macro-fila">
+            <span>Grasas</span><strong>{{ macrosPorRacion().grasa }}g</strong>
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+  }
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Instrucciones de preparación</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-textarea placeholder="Escribe los pasos de preparación..." [value]="instrucciones()"
+          (ionInput)="instrucciones.set($event.detail.value ?? '')" [autoGrow]="true" rows="6">
+        </ion-textarea>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" class="ion-margin" [disabled]="!formularioValido() || cargandoDatos()"
+    (click)="guardarReceta()">
+    {{ modoEdicion() ? 'Actualizar receta' : 'Guardar receta' }}
+  </ion-button>
+
+</ion-content>

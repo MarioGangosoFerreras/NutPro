@@ -1,0 +1,32 @@
+<div class="tab-citas">
+  <div class="tab-citas__toolbar">
+    <ion-segment value="lista" (ionChange)="onVistaChange($event)" mode="md" class="citas-vista-segment">
+      <ion-segment-button value="lista">
+        <ion-icon name="list-outline"></ion-icon>
+        <ion-label>Lista</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="calendario">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <ion-label>Calendario</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <ion-button fill="clear" (click)="abrirModal()">
+      <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  @if (!cargando && vistaActiva === 'lista') {
+  <app-citas-lista [citas]="citas" (editarCita)="abrirModal($event)" (confirmarCita)="confirmar($event)"
+    (cancelarCita)="cancelar($event)" (eliminarCita)="eliminar($event)" (facturarCita)="crearFactura($event)">
+  </app-citas-lista>
+  }
+
+  @if (!cargando && vistaActiva === 'calendario') {
+  <app-universal-calendar mode="patient" [citasInput]="citas" 
+    (nuevaCita)="abrirModal($event)"
+    (editarCita)="abrirModal($event)" 
+    (facturarCita)="crearFactura($event)"
+    (eliminarCita)="eliminar($event)"> </app-universal-calendar>
+  }
+</div>
