@@ -24,6 +24,7 @@ import {
   IonNote,
   IonCheckbox,
   IonBadge,
+  ActionSheetController,
 } from '@ionic/angular/standalone';
 import { computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -33,12 +34,15 @@ import {
   addOutline,
   arrowBackOutline,
   cameraOutline,
+  cameraReverseOutline,
   checkmarkOutline,
   closeOutline,
   createOutline,
+  imageOutline,
   nutritionOutline,
   removeOutline,
   searchOutline,
+  trashOutline,
 } from 'ionicons/icons';
 import { RecetaService } from '../../../../core/services/receta';
 import { FoodItem, FoodService, IngredienteLocal } from '../../../../core/services/food';
@@ -89,6 +93,7 @@ export class CrearReceta {
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
   private route = inject(ActivatedRoute);
+  private actionSheetCtrl = inject(ActionSheetController);
 
   router = inject(Router);
 
@@ -222,6 +227,9 @@ export class CrearReceta {
       cameraOutline,
       createOutline,
       searchOutline,
+      imageOutline,
+      trashOutline,
+      cameraReverseOutline,
     });
   }
 
@@ -281,16 +289,46 @@ export class CrearReceta {
   }
 
   /**
-   * Gestiona el evento de selección de un archivo de imagen, subiéndolo a Cloudinary.
-   * @param event Evento nativo del input file.
+   * Muestra un Action Sheet nativo para que el usuario elija el origen de la foto
    */
-  async tomarFoto() {
+  async presentarActionSheetImagen() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Añadir foto de la receta',
+      buttons: [
+        {
+          text: 'Tomar foto',
+          icon: 'camera-outline',
+          handler: () => {
+            this.seleccionarImagen(CameraSource.Camera);
+          }
+        },
+        {
+          text: 'Elegir de la galería',
+          icon: 'image-outline',
+          handler: () => {
+            this.seleccionarImagen(CameraSource.Photos);
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close-outline',
+          role: 'cancel'
+        }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  /**
+   * Gestiona la captura o selección de la imagen
+   */
+  async seleccionarImagen(source: CameraSource) {
     try {
       const image = await Camera.getPhoto({
         quality: 90,
-        allowEditing: false,
+        allowEditing: true, // Permite recortar la imagen (ideal para recetas)
         resultType: CameraResultType.Uri,
-        source: CameraSource.Prompt, // Pregunta si usar Cámara o Galería
+        source: source, 
       });
 
       if (image.webPath) {
