@@ -1,4 +1,3 @@
-// crear-receta.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -44,7 +43,8 @@ import {
 import { RecetaService } from '../../../../core/services/receta';
 import { FoodItem, FoodService, IngredienteLocal } from '../../../../core/services/food';
 import { CloudinaryService } from '../../../../core/services/cloudinary';
-import { Header } from "../../../../shared/components/header/header";
+import { Header } from '../../../../shared/components/header/header';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 /**
  * Componente principal para la creación y edición de recetas.
@@ -78,7 +78,7 @@ import { Header } from "../../../../shared/components/header/header";
     IonNote,
     IonCheckbox,
     IonBadge,
-    Header
+    Header,
   ],
   templateUrl: './crear-receta.html',
 })
@@ -284,23 +284,33 @@ export class CrearReceta {
    * Gestiona el evento de selección de un archivo de imagen, subiéndolo a Cloudinary.
    * @param event Evento nativo del input file.
    */
-  async onSeleccionarImagen(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-    this.subiendoImagen.set(true);
+  async tomarFoto() {
     try {
-      const url = await this.cloudinaryService.uploadImage(file);
-      if (url) {
-        this.imagenUrl.set(url);
-      } else {
-        await this.mostrarToast('Error subiendo la imagen', 'danger');
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Prompt, // Pregunta si usar Cámara o Galería
+      });
+
+      if (image.webPath) {
+        this.subiendoImagen.set(true);
+        // Convertimos la imagen nativa a un File para Cloudinary
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        const file = new File([blob], `receta_${new Date().getTime()}.jpg`, { type: 'image/jpeg' });
+
+        const url = await this.cloudinaryService.uploadImage(file);
+        if (url) {
+          this.imagenUrl.set(url);
+        } else {
+          await this.mostrarToast('Error subiendo la imagen', 'danger');
+        }
       }
-    } catch {
-      await this.mostrarToast('Error subiendo la imagen', 'danger');
+    } catch (error) {
+      console.log('Foto cancelada o error', error);
     } finally {
       this.subiendoImagen.set(false);
-      input.value = '';
     }
   }
 

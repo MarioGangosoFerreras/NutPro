@@ -21,7 +21,7 @@
             </ion-button>
           </div>
         } @else {
-          <label class="upload-label" [class.uploading]="subiendoImagen()">
+          <div class="upload-label" [class.uploading]="subiendoImagen()" (click)="tomarFoto()">
             @if (subiendoImagen()) {
               <div class="avocado-spinner">🥑</div>
               <span>Subiendo imagen...</span>
@@ -29,14 +29,7 @@
               <ion-icon name="camera-outline"></ion-icon>
               <span>Añadir foto a la receta</span>
             }
-            <input
-              type="file"
-              accept="image/*"
-              style="display: none"
-              (change)="onSeleccionarImagen($event)"
-              [disabled]="subiendoImagen()"
-            />
-          </label>
+          </div>
         }
       </div>
 
