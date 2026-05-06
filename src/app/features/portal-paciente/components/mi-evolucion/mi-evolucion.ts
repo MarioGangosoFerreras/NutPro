@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonSpinner, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { Header } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth';
 import { PacientesService } from '../../../../core/services/pacientes';
@@ -17,7 +17,7 @@ import { TabMediciones } from '../../../pacientes/ficha-paciente/tabs/tab-medici
 @Component({
   selector: 'app-mi-evolucion',
   standalone: true,
-  imports: [CommonModule, IonContent, IonSpinner, IonIcon, Header, TabMediciones],
+  imports: [CommonModule, IonContent, IonIcon, Header, TabMediciones],
   templateUrl: './mi-evolucion.html',
   styleUrls: ['./mi-evolucion.css']
 })

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonSpinner, IonIcon } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular/standalone';
 import { Header } from '../../../../shared/components/header/header';
 import { AuthService } from '../../../../core/services/auth';
 import { PacientesService } from '../../../../core/services/pacientes';
@@ -17,7 +17,7 @@ import { TabDocumentos } from '../../../pacientes/ficha-paciente/tabs/tab-docume
 @Component({
   selector: 'app-mis-documentos',
   standalone: true,
-  imports: [CommonModule, IonContent, IonSpinner, IonIcon, Header, TabDocumentos],
+  imports: [CommonModule, IonContent, Header, TabDocumentos],
   templateUrl: './mis-documentos.html',
 })
 export class MisDocumentos implements OnInit {

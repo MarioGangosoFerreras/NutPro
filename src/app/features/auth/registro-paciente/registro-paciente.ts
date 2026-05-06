@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonContent, IonInput, IonButton, IonSpinner, IonIcon,
-  ToastController, IonItem, IonLabel, IonText, IonSelect, IonSelectOption,
+  ToastController, IonText, IonSelect, IonSelectOption,
   IonDatetime, IonDatetimeButton, IonModal
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -22,8 +22,6 @@ import { AuthService } from '../../../core/services/auth';
     IonButton, IonSpinner, IonText,
     IonSelect, IonSelectOption,
     IonDatetime, IonDatetimeButton, IonModal,
-    IonItem,
-    IonLabel
 ],
   templateUrl: './registro-paciente.html',
   styleUrl: './registro-paciente.css'

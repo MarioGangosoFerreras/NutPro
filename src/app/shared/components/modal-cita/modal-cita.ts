@@ -18,8 +18,6 @@ import {
   IonIcon,
   IonChip,
   IonDatetime,
-  IonDatetimeButton,
-  IonModal
 } from '@ionic/angular/standalone';
 import { CitasService, Cita } from '../../../core/services/citas';
 import { PacientesService } from '../../../core/services/pacientes';
@@ -47,8 +45,6 @@ import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionico
     IonIcon,
     IonChip,
     IonDatetime,
-    IonDatetimeButton,
-    IonModal,
   ],
   templateUrl: './modal-cita.html',
   styleUrls: ['./modal-cita.css'],

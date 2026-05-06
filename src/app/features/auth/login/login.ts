@@ -34,7 +34,7 @@ export class Login {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef // 👈 Añadimos esto para forzar la actualización visual
+    private cdr: ChangeDetectorRef
   ) { }
 
   toggleModoRecuperar() {
@@ -60,9 +60,13 @@ export class Login {
       } else {
         const usuario = await this.authService.getUsuario();
 
-        if (usuario?.rol === 'paciente') {
+        // 👇 AÑADIR LA CONDICIÓN PARA EL ADMIN AQUÍ 👇
+        if (usuario?.rol === 'admin') {
+          this.router.navigate(['/admin']);
+        } else if (usuario?.rol === 'paciente') {
           this.router.navigate(['/portal-paciente']);
         } else {
+          // El resto (nutricionistas) va al dashboard
           this.router.navigate(['/dashboard']);
         }
       }
@@ -72,7 +76,7 @@ export class Login {
       console.error('Excepción en login:', err);
     } finally {
       this.loading = false;
-      this.cdr.detectChanges(); // 👈 Obligamos a la UI a quitar el spinner y mostrar el error
+      this.cdr.detectChanges(); // Obligamos a la UI a quitar el spinner y mostrar el error
     }
   }
 
@@ -90,7 +94,7 @@ export class Login {
 
     try {
       const { error } = await this.authService.resetPasswordForEmail(this.email.trim());
-      
+
       if (error) {
         this.errorMessage = 'Error al enviar el correo. Asegúrate de que el formato sea correcto.';
       } else {

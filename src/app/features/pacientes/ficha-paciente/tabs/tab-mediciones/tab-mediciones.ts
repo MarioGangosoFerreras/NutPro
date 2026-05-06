@@ -10,7 +10,6 @@ import {
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardTitle,
   IonModal,
   IonSegment,
   IonSegmentButton,
@@ -21,8 +20,8 @@ import {
   IonTextarea,
   ToastController,
   AlertController,
-  IonDatetime,       // <-- AÑADIDOS
-  IonDatetimeButton  // <-- AÑADIDOS
+  IonDatetime,      
+  IonDatetimeButton 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -49,7 +48,7 @@ type TipoGrafica = 'peso' | 'grasa' | 'musculo' | 'cintura' | 'cadera' | 'abdome
   standalone: true,
   imports: [
     CommonModule, FormsModule, IonButton, IonIcon, IonSpinner, IonBadge, IonCard,
-    IonCardContent, IonCardHeader, IonCardTitle, IonModal, IonSegment, IonSegmentButton,
+    IonCardContent, IonCardHeader, IonModal, IonSegment, IonSegmentButton,
     IonLabel, IonContent, IonItem, IonInput, IonTextarea,
     IonDatetime, IonDatetimeButton // <-- AÑADIDOS
   ],
