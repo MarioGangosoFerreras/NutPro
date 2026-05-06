@@ -113,5 +113,5 @@ npx cap open android
 ---
 
 <div align="center">
-  <i>Desarrollado con ❤️ para transformar la forma en la que los nutricionistas trabajan.</i>
+  <i>Desarrollado para transformar la forma en la que los nutricionistas trabajan.</i>
 </div>
