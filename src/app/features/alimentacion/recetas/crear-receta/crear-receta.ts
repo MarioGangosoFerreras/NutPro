@@ -61,7 +61,6 @@ import { Capacitor } from '@capacitor/core';
     IonNote,
     IonCheckbox,
     IonBadge,
-    Header,
     IonBackButton,
     IonHeader,
     IonToolbar,

@@ -103,19 +103,19 @@
         
         <div class="macros-grid">
           <div class="macro-box">
-            <span class="macro-val kcal">{{ receta.calorias_kcal }}</span>
+            <span class="macro-val kcal">{{ receta.calorias_kcal || 0 }}</span>
             <span class="macro-lbl">kcal</span>
           </div>
           <div class="macro-box">
-            <span class="macro-val prot">{{ receta.proteina_g }}g</span>
+            <span class="macro-val prot">{{ receta.proteina_g || 0 }}g</span>
             <span class="macro-lbl">Prot</span>
           </div>
           <div class="macro-box">
-            <span class="macro-val carbs">{{ receta.carbohidratos_g }}g</span>
+            <span class="macro-val carbs">{{ receta.carbohidratos_g || 0 }}g</span>
             <span class="macro-lbl">Carbs</span>
           </div>
           <div class="macro-box">
-            <span class="macro-val grasa">{{ receta.grasa_g }}g</span>
+            <span class="macro-val grasa">{{ receta.grasa_g || 0 }}g</span>
             <span class="macro-lbl">Grasa</span>
           </div>
         </div>

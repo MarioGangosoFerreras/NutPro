@@ -138,7 +138,7 @@ export class PlanNutricionalService {
   async getEntradasMenu(menuId: string) {
     const { data, error } = await this.supabase
       .from('menu_entradas')
-      .select('*, receta:recetas(id, nombre, calorias_kcal, proteina_g, imagen_url)')
+      .select('*, receta:recetas(id, nombre, calorias_kcal, proteina_g, carbohidratos_g, grasa_g, instrucciones, imagen_url)')
       .eq('menu_id', menuId);
     if (error) throw error;
     return data || [];
@@ -154,7 +154,7 @@ export class PlanNutricionalService {
     const { data, error } = await this.supabase
       .from('menu_entradas')
       .insert(entrada)
-      .select('*, receta:recetas(id, nombre, calorias_kcal, proteina_g, imagen_url)')
+      .select('*, receta:recetas(id, nombre, calorias_kcal, proteina_g, carbohidratos_g, grasa_g, instrucciones, imagen_url)')
       .single();
     if (error) throw error;
     return data;
