@@ -76,6 +76,11 @@ import { ModalCitaComponent } from '../../shared/components/modal-cita/modal-cit
     IonList,
     Header,
     HabitosTrackerComponent,
+    IonModal,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons
   ],
   templateUrl: './portal-paciente.html',
   styleUrls: ['./portal-paciente.css'],
