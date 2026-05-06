@@ -49,6 +49,7 @@ import { FoodItem, FoodService, IngredienteLocal } from '../../../../core/servic
 import { CloudinaryService } from '../../../../core/services/cloudinary';
 import { Header } from '../../../../shared/components/header/header';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
 
 /**
  * Componente principal para la creación y edición de recetas.
@@ -85,6 +86,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     Header,
   ],
   templateUrl: './crear-receta.html',
+  styleUrls: ['./crear-receta.css'],
 })
 export class CrearReceta {
   private recetaService = inject(RecetaService);
@@ -289,8 +291,8 @@ export class CrearReceta {
   }
 
   /**
-   * Muestra un Action Sheet nativo para que el usuario elija el origen de la foto
-   */
+    * Muestra un Action Sheet nativo para que el usuario elija el origen de la foto
+    */
   async presentarActionSheetImagen() {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Añadir foto de la receta',
@@ -299,14 +301,16 @@ export class CrearReceta {
           text: 'Tomar foto',
           icon: 'camera-outline',
           handler: () => {
-            this.seleccionarImagen(CameraSource.Camera);
+            this.ejecutarAccionCamara(CameraSource.Camera);
+            return true;
           }
         },
         {
           text: 'Elegir de la galería',
           icon: 'image-outline',
           handler: () => {
-            this.seleccionarImagen(CameraSource.Photos);
+            this.ejecutarAccionCamara(CameraSource.Photos);
+            return true;
           }
         },
         {
@@ -320,13 +324,34 @@ export class CrearReceta {
   }
 
   /**
+   * Decide cómo ejecutar la cámara dependiendo de si estamos en navegador web o móvil nativo
+   */
+  private ejecutarAccionCamara(source: CameraSource) {
+    if (Capacitor.isNativePlatform()) {
+      // En móvil: aplicamos el retardo para no chocar con la animación de cierre del menú
+      setTimeout(() => {
+        this.seleccionarImagen(source);
+      }, 300);
+    } else {
+      // En navegador web (PWA/Portátil): Ejecutamos AL INSTANTE, o el navegador lo bloqueará por seguridad
+      this.seleccionarImagen(source);
+    }
+  }
+
+ /**
    * Gestiona la captura o selección de la imagen
    */
   async seleccionarImagen(source: CameraSource) {
     try {
+      // Solo pedimos permisos explícitos si estamos en una app móvil nativa
+      if (Capacitor.isNativePlatform()) {
+        await Camera.requestPermissions();
+      }
+
+      // Ejecutamos la cámara o abrimos la galería
       const image = await Camera.getPhoto({
         quality: 90,
-        allowEditing: true, // Permite recortar la imagen (ideal para recetas)
+        allowEditing: false, 
         resultType: CameraResultType.Uri,
         source: source, 
       });
@@ -345,8 +370,16 @@ export class CrearReceta {
           await this.mostrarToast('Error subiendo la imagen', 'danger');
         }
       }
-    } catch (error) {
-      console.log('Foto cancelada o error', error);
+    } catch (error: any) {
+      console.log('Foto cancelada o error:', error);
+      
+      // Añadimos esta comprobación para la Web:
+      if (!Capacitor.isNativePlatform() && source === CameraSource.Camera) {
+        await this.mostrarToast(
+          'Asegúrate de permitir el acceso a la webcam en el navegador o usar localhost', 
+          'warning'
+        );
+      }
     } finally {
       this.subiendoImagen.set(false);
     }
