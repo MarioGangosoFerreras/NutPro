@@ -1,6 +1,58 @@
 <app-header [titulo]="modoEdicion() ? 'Editar receta' : 'Crear receta'"></app-header>
 
 <ion-content class="ion-padding">
+
+  <!-- Inputs ocultos para selección de imagen en web/PWA.
+       En plataformas nativas nunca se activan (usamos Capacitor Camera). -->
+  <input id="file-camara-receta" type="file" accept="image/*" capture="environment" style="display: none"
+    (change)="onFileInputChange($event)" />
+
+  <input id="file-galeria-receta" type="file" accept="image/*" style="display: none"
+    (change)="onFileInputChange($event)" />
+
+  <!-- Diálogo de selección de imagen (solo web/PWA) -->
+  @if (mostrarDialogoImagen()) {
+  <div class="dialogo-imagen-overlay" (click)="cerrarDialogoImagen()">
+    <div class="dialogo-imagen-sheet" (click)="$event.stopPropagation()">
+      <p class="dialogo-titulo">Añadir foto de la receta</p>
+
+      <button class="dialogo-opcion" (click)="elegirCamaraWeb()">
+        <ion-icon name="camera-outline"></ion-icon>
+        <span>Tomar foto</span>
+      </button>
+
+      <button class="dialogo-opcion" (click)="elegirGaleriaWeb()">
+        <ion-icon name="image-outline"></ion-icon>
+        <span>Elegir de la galería</span>
+      </button>
+
+      <button class="dialogo-cancelar" (click)="cerrarDialogoImagen()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Modal cámara web (getUserMedia) -->
+@if (mostrarModalCamara()) {
+<div class="camara-modal-overlay">
+  <div class="camara-modal">
+    <div class="camara-header">
+      <span>Tomar foto</span>
+      <button class="camara-cerrar" (click)="cerrarModalCamara()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+    <video id="camara-preview" class="camara-video" autoplay playsinline muted></video>
+    <div class="camara-footer">
+      <button class="camara-capturar" (click)="capturarFotoWeb()">
+        <ion-icon name="camera-outline"></ion-icon>
+      </button>
+    </div>
+  </div>
+</div>
+}
+
   <ion-card>
     <ion-card-header>
       <ion-card-title>Datos básicos</ion-card-title>
@@ -12,7 +64,7 @@
           <img [src]="imagenUrl()" class="imagen-preview" alt="Imagen de la receta" />
 
           <div class="imagen-overlay">
-            <ion-button class="imagen-cambiar-btn" fill="clear" color="light" (click)="presentarActionSheetImagen()">
+            <ion-button class="imagen-cambiar-btn" fill="clear" color="light" (click)="abrirSelectorImagen()">
               <ion-icon slot="start" name="camera-reverse-outline"></ion-icon>
               Cambiar foto
             </ion-button>
@@ -23,7 +75,7 @@
           </ion-button>
         </div>
         } @else {
-        <div class="upload-label" [class.uploading]="subiendoImagen()" (click)="presentarActionSheetImagen()">
+        <div class="upload-label" [class.uploading]="subiendoImagen()" (click)="abrirSelectorImagen()">
           @if (subiendoImagen()) {
           <ion-spinner name="crescent" color="primary"></ion-spinner>
           <span class="upload-title" style="margin-top: 10px;">Subiendo imagen...</span>
@@ -363,4 +415,5 @@
     (click)="guardarReceta()">
     {{ modoEdicion() ? 'Actualizar receta' : 'Guardar receta' }}
   </ion-button>
+
 </ion-content>

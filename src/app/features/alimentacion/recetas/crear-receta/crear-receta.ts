@@ -111,6 +111,8 @@ export class CrearReceta {
   // --- SEÑALES DE IMAGEN ---
   imagenUrl = signal<string | null>(null);
   subiendoImagen = signal(false);
+  /** Controla la visibilidad del diálogo de selección de fuente de imagen (solo web) */
+  mostrarDialogoImagen = signal(false);
 
   // --- SEÑALES DE INGREDIENTES ---
   ingredientes = signal<IngredienteLocal[]>([]);
@@ -140,6 +142,9 @@ export class CrearReceta {
   modoEdicion = signal(false);
   recetaId = signal<string | null>(null);
   cargandoDatos = signal(false);
+
+  mostrarModalCamara = signal(false);
+  private streamCamara: MediaStream | null = null;
 
   /** Opciones disponibles para clasificar la receta por tipo de comida */
   readonly tiposComida = ['desayuno', 'comida', 'cena', 'snack'];
@@ -267,7 +272,6 @@ export class CrearReceta {
       this.etiquetasSeleccionadas.set(receta.etiquetas || []);
       this.imagenUrl.set(receta.imagen_url || null);
 
-      // Adaptamos los ingredientes para que el formulario los entienda igual
       if (receta.receta_ingredientes) {
         const ingredientesFormato = receta.receta_ingredientes.map((ing) => ({
           food_item_id: ing.food_item_id,
@@ -290,10 +294,151 @@ export class CrearReceta {
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // GESTIÓN DE IMAGEN
+  // ─────────────────────────────────────────────────────────────────────────────
+
   /**
-    * Muestra un Action Sheet nativo para que el usuario elija el origen de la foto
-    */
-  async presentarActionSheetImagen() {
+   * Punto de entrada único para añadir una imagen a la receta.
+   *
+   * - Nativo (iOS/Android): usa el ActionSheet de Ionic + Capacitor Camera.
+   *   Aquí no hay conflicto con $instanceValues$ porque Capacitor gestiona
+   *   sus propios overlays nativos completamente fuera del DOM web.
+   *
+   * - Web/PWA: muestra un diálogo propio construido con señales de Angular.
+   *   Evita el ActionSheet de Ionic en web, que es donde ocurre el crash
+   *   "$instanceValues$ undefined" al desmontar componentes Stencil mientras
+   *   Camera.getPhoto() intenta montar su overlay simultáneamente.
+   */
+  abrirSelectorImagen(): void {
+    if (Capacitor.isNativePlatform()) {
+      this.mostrarActionSheetNativo();
+    } else {
+      this.mostrarDialogoImagen.set(true);
+    }
+  }
+
+  /** Cierra el diálogo de selección de imagen sin hacer nada (web). */
+  cerrarDialogoImagen(): void {
+    this.mostrarDialogoImagen.set(false);
+  }
+
+  /**
+   * Llamado desde el diálogo web al pulsar "Tomar foto".
+   * Cierra el diálogo y activa el <input capture="environment"> oculto,
+   * que abre la cámara directamente sin pasar por ningún overlay de Ionic.
+   */
+  elegirCamaraWeb(): void {
+    this.mostrarDialogoImagen.set(false);
+    setTimeout(() => this.abrirModalCamara(), 50);
+  }
+
+  async abrirModalCamara(): Promise<void> {
+    try {
+      this.streamCamara = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      this.mostrarModalCamara.set(true);
+      // Esperamos a que Angular renderice el elemento video
+      setTimeout(() => {
+        const video = document.getElementById('camara-preview') as HTMLVideoElement;
+        if (video && this.streamCamara) {
+          video.srcObject = this.streamCamara;
+          video.play();
+        }
+      }, 100);
+    } catch (err) {
+      await this.mostrarToast('No se pudo acceder a la cámara', 'danger');
+    }
+  }
+
+  async capturarFotoWeb(): Promise<void> {
+    const video = document.getElementById('camara-preview') as HTMLVideoElement;
+    if (!video) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d')!.drawImage(video, 0, 0);
+
+    this.cerrarModalCamara();
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], `receta_${Date.now()}.jpg`, { type: 'image/jpeg' });
+      this.subiendoImagen.set(true);
+      try {
+        const url = await this.cloudinaryService.uploadImage(file);
+        if (url) {
+          this.imagenUrl.set(url);
+        } else {
+          await this.mostrarToast('Error subiendo la imagen', 'danger');
+        }
+      } catch {
+        await this.mostrarToast('Error subiendo la imagen', 'danger');
+      } finally {
+        this.subiendoImagen.set(false);
+      }
+    }, 'image/jpeg', 0.9);
+  }
+
+  cerrarModalCamara(): void {
+    if (this.streamCamara) {
+      this.streamCamara.getTracks().forEach(t => t.stop());
+      this.streamCamara = null;
+    }
+    this.mostrarModalCamara.set(false);
+  }
+
+  /**
+   * Llamado desde el diálogo web al pulsar "Elegir de la galería".
+   * Cierra el diálogo y activa el <input type="file"> estándar sin capture,
+   * que abre el explorador de archivos / galería del SO.
+   */
+  elegirGaleriaWeb(): void {
+    this.mostrarDialogoImagen.set(false);
+    setTimeout(() => {
+      const input = document.getElementById('file-galeria-receta') as HTMLInputElement;
+      input?.click();
+    }, 50);
+  }
+
+  /**
+   * Maneja la selección de un archivo desde cualquiera de los dos
+   * <input type="file"> ocultos (cámara o galería, solo web).
+   * Sube el archivo a Cloudinary y actualiza la señal imagenUrl.
+   */
+  async onFileInputChange(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    // Limpiamos el valor para que (change) se dispare aunque se elija
+    // la misma imagen dos veces seguidas.
+    input.value = '';
+
+    if (!file) return;
+
+    this.subiendoImagen.set(true);
+    try {
+      const url = await this.cloudinaryService.uploadImage(file);
+      if (url) {
+        this.imagenUrl.set(url);
+      } else {
+        await this.mostrarToast('Error subiendo la imagen', 'danger');
+      }
+    } catch {
+      await this.mostrarToast('Error subiendo la imagen', 'danger');
+    } finally {
+      this.subiendoImagen.set(false);
+    }
+  }
+
+  /**
+   * Presenta el ActionSheet nativo para elegir entre cámara y galería.
+   * Solo se invoca en iOS/Android donde Capacitor Camera funciona de forma
+   * completamente nativa y no interfiere con el DOM de Ionic/Stencil.
+   */
+  private async mostrarActionSheetNativo(): Promise<void> {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Añadir foto de la receta',
       buttons: [
@@ -301,67 +446,47 @@ export class CrearReceta {
           text: 'Tomar foto',
           icon: 'camera-outline',
           handler: () => {
-            this.ejecutarAccionCamara(CameraSource.Camera);
-            return true;
-          }
+            setTimeout(() => this.capturarImagenNativa(CameraSource.Camera), 300);
+          },
         },
         {
           text: 'Elegir de la galería',
           icon: 'image-outline',
           handler: () => {
-            this.ejecutarAccionCamara(CameraSource.Photos);
-            return true;
-          }
+            setTimeout(() => this.capturarImagenNativa(CameraSource.Photos), 300);
+          },
         },
         {
           text: 'Cancelar',
           icon: 'close-outline',
-          role: 'cancel'
-        }
-      ]
+          role: 'cancel',
+        },
+      ],
     });
     await actionSheet.present();
   }
 
   /**
-   * Decide cómo ejecutar la cámara dependiendo de si estamos en navegador web o móvil nativo
+   * Captura o selecciona una imagen usando la API de Capacitor Camera.
+   * Solo debe llamarse desde plataformas nativas (iOS/Android).
+   * @param source Origen de la imagen: cámara del dispositivo o galería de fotos.
    */
-  private ejecutarAccionCamara(source: CameraSource) {
-    if (Capacitor.isNativePlatform()) {
-      // En móvil: aplicamos el retardo para no chocar con la animación de cierre del menú
-      setTimeout(() => {
-        this.seleccionarImagen(source);
-      }, 300);
-    } else {
-      // En navegador web (PWA/Portátil): Ejecutamos AL INSTANTE, o el navegador lo bloqueará por seguridad
-      this.seleccionarImagen(source);
-    }
-  }
-
- /**
-   * Gestiona la captura o selección de la imagen
-   */
-  async seleccionarImagen(source: CameraSource) {
+  private async capturarImagenNativa(source: CameraSource): Promise<void> {
+    this.subiendoImagen.set(true);
     try {
-      // Solo pedimos permisos explícitos si estamos en una app móvil nativa
-      if (Capacitor.isNativePlatform()) {
-        await Camera.requestPermissions();
-      }
+      await Camera.requestPermissions({ permissions: ['camera', 'photos'] });
 
-      // Ejecutamos la cámara o abrimos la galería
       const image = await Camera.getPhoto({
         quality: 90,
-        allowEditing: false, 
+        allowEditing: false,
         resultType: CameraResultType.Uri,
-        source: source, 
+        source,
       });
 
       if (image.webPath) {
-        this.subiendoImagen.set(true);
-        // Convertimos la imagen nativa a un File para Cloudinary
         const response = await fetch(image.webPath);
         const blob = await response.blob();
-        const file = new File([blob], `receta_${new Date().getTime()}.jpg`, { type: 'image/jpeg' });
+        const file = new File([blob], `receta_${Date.now()}.jpg`, { type: 'image/jpeg' });
 
         const url = await this.cloudinaryService.uploadImage(file);
         if (url) {
@@ -370,16 +495,8 @@ export class CrearReceta {
           await this.mostrarToast('Error subiendo la imagen', 'danger');
         }
       }
-    } catch (error: any) {
-      console.log('Foto cancelada o error:', error);
-      
-      // Añadimos esta comprobación para la Web:
-      if (!Capacitor.isNativePlatform() && source === CameraSource.Camera) {
-        await this.mostrarToast(
-          'Asegúrate de permitir el acceso a la webcam en el navegador o usar localhost', 
-          'warning'
-        );
-      }
+    } catch (error) {
+      console.warn('Selección de imagen cancelada o fallida:', error);
     } finally {
       this.subiendoImagen.set(false);
     }
@@ -388,16 +505,19 @@ export class CrearReceta {
   /**
    * Elimina la imagen actualmente asociada a la receta.
    */
-  quitarImagen() {
+  quitarImagen(): void {
     this.imagenUrl.set(null);
   }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // BÚSQUEDA Y GESTIÓN DE INGREDIENTES
+  // ─────────────────────────────────────────────────────────────────────────────
 
   private searchTimeout: any;
 
   /**
    * Se ejecuta al escribir en el buscador de ingredientes.
    * Llama al servicio de alimentos con debounce para evitar múltiples peticiones.
-   * @param event Evento emitido por el IonSearchbar.
    */
   onBuscarAlimento(event: any) {
     const query = event.detail.value?.trim();
@@ -412,7 +532,6 @@ export class CrearReceta {
         this.buscando.set(true);
         const resultados = await this.foodService.buscarAlimentos(query);
 
-        // ORDENAR: Primero los ingredientes de creación propia, luego los externos (Open Food Facts u otros)
         const ordenados = resultados.sort((a, b) => {
           const pesoA = a.fuente === 'manual' || a.fuente === 'custom' ? 0 : 1;
           const pesoB = b.fuente === 'manual' || b.fuente === 'custom' ? 0 : 1;
@@ -428,21 +547,12 @@ export class CrearReceta {
     }, 400);
   }
 
-  /**
-   * Formatea la cadena de origen de la fuente para mostrar en la interfaz.
-   * @param fuente Código de la fuente del alimento (ej. 'off', 'manual').
-   * @returns Nombre legible de la base de datos o fuente.
-   */
   formatFuente(fuente: string | undefined): string {
     if (fuente === 'manual' || fuente === 'custom') return 'Base de datos propia';
     if (fuente === 'off') return 'Open Food Facts';
-    return 'Base de datos'; // Por defecto/caché general
+    return 'Base de datos';
   }
 
-  /**
-   * Selecciona un alimento de los resultados de búsqueda para configurarlo.
-   * @param food Objeto del alimento seleccionado.
-   */
   seleccionarFood(food: FoodItem) {
     this.foodSeleccionado.set(food);
     this.cantidadGramos.set(100);
@@ -452,16 +562,10 @@ export class CrearReceta {
     this.busquedaQuery.set('');
   }
 
-  /**
-   * Cancela la selección actual del alimento y limpia el configurador.
-   */
   cancelarSeleccion() {
     this.foodSeleccionado.set(null);
   }
 
-  /**
-   * Confirma la configuración actual del ingrediente y lo añade a la lista de ingredientes de la receta.
-   */
   confirmarIngrediente() {
     const food = this.foodSeleccionado();
     if (!food || this.cantidadGramos() <= 0) return;
@@ -486,10 +590,6 @@ export class CrearReceta {
     this.foodSeleccionado.set(null);
   }
 
-  /**
-   * Guarda un alimento ingresado manualmente en la base de datos de usuario,
-   * y luego lo auto-selecciona para agregarlo a la receta.
-   */
   async guardarIngredienteManual() {
     if (!this.manualNombre().trim()) return;
     this.guardandoManual.set(true);
@@ -513,9 +613,6 @@ export class CrearReceta {
     }
   }
 
-  /**
-   * Limpia los campos del formulario de ingreso manual de alimentos.
-   */
   private limpiarFormManual() {
     this.manualNombre.set('');
     this.manualCalorias.set(0);
@@ -525,11 +622,6 @@ export class CrearReceta {
     this.manualFibra.set(0);
   }
 
-  /**
-   * Actualiza la cantidad en gramos de un ingrediente ya presente en la lista de la receta.
-   * @param index Índice del ingrediente en el array.
-   * @param valor Nueva cantidad en gramos (mínimo 1).
-   */
   actualizarCantidad(index: number, valor: number) {
     this.ingredientes.update((lista) => {
       const nueva = [...lista];
@@ -538,38 +630,26 @@ export class CrearReceta {
     });
   }
 
-  /**
-   * Elimina un ingrediente de la lista actual de la receta.
-   * @param index Índice del ingrediente a remover.
-   */
   quitarIngrediente(index: number) {
     this.ingredientes.update((lista) => lista.filter((_, i) => i !== index));
   }
 
-  /**
-   * Alterna la selección de una etiqueta de tipo de comida (ej: Desayuno, Cena).
-   * @param tipo Identificador del tipo de comida.
-   */
   toggleTipoComida(tipo: string) {
     this.tiposComidaSeleccionados.update((tipos) =>
       tipos.includes(tipo) ? tipos.filter((t) => t !== tipo) : [...tipos, tipo],
     );
   }
 
-  /**
-   * Alterna la selección de una etiqueta dietética especial (ej: sin_gluten, vegano).
-   * @param etiqueta Identificador de la etiqueta.
-   */
   toggleEtiqueta(etiqueta: string) {
     this.etiquetasSeleccionadas.update((ets) =>
       ets.includes(etiqueta) ? ets.filter((e) => e !== etiqueta) : [...ets, etiqueta],
     );
   }
 
-  /**
-   * Agrupa los datos del componente y los envía al servicio correspondiente
-   * para guardar la receta (crear nueva o actualizar existente).
-   */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // GUARDADO DE RECETA
+  // ─────────────────────────────────────────────────────────────────────────────
+
   async guardarReceta() {
     if (!this.formularioValido()) return;
 
@@ -594,17 +674,14 @@ export class CrearReceta {
       let idRecetaActual = '';
 
       if (this.modoEdicion() && this.recetaId()) {
-        // ACTUALIZAR RECETA EXISTENTE
         idRecetaActual = this.recetaId()!;
         await this.recetaService.actualizarReceta(idRecetaActual, datosReceta);
-        await this.recetaService.eliminarIngredientesDeReceta(idRecetaActual); // Limpieza de viejos ingredientes
+        await this.recetaService.eliminarIngredientesDeReceta(idRecetaActual);
       } else {
-        // CREAR NUEVA RECETA
         const recetaNueva = await this.recetaService.crearReceta(datosReceta);
         idRecetaActual = recetaNueva.id;
       }
 
-      // Insertamos los ingredientes de la lista actual (sean nuevos o editados)
       await Promise.all(
         this.ingredientes().map((ing, index) =>
           this.recetaService.addIngrediente({
@@ -624,7 +701,6 @@ export class CrearReceta {
         'success',
       );
 
-      // Redireccionamiento posterior
       if (this.modoEdicion()) {
         this.router.navigate(['/alimentacion/recetas', idRecetaActual]);
       } else {
@@ -636,11 +712,10 @@ export class CrearReceta {
     }
   }
 
-  /**
-   * Método de utilidad para renderizar Toasts (mensajes flotantes).
-   * @param message Mensaje a mostrar.
-   * @param color Color del componente (success, danger, warning).
-   */
+  // ─────────────────────────────────────────────────────────────────────────────
+  // UTILIDADES
+  // ─────────────────────────────────────────────────────────────────────────────
+
   private async mostrarToast(message: string, color: string) {
     const toast = await this.toastCtrl.create({
       message,
@@ -651,10 +726,6 @@ export class CrearReceta {
     await toast.present();
   }
 
-  /**
-   * Hook de Ionic que se ejecuta justo antes de mostrar la vista.
-   * Sirve para limpiar el formulario y asegurar un estado inicial correcto.
-   */
   ionViewWillEnter() {
     this.nombre.set('');
     this.instrucciones.set('');
@@ -668,6 +739,7 @@ export class CrearReceta {
     this.resultadosBusqueda.set([]);
     this.busquedaQuery.set('');
     this.imagenUrl.set(null);
+    this.mostrarDialogoImagen.set(false);
     this.modoManual.set(false);
     this.limpiarFormManual();
   }
