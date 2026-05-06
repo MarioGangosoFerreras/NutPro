@@ -8,6 +8,7 @@ import {
   IonInput,
   IonButton,
   IonSpinner,
+  ViewWillEnter,
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -23,7 +24,7 @@ import {
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class Login implements ViewWillEnter {
   email = '';
   password = '';
   loading = false;
@@ -60,7 +61,7 @@ export class Login {
       } else {
         const usuario = await this.authService.getUsuario();
 
-        // 👇 AÑADIR LA CONDICIÓN PARA EL ADMIN AQUÍ 👇
+        // AÑADIR LA CONDICIÓN PARA EL ADMIN AQUÍ
         if (usuario?.rol === 'admin') {
           this.router.navigate(['/admin']);
         } else if (usuario?.rol === 'paciente') {
@@ -77,6 +78,20 @@ export class Login {
     } finally {
       this.loading = false;
       this.cdr.detectChanges(); // Obligamos a la UI a quitar el spinner y mostrar el error
+    }
+  }
+
+  async ionViewWillEnter() {
+    const { data } = await this.authService.getSession();
+    if (data.session) {
+      const usuario = await this.authService.getUsuario();
+      if (usuario?.rol === 'admin') {
+        this.router.navigate(['/admin']);
+      } else if (usuario?.rol === 'paciente') {
+        this.router.navigate(['/portal-paciente']);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
     }
   }
 

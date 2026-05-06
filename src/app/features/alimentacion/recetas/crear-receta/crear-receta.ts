@@ -3,29 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
-import {
-  IonButton,
-  IonIcon,
-  IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonTextarea,
-  IonSelect,
-  IonSelectOption,
-  IonChip,
-  IonSearchbar,
-  IonSpinner,
-  IonList,
-  IonNote,
-  IonCheckbox,
-  IonBadge,
-  ActionSheetController,
-} from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonChip, IonSearchbar, IonSpinner, IonList, IonNote, IonCheckbox, IonBadge, ActionSheetController, IonBackButton, IonHeader, IonToolbar, IonTitle, IonButtons } from '@ionic/angular/standalone';
 import { computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController, ToastController } from '@ionic/angular/standalone';
@@ -84,7 +62,12 @@ import { Capacitor } from '@capacitor/core';
     IonCheckbox,
     IonBadge,
     Header,
-  ],
+    IonBackButton,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons
+],
   templateUrl: './crear-receta.html',
   styleUrls: ['./crear-receta.css'],
 })

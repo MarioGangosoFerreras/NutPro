@@ -1,5 +1,11 @@
-<app-header [titulo]="modoEdicion() ? 'Editar receta' : 'Crear receta'"></app-header>
-
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/alimentacion/recetas"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ modoEdicion() ? 'Editar receta' : 'Crear receta' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
 <ion-content class="ion-padding">
 
   <!-- Inputs ocultos para selección de imagen en web/PWA.
@@ -34,24 +40,24 @@
   }
 
   <!-- Modal cámara web (getUserMedia) -->
-@if (mostrarModalCamara()) {
-<div class="camara-modal-overlay">
-  <div class="camara-modal">
-    <div class="camara-header">
-      <span>Tomar foto</span>
-      <button class="camara-cerrar" (click)="cerrarModalCamara()">
-        <ion-icon name="close-outline"></ion-icon>
-      </button>
-    </div>
-    <video id="camara-preview" class="camara-video" autoplay playsinline muted></video>
-    <div class="camara-footer">
-      <button class="camara-capturar" (click)="capturarFotoWeb()">
-        <ion-icon name="camera-outline"></ion-icon>
-      </button>
+  @if (mostrarModalCamara()) {
+  <div class="camara-modal-overlay">
+    <div class="camara-modal">
+      <div class="camara-header">
+        <span>Tomar foto</span>
+        <button class="camara-cerrar" (click)="cerrarModalCamara()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+      <video id="camara-preview" class="camara-video" autoplay playsinline muted></video>
+      <div class="camara-footer">
+        <button class="camara-capturar" (click)="capturarFotoWeb()">
+          <ion-icon name="camera-outline"></ion-icon>
+        </button>
+      </div>
     </div>
   </div>
-</div>
-}
+  }
 
   <ion-card>
     <ion-card-header>
