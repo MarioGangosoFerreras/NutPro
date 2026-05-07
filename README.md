@@ -69,8 +69,7 @@ Si deseas probar la experiencia móvil directamente en tu dispositivo sin config
 ### 🛠️ Pasos para ejecutar
 1. **Clonar:** `git clone <URL_REPOSITORIO>` y `cd nutpro`
 2. **Dependencias:** `npm install`
-3. **Entorno:** Configura tus credenciales en `src/environments/environment.ts`.
-4. **Servidor:** `ng serve` (Accede en `http://localhost:4200/`).
+3. **Servidor:** `ng serve` (Accede en `http://localhost:4200/`).
 
 ---
 
