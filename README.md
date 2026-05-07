@@ -65,11 +65,36 @@ Si deseas probar la experiencia móvil directamente en tu dispositivo sin config
 ### 📋 Requisitos Previos
 * **Node.js** (v18+)
 * **Angular CLI** (`npm install -g @angular/cli`)
+* **Android Studio** (Para compilación móvil)
 
 ### 🛠️ Pasos para ejecutar
 1. **Clonar:** `git clone <URL_REPOSITORIO>` y `cd nutpro`
 2. **Dependencias:** `npm install`
 3. **Servidor:** `ng serve` (Accede en `http://localhost:4200/`).
+
+### 🌐 Ejecución en Red Local (Pruebas en dispositivos reales)
+Para probar la aplicación en tu móvil u otros dispositivos conectados a la misma red Wi-Fi:
+1. **Ejecutar servidor externo:**
+   ```bash
+   ng serve --host 0.0.0.0
+   ```
+2. **Acceder:** Identifica la IP local de tu ordenador (Ej: `192.168.1.15`) y abre en el navegador de tu móvil: `http://192.168.1.15:4200`.
+
+### 🤖 Sincronización y Actualización en Android
+Si realizas cambios en el código de Angular y deseas verlos reflejados en el proyecto de Android Studio/Dispositivo móvil:
+1. **Generar el build de producción:**
+   ```bash
+   npm run build
+   ```
+2. **Sincronizar cambios con Capacitor:**
+   ```bash
+   npx cap sync android
+   ```
+3. **Abrir el proyecto en Android Studio:**
+   ```bash
+   npx cap open android
+   ```
+*Desde Android Studio, puedes ejecutar el proyecto directamente en un emulador o un dispositivo físico conectado por USB.*
 
 ---
 
