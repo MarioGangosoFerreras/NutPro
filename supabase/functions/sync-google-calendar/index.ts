@@ -12,15 +12,12 @@ serve(async (req) => {
 
     if (!cita) throw new Error('Sin datos de cita');
 
-    console.log(`[SYNC] Iniciando sincronización para cita ${cita.id} (Tipo: ${type})`);
-
     // --- 1. EVITAR BUCLE INFINITO ---
     if (
       type === 'UPDATE' &&
       payload.old_record?.google_event_id !== payload.record?.google_event_id &&
       Object.keys(payload.record).length <= 4
     ) {
-      console.log('[SYNC] Ignorado para evitar bucles (solo se actualizó el google_event_id)');
       return new Response(JSON.stringify({ ok: true, msg: 'Ignorado para evitar bucles' }));
     }
 
@@ -34,7 +31,6 @@ serve(async (req) => {
       .single();
 
     if (tokenErr || !tokenData) {
-      console.log('[SYNC] No hay token para este nutricionista. Abortando.');
       return new Response(JSON.stringify({ ok: true, msg: 'Sincronización desactivada' }));
     }
 
@@ -63,13 +59,10 @@ serve(async (req) => {
           headers: { Authorization: `Bearer ${access_token}` },
         },
       );
-      console.log(`[SYNC] Cita ${googleEventId} eliminada de Google Calendar`);
       return new Response(JSON.stringify({ ok: true }));
     }
 
     // --- 5. OBTENER DATOS DEL PACIENTE (IGUAL QUE EN ANGULAR) ---
-    console.log(`[SYNC] Buscando datos del paciente con ID: ${cita.paciente_id}`);
-
     const { data: pacienteData, error: pacError } = await supabase
       .from('pacientes')
       .select(
@@ -89,8 +82,6 @@ serve(async (req) => {
       console.error('[SYNC] Error al consultar la tabla pacientes:', pacError.message);
     }
 
-    console.log('[SYNC] Datos crudos devueltos por la BD:', pacienteData);
-
     // Supabase a veces devuelve un array en los Joins, lo controlamos por si acaso:
     const u = Array.isArray(pacienteData?.usuario)
       ? pacienteData?.usuario[0]
@@ -100,8 +91,6 @@ serve(async (req) => {
     const nombre = u?.nombre || '';
     const apellidos = u?.apellidos || u?.apellido || '';
     const nombreCompleto = `${nombre} ${apellidos}`.trim() || 'Paciente';
-
-    console.log(`[SYNC] Nombre final a mostrar: "${nombreCompleto}"`);
 
     // --- 6. DURACIÓN Y HORARIOS ---
     const duracionMinutos = Number(cita.duracion_min) || 60;
@@ -142,7 +131,6 @@ Generado automáticamente por NutPro.
     });
 
     if (gRes.status === 409) {
-      console.log('[SYNC] El evento ya existe en Google (409), actualizando con PATCH...');
       gRes = await fetch(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events/${googleEventId}`,
         {
@@ -155,7 +143,6 @@ Generado automáticamente por NutPro.
 
     if (gRes.ok && !cita.google_event_id) {
       await supabase.from('citas').update({ google_event_id: googleEventId }).eq('id', cita.id);
-      console.log('[SYNC] Cita creada y ID guardado en base de datos correctamente');
     }
 
     return new Response(JSON.stringify({ ok: true }));

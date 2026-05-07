@@ -41,7 +41,6 @@ export class OAuthCallbackPage implements OnInit {
    */
   async ngOnInit() {
     const code = this.route.snapshot.queryParamMap.get('code');
-    console.log('OAuth callback — code presente:', !!code);
 
     if (!code) {
       await this.router.navigate(['/ajustes'], { queryParams: { gcal: 'error' } });
@@ -50,7 +49,6 @@ export class OAuthCallbackPage implements OnInit {
 
     try {
       const session = await this.waitForSession();
-      console.log('Sesión obtenida:', session?.access_token ? 'OK' : 'NINGUNA');
 
       if (!session) throw new Error('No hay sesión activa');
 
@@ -81,7 +79,6 @@ export class OAuthCallbackPage implements OnInit {
 
       const { data: { subscription } } = this.supabase.auth.onAuthStateChange(
         (event, session) => {
-          console.log('Auth event:', event, '| sesión:', session?.access_token ? 'OK' : 'vacía');
           if (session?.access_token) {
             clearTimeout(timeout);
             subscription.unsubscribe();
@@ -92,7 +89,6 @@ export class OAuthCallbackPage implements OnInit {
 
       // Comprueba si la sesión ya está disponible en este momento
       this.supabase.auth.getSession().then(({ data: { session } }) => {
-        console.log('Sesión inmediata:', session?.access_token ?? 'NINGUNA');
         if (session?.access_token) {
           clearTimeout(timeout);
           subscription.unsubscribe();

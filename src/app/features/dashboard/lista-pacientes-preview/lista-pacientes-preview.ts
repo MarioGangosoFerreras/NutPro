@@ -64,7 +64,14 @@ export class ListaPacientesPreviewComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
   ) {
-    addIcons({ arrowForwardOutline, peopleOutline, chevronForwardOutline, calendarOutline, locationOutline, videocamOutline});
+    addIcons({
+      arrowForwardOutline,
+      peopleOutline,
+      chevronForwardOutline,
+      calendarOutline,
+      locationOutline,
+      videocamOutline,
+    });
   }
 
   /**
@@ -87,19 +94,17 @@ export class ListaPacientesPreviewComponent implements OnInit, OnDestroy {
    * @private
    */
   private escucharCambios() {
-  this.citaSub = this.pacientesService.supabaseClient
-    .channel(`citas-preview-${Date.now()}`)
-    .on('postgres_changes', 
-      { event: '*', schema: 'public', table: 'citas' }, 
-      (payload) => {
-        console.log('🔔 Realtime recibido:', payload); // ← añade esto
+    this.citaSub = this.pacientesService.supabaseClient
+      .channel(`citas-preview-${Date.now()}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'citas' }, () => {
+        // Ejecutamos la recarga dentro de ngZone para asegurar que Angular
+        // detecte los cambios en la vista al venir de un evento externo
         this.ngZone.run(() => this.cargarPacientes());
-      }
-    )
-    .subscribe((status) => {
-      console.log('📡 Estado canal preview:', status); // ← y esto
+      })
+      .subscribe((status, err) => {
+      if (err) console.error('Error en la suscripción de citas:', err);
     });
-}
+  }
 
   /**
    * Carga desde base de datos la previsualización de pacientes utilizando el ID

@@ -74,8 +74,6 @@ export class FoodService {
     const {
       data: { session },
     } = await this.supabase.auth.getSession();
-    console.log('Token:', session?.access_token ? 'OK' : 'SIN TOKEN');
-    console.log('URL:', `${environment.supabaseUrl}/functions/v1/search-foods`);
 
     const response = await fetch(`${environment.supabaseUrl}/functions/v1/search-foods`, {
       method: 'POST',
@@ -86,10 +84,7 @@ export class FoodService {
       },
       body: JSON.stringify({ query }),
     });
-
-    console.log('Status:', response.status);
     const result = await response.json();
-    console.log('Respuesta:', result);
 
     if (!response.ok) throw new Error('Error buscando alimentos');
     return result.data ?? [];

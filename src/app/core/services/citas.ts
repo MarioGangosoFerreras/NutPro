@@ -59,10 +59,7 @@ export class CitasService {
     }
 
     const { data, error } = await query.order('fecha_hora', { ascending: true });
-    
-    // 👇 AÑADE ESTO PARA DEPURAR 👇
-    console.log("Respuesta de Supabase para el paciente:", data, "Error:", error);
-    
+        
     if (error) throw error;
     return data as Cita[];
   }
