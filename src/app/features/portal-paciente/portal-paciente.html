@@ -144,4 +144,58 @@
       </ion-card-content>
     </ion-card>
   }
+  <ion-modal [isOpen]="modalRecetaAbierto()" (didDismiss)="cerrarReceta()" initialBreakpoint="0.85" [breakpoints]="[0, 0.85, 1]">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar>
+          <ion-title>Detalle del Plato</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarReceta()">
+              <ion-icon name="close-circle" class="btn-close-icon"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      
+      <ion-content class="ion-padding modal-bg">
+        @if (recetaSeleccionada(); as receta) {
+          <div class="receta-hero">
+            @if (receta.imagen_url) {
+              <img [src]="receta.imagen_url" class="receta-img-full" />
+            } @else {
+              <div class="receta-img-placeholder">
+                <ion-icon name="restaurant-outline"></ion-icon>
+              </div>
+            }
+          </div>
+          
+          <h2 class="receta-title-modal">{{ receta.nombre }}</h2>
+          
+          <div class="macros-grid">
+            <div class="macro-box">
+              <span class="macro-val kcal">{{ receta.calorias_kcal || 0 }}</span>
+              <span class="macro-lbl">kcal</span>
+            </div>
+            <div class="macro-box">
+              <span class="macro-val prot">{{ receta.proteina_g || 0 }}g</span>
+              <span class="macro-lbl">Prot</span>
+            </div>
+            <div class="macro-box">
+              <span class="macro-val carbs">{{ receta.carbohidratos_g || 0 }}g</span>
+              <span class="macro-lbl">Carbs</span>
+            </div>
+            <div class="macro-box">
+              <span class="macro-val grasa">{{ receta.grasa_g || 0 }}g</span>
+              <span class="macro-lbl">Grasa</span>
+            </div>
+          </div>
+          
+          <div class="instrucciones-box">
+            <h3 class="instrucciones-title">Preparación paso a paso</h3>
+            <p class="instrucciones-texto">{{ receta.instrucciones || 'Tu nutricionista no ha añadido instrucciones específicas para esta receta. ¡Disfrútala!' }}</p>
+          </div>
+        }
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
