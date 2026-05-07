@@ -21,7 +21,7 @@
 
 Si deseas probar la experiencia móvil directamente en tu dispositivo sin configurar el entorno de desarrollo:
 
-1. Dirígete a la sección de [**Releases**](https://github.com/tu-usuario/nutpro/releases) de este repositorio.
+1. Dirígete a la sección de [**Releases**](https://github.com/MarioGangosoFerreras/NutPro/releases) de este repositorio.
 2. Descarga el archivo `.apk` de la versión más reciente.
 3. En tu dispositivo Android, abre el archivo descargado para iniciar la instalación.
    - *Nota: Es posible que debas permitir la "Instalación de aplicaciones de fuentes desconocidas" en los ajustes de seguridad de tu teléfono.*
@@ -38,12 +38,16 @@ Si deseas probar la experiencia móvil directamente en tu dispositivo sin config
 - **Agenda:** Calendario con sincronización bidireccional con **Google Calendar**.
 - **Chat:** Comunicación directa en tiempo real.
 - **Facturación:** Generación automática de facturas en PDF.
+<img width="1917" height="981" alt="image" src="https://github.com/user-attachments/assets/6e61f0fa-4d05-4b1a-aae9-3f17fc4b719f" />
+
 
 ### 👤 Para el Paciente
 - **Mi Dieta:** Menú semanal y recetas con detalle de macros.
 - **Evolución:** Registro de hábitos (agua, sueño, fruta) y gráficas de peso.
 - **Citas:** Gestión de sesiones y enlaces a videollamadas.
 - **Documentos:** Historial de facturas e informes compartidos.
+<img width="1918" height="979" alt="image" src="https://github.com/user-attachments/assets/7d6df0fb-3300-453b-83ec-6d9ece880fd4" />
+
 
 ---
 
@@ -71,14 +75,22 @@ Si deseas probar la experiencia móvil directamente en tu dispositivo sin config
 ---
 
 ## 📂 Estructura del Proyecto
-
-* `/src/app/core/` - Servicios globales, guards e integraciones de Supabase.
-* `/src/app/features/` - Módulos de negocio (Admin, Dieta, Chat, Pacientes).
-* `/src/app/shared/` - Componentes comunes (Header, Calendario, Shell).
-* `/supabase/` - Código de las Edge Functions en Deno.
+* `/src/app/core/` - Servicios globales, guards de autenticación e integraciones (Auth, Supabase, Cloudinary).
+* `/src/app/features/` - Módulos principales separados por dominio:
+    * `/admin/` - Panel de administrador.
+    * `/ajustes/` - Configuración de cuenta y sincronización (Google Calendar).
+    * `/alimentacion/` - Base de datos de recetas e ingredientes.
+    * `/auth/` - Login, Registro y flujos de recuperación.
+    * `/dashboard/` - Vistas del panel principal y estadísticas.
+    * `/facturacion/` - Control de pagos y gráficas de ingresos.
+    * `/mensajes/` - Chat en tiempo real.
+    * `/pacientes/` - CRM del nutricionista (Fichas, mediciones, planes, dietas).
+    * `/portal-paciente/` - Entorno dedicado y simplificado para el paciente.
+* `/src/app/shared/` - Componentes reutilizables (Menú lateral/Shell, Header, Calendario, Tarjetas).
+* `/supabase/` - Configuración y código fuente de las Edge Functions (Deno).
 
 ---
 
 <div align="center">
-  <i>Desarrollado con ❤️ para transformar la nutrición digital.</i>
+  <i>Desarrollado para transformar la nutrición digital.</i>
 </div>
