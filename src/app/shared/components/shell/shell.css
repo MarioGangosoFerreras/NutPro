@@ -115,6 +115,7 @@ ion-split-pane.menu-collapsed .nav-container {
   font-weight: 500;
   cursor: pointer; 
   transition: all 0.2s ease, gap 0.4s ease;
+  position: relative;
 }
 
 ion-split-pane.menu-collapsed .nav-btn {
@@ -261,8 +262,8 @@ ion-split-pane.menu-collapsed .chat-item {
 
 ion-split-pane.menu-collapsed .badge-nav {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 8px;    
+  right: 18px;  
   font-size: 10px;
   padding: 3px 5px;
 }
