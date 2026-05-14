@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FichaClinicaService } from '../../../../../core/services/ficha-clinica';
-import { IonButton, IonIcon, IonSpinner, IonItem, IonLabel, IonInput, IonTextarea, IonToggle, ToastController, IonSelectOption } from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonSpinner, IonItem, IonLabel, IonInput, IonTextarea, IonToggle, ToastController, IonSelectOption, IonFab, IonFabButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { saveOutline } from 'ionicons/icons';
 
@@ -19,7 +19,7 @@ import { saveOutline } from 'ionicons/icons';
     FormsModule,
     IonButton, IonIcon, IonSpinner, IonItem, IonLabel,
     IonInput, IonTextarea, IonToggle,
-    IonSelectOption
+    IonSelectOption, IonFab, IonFabButton
 ],
   templateUrl: './tab-alimentacion.html',
   styleUrl: './tab-alimentacion.css',

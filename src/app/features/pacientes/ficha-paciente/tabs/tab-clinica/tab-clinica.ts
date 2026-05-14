@@ -5,6 +5,8 @@ import {
   IonButton, IonIcon, IonSpinner, IonItem, IonLabel,
   IonInput, IonSelect, IonSelectOption, IonTextarea, IonToggle,
   ToastController,
+  IonFab,
+  IonFabButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { saveOutline } from 'ionicons/icons';
@@ -22,7 +24,7 @@ import { saveOutline } from 'ionicons/icons';
   imports: [
     FormsModule,
     IonButton, IonIcon, IonSpinner, IonItem, IonLabel,
-    IonInput, IonSelect, IonSelectOption, IonTextarea, IonToggle,
+    IonInput, IonSelect, IonSelectOption, IonTextarea, IonToggle, IonFab, IonFabButton
   ],
   templateUrl: './tab-clinica.html',
   styleUrl: './tab-clinica.css',
