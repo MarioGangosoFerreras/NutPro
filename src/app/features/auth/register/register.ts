@@ -175,11 +175,10 @@ export class Register {
           rol: 'nutricionista',
           telefono: this.telefono,
           numero_colegiado: this.numeroColegiado,
-          titulacion: this.titulacion,
+          titulacion: this.titulacion ? this.titulacion : null,
           especialidad: this.especialidad,
           nombre_empresa: this.nombreEmpresa,
           avatar_url: avatarUrl,
-          // 👇 Ahora estos ya no saldrán en rojo
           dni_fiscal: this.dniFiscal,
           direccion_fiscal: this.direccionFiscal,
           centros: this.centros,

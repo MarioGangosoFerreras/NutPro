@@ -24,7 +24,7 @@ import { saveOutline } from 'ionicons/icons';
   imports: [
     FormsModule,
     IonButton, IonIcon, IonSpinner, IonItem, IonLabel,
-    IonInput, IonSelect, IonSelectOption, IonTextarea, IonToggle, IonFab, IonFabButton
+    IonInput, IonSelect, IonSelectOption, IonTextarea, IonToggle, IonFab,
   ],
   templateUrl: './tab-clinica.html',
   styleUrl: './tab-clinica.css',

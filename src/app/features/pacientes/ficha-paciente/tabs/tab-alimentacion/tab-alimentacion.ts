@@ -18,8 +18,7 @@ import { saveOutline } from 'ionicons/icons';
   imports: [
     FormsModule,
     IonButton, IonIcon, IonSpinner, IonItem, IonLabel,
-    IonInput, IonTextarea, IonToggle,
-    IonSelectOption, IonFab, IonFabButton
+    IonInput, IonTextarea, IonToggle, IonFab,
 ],
   templateUrl: './tab-alimentacion.html',
   styleUrl: './tab-alimentacion.css',
