@@ -109,13 +109,11 @@
     <ion-textarea [(ngModel)]="notas" rows="3" placeholder="Observaciones..."></ion-textarea>
   </ion-item>
 
-</ion-content>
+  <ion-button expand="block" (click)="guardar()" [disabled]="guardando || !fecha || !hora" style="margin-top: 24px;">
+    @if (guardando) { <ion-spinner name="crescent"></ion-spinner> }
+    @else { {{ esEdicion ? 'Guardar cambios' : 'Crear cita' }} }
+  </ion-button>
 
-<ion-footer class="ion-no-border" style="padding-bottom: 45px; background: white;">
-  <div class="ion-padding-horizontal">
-    <ion-button expand="block" (click)="guardar()" [disabled]="guardando || !fecha || !hora">
-      @if (guardando) { <ion-spinner name="crescent"></ion-spinner> }
-      @else { {{ esEdicion ? 'Guardar cambios' : 'Crear cita' }} }
-    </ion-button>
-  </div>
-</ion-footer>
+  <div class="espaciador-inferior"></div>
+
+</ion-content>

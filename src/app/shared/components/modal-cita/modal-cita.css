@@ -110,3 +110,12 @@ ion-item ion-textarea {
   --color: #1e293b;
   font-size: 15px;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ESPACIADOR PARA FORZAR SCROLL EN WINDOWS/MÓVIL
+   ═══════════════════════════════════════════════════════════════ */
+.espaciador-inferior {
+  height: 160px;
+  width: 100%;
+  background: transparent;
+}
