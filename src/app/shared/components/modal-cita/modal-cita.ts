@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Input, OnInit, inject, signal, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonTextarea, IonSpinner, ModalController, IonSearchbar, IonList, IonAvatar, IonIcon, IonChip, IonDatetime, IonFooter } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonTextarea, IonSpinner, ModalController, IonSearchbar, IonList, IonAvatar, IonIcon, IonChip, IonDatetime } from '@ionic/angular/standalone';
 import { CitasService, Cita } from '../../../core/services/citas';
 import { PacientesService } from '../../../core/services/pacientes';
 import { addIcons } from 'ionicons';
@@ -28,7 +28,6 @@ import { checkmarkCircle, closeCircleOutline, personCircleOutline } from 'ionico
     IonIcon,
     IonChip,
     IonDatetime,
-    IonFooter
 ],
   templateUrl: './modal-cita.html',
   styleUrls: ['./modal-cita.css'],
