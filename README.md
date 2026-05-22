@@ -117,7 +117,7 @@ Si realizas cambios en el código de Angular y deseas verlos reflejados en el pr
 
 ## 📚 Documentación
 
-* [Documento de la memoria](Gangoso_Ferreras_Mario_Memoria_ProyectoFinal_DAM26.pdf) *
+* [Documento de la memoria](Gangoso_Ferreras_Mario_Memoria_ProyectoFinal_DAM26.pdf) 
 ---
 
 ## 📜 Licencia
