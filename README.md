@@ -117,14 +117,14 @@ Si realizas cambios en el código de Angular y deseas verlos reflejados en el pr
 
 ## 📚 Documentación
 
-* [Documento de la memoria](Gangoso_Ferreras_Mario_Memoria_ProyectoFinal_DAM26.pdf) 
+* [Documento de la memoria](Gangoso_Ferreras_Mario_Memoria_ProyectoFinal_DAM26.pdf)
 ---
 
 ## 📜 Licencia
 
 © 2025/2026 Mario Gangoso Ferreras 
 
-Este proyecto se encuentra bajo la licencia **Copyright 2024/2025**, y está protegido por los derechos de autor. El acceso es público para su revisión, pero no se permite la modificación ni redistribución sin permiso expreso.
+Este proyecto se encuentra bajo la licencia **Copyright 2025/2026**, y está protegido por los derechos de autor. El acceso es público para su revisión, pero no se permite la modificación ni redistribución sin permiso expreso.
 
 ---
 
