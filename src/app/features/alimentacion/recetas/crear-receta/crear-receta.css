@@ -1,0 +1,459 @@
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+ion-card { margin: 8px 0; }
+
+/* ── Imagen de receta ────────────────────────────────────────────────────── */
+.imagen-upload-wrapper {
+  display: flex;
+  justify-content: center; /* Asegura que todo el bloque esté centrado */
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+/* Estado con imagen cargada (Tamaño más pequeño) */
+.imagen-preview-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  width: 180px;  /* Reducido a 180px */
+  height: 180px; /* Reducido a 180px */
+  background: var(--np-green-50);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.imagen-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Mantiene la proporción sin aplastar la imagen */
+  display: block;
+}
+
+.imagen-quitar-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  --border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  --padding-start: 0;
+  --padding-end: 0;
+  margin: 0;
+  opacity: 0.9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Área para subir imagen vacía (Estilo verde y centrado) */
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 280px; /* Un poco más ancha que la imagen cuadrada para invitar a hacer clic */
+  height: 160px;
+  border-radius: 16px;
+  border: 2px dashed var(--np-green-400);
+  background: var(--np-green-50);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+}
+
+.upload-label:active {
+  background: #d1e7dd;
+  border-color: var(--np-green-600);
+}
+
+.upload-icon-container {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.upload-icon-container ion-icon {
+  font-size: 42px;
+  color: var(--np-green-600);
+}
+
+.upload-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -6px;
+  background: var(--np-green-600);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--np-green-50);
+}
+
+.upload-badge ion-icon {
+  font-size: 14px;
+}
+
+.upload-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--np-green-800);
+  margin-bottom: 4px;
+}
+
+.upload-subtitle {
+  font-size: 13px;
+  color: var(--np-green-600);
+  opacity: 0.8;
+}
+
+.upload-label.uploading {
+  opacity: 0.7;
+  pointer-events: none;
+  border-style: solid;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.row-dos-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.chips-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+/* ── Toggle búsqueda / manual ────────────────────────────────────────────── */
+.modo-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.modo-toggle ion-button {
+  flex: 1;
+  --border-radius: 10px;
+  font-size: 13px;
+}
+
+/* ── Formulario manual ───────────────────────────────────────────────────── */
+.manual-form {
+  background: var(--ion-color-light);
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 4px;
+}
+
+.manual-hint {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin: 6px 0 10px;
+  line-height: 1.5;
+}
+
+.macros-hint {
+  font-weight: 500;
+  color: var(--np-green-600);
+  background: var(--np-green-50);
+  border-radius: 8px;
+  border-left: 3px solid var(--np-green-400);
+  padding: 6px 10px;
+  margin-top: 12px;
+}
+
+/* ── Spinner búsqueda ────────────────────────────────────────────────────── */
+.buscando-spinner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 4px;
+  font-size: 14px;
+  color: var(--ion-color-medium);
+}
+
+/* ── Configurar ingrediente seleccionado ─────────────────────────────────── */
+.configurar-ingrediente {
+  background: var(--np-green-50);
+  border: 1px solid var(--np-green-100);
+  border-radius: 14px;
+  padding: 14px;
+  margin: 8px 0;
+}
+
+.food-seleccionado-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.food-seleccionado-header strong {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--np-green-800);
+}
+
+.macros-preview {
+  display: flex;
+  gap: 8px;
+  padding: 10px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.macros-preview span {
+  background: #fff;
+  border: 0.5px solid var(--np-green-100);
+  border-radius: 10px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--np-green-600);
+}
+
+/* ── Lista ingredientes ──────────────────────────────────────────────────── */
+.ingredientes-lista {
+  margin-top: 14px;
+  border-top: 0.5px solid var(--ion-color-light-shade);
+  padding-top: 8px;
+}
+
+.ingrediente-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 4px;
+  border-bottom: 0.5px solid var(--ion-color-light);
+  gap: 8px;
+}
+
+.ingrediente-row:last-child { border-bottom: none; }
+
+.ingrediente-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ingrediente-nombre {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ingrediente-medida {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  font-style: italic;
+}
+
+.ingrediente-acciones {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.cantidad-input {
+  width: 64px;
+  --padding-start: 4px;
+  --padding-end: 4px;
+  --background: var(--ion-color-light);
+  --border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.gramos-label {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+/* ── Card macros totales ─────────────────────────────────────────────────── */
+.macros-card {
+  background: var(--np-green-400) !important;
+  box-shadow: 0 4px 16px rgba(29, 185, 84, 0.28) !important;
+}
+
+.macros-card ion-card-title {
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.macros-tabs {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+}
+
+.separador {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  align-self: stretch;
+}
+
+.macro-titulo {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.macro-fila {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 3px 0;
+  color: #fff;
+  opacity: 0.92;
+}
+
+.macro-fila strong { font-weight: 600; }
+
+.dialogo-imagen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.dialogo-imagen-sheet {
+  background: var(--ion-background-color, #fff);
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px 16px 0 0;
+  padding: 16px 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dialogo-titulo {
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ion-color-medium);
+  margin-bottom: 8px;
+}
+
+.dialogo-opcion {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: none;
+  background: var(--ion-color-light, #f4f4f4);
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  color: var(--ion-text-color, #000);
+}
+
+.dialogo-opcion ion-icon {
+  font-size: 22px;
+  color: var(--ion-color-primary);
+}
+
+.dialogo-cancelar {
+  margin-top: 4px;
+  padding: 14px;
+  border: none;
+  background: transparent;
+  color: var(--ion-color-danger);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 12px;
+}.camara-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camara-modal {
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+}
+
+.camara-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #111;
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.camara-cerrar {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.camara-video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+}
+
+.camara-footer {
+  background: #111;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.camara-capturar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ion-color-primary, #3880ff);
+  border: 4px solid #fff;
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease;
+}
+
+.camara-capturar:active {
+  transform: scale(0.92);
+}

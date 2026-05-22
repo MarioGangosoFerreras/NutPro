@@ -1,0 +1,121 @@
+.selector-paciente-container {
+  margin-bottom: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 12px 0 0 0;
+  border: 1px solid #e2e8f0;
+}
+
+.selector-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-left: 16px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.custom-searchbar {
+  padding-top: 0;
+  padding-bottom: 0;
+  --box-shadow: none;
+  --background: #ffffff;
+}
+
+.lista-pacientes-buscador {
+  max-height: 180px;
+  overflow-y: auto;
+  background: transparent;
+  margin-top: 8px;
+  padding-bottom: 0;
+}
+
+.avatar-pequeno {
+  width: 32px;
+  height: 32px;
+  background: #e8f5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-pequeno ion-icon {
+  font-size: 32px;
+  color: #2d6a4f;
+}
+
+.paciente-seleccionado {
+  --background: #ffffff;
+  margin: 8px 16px 16px 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ESTILOS DEL BOTÓN DEL CALENDARIO
+   ═══════════════════════════════════════════════════════════════ */
+.datetime-button-wrapper {
+  margin: 0 16px; /* Lo alineamos con el resto de los inputs */
+}
+
+/* Le damos la misma estética que los inputs: fondo gris, borde, esquinas redondas */
+ion-datetime-button {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  width: 100%;
+  padding: 6px 4px;
+}
+
+/* Modificamos el botón interno que genera Ionic para que ocupe todo el ancho */
+ion-datetime-button::part(native) {
+  background: transparent;
+  box-shadow: none;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  color: #1e293b;
+  font-size: 15px;
+  padding-left: 10px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CAMPOS DEL FORMULARIO (Duración, Tipo, Estado, Notas)
+   ═══════════════════════════════════════════════════════════════ */
+
+ion-item {
+  --background: #f8fafc;
+  --border-color: transparent;
+  --inner-border-width: 0;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin: 0 0 10px 0;
+}
+
+ion-item ion-label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+ion-item ion-select,
+ion-item ion-input,
+ion-item ion-textarea {
+  --color: #1e293b;
+  font-size: 15px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ESPACIADOR PARA FORZAR SCROLL EN WINDOWS/MÓVIL
+   ═══════════════════════════════════════════════════════════════ */
+.espaciador-inferior {
+  height: 160px;
+  width: 100%;
+  background: transparent;
+}

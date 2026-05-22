@@ -1,0 +1,56 @@
+<ion-content class="ion-padding">
+  <div class="modal-header">
+    <h2>{{ titulo }}</h2>
+    <ion-button fill="clear" (click)="cancelado.emit()">
+      <ion-icon name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="edit-grid">
+    <ion-item class="full-width">
+      <ion-label position="stacked">Fecha</ion-label>
+      <ion-input type="date" [(ngModel)]="form.fecha"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Peso (kg)</ion-label>
+      <ion-input type="number" [(ngModel)]="form.peso_kg" step="0.1"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Altura (cm)</ion-label>
+      <ion-input type="number" [(ngModel)]="form.altura_cm" step="0.1"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Grasa corporal (%)</ion-label>
+      <ion-input type="number" [(ngModel)]="form.grasa_corporal_pct" step="0.1"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Masa muscular (kg)</ion-label>
+      <ion-input type="number" [(ngModel)]="form.masa_muscular_kg" step="0.1"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Perímetro cintura (cm)</ion-label>
+      <ion-input type="number" [(ngModel)]="form.perimetro_cintura_cm" step="0.1"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Perímetro cadera (cm)</ion-label>
+      <ion-input type="number" [(ngModel)]="form.perimetro_cadera_cm" step="0.1"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Perímetro abdomen (cm)</ion-label>
+      <ion-input type="number" [(ngModel)]="form.perimetro_abdomen_cm" step="0.1"></ion-input>
+    </ion-item>
+    <ion-item class="full-width">
+      <ion-label position="stacked">Notas</ion-label>
+      <ion-textarea [(ngModel)]="form.notas" rows="2"></ion-textarea>
+    </ion-item>
+  </div>
+
+  <ion-button expand="block" (click)="guardar()" [disabled]="guardando" style="margin-top: 16px">
+    @if (guardando) {
+      <ion-spinner name="crescent"></ion-spinner>
+    } @else {
+      <ion-icon name="save-outline" slot="start"></ion-icon>
+      {{ medicion ? 'Guardar cambios' : 'Guardar medición' }}
+    }
+  </ion-button>
+</ion-content>

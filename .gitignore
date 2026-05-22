@@ -1,0 +1,42 @@
+
+---
+node_modules/
+dist/
+# ✅ .gitignore (optimizado para Angular)
+
+```bash
+# Angular / Build
+/dist/
+/out-tsc/
+/tmp/
+/.angular/
+/coverage/
+
+# Node
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+
+# IDEs / Editors
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# TypeScript
+*.tsbuildinfo

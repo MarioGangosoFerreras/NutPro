@@ -1,0 +1,331 @@
+/* ── CONTENEDOR PRINCIPAL ── */
+.ucal {
+  --cal-bg: #ffffff;
+  --cal-border: #e2e8f0;
+  --cal-text-main: #1e293b;
+  --cal-text-muted: #64748b;
+  --cal-primary: #2d6a4f;
+  --cal-primary-soft: #e8f5e9;
+  --cal-hover: #f8fafc;
+  --cal-selected: #2d6a4f;
+  --cal-selected-text: #ffffff;
+
+  background: var(--cal-bg);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  font-family: inherit;
+  border: 1px solid #f1f5f9;
+}
+
+/* ── NAVEGACIÓN (HEADER) ── */
+.ucal__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.ucal__mes-label {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--cal-text-main);
+  text-transform: capitalize;
+  letter-spacing: -0.01em;
+}
+
+ion-button[fill="clear"] {
+  --color: var(--cal-text-muted);
+  --border-radius: 12px;
+}
+ion-button[fill="clear"]:hover {
+  --color: var(--cal-primary);
+}
+
+/* ── GRID GENERAL ── */
+.ucal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.ucal__dia-header {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94a3b8;
+  padding-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── DÍAS (MODO DASHBOARD / PATIENT) ── */
+.ucal__dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  cursor: pointer;
+  border-radius: 14px;
+  min-height: 50px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  gap: 4px;
+}
+
+.ucal__dia:hover {
+  background: var(--cal-hover);
+}
+
+.ucal__num {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--cal-text-main);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.ucal__dia.otro-mes .ucal__num {
+  color: #cbd5e1;
+}
+
+/* Hoy */
+.ucal__dia.hoy {
+  background: rgba(29, 185, 84, 0.06) !important; /* Fondo verde súper transparente */
+}
+
+.ucal__dia.hoy .ucal__num {
+  color: var(--cal-primary);
+  font-weight: 800; /* Lo hacemos más gordito para que destaque que es hoy */
+}
+
+/* Seleccionado */
+.ucal__dia.seleccionado {
+  background: var(--cal-primary-soft) !important; /* Fondo verde claro (e8f5e9) */
+  border-color: var(--cal-primary) !important; /* Le ponemos un borde verde oscuro para enmarcarlo */
+  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.15) !important; /* Sombra más suave */
+}
+
+.ucal__dia.seleccionado .ucal__num {
+  background: var(--cal-primary) !important; /* El circulito del número sí va en verde oscuro */
+  color: var(--cal-selected-text) !important; /* Número en blanco */
+}
+
+/* ── MODO PANTALLA COMPLETA (FULL) ── */
+.ucal--full {
+  min-height: 100%; /* Cambiamos height: 100% por min-height */
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: transparent;
+}
+
+.ucal--full .ucal__nav {
+  background: white;
+  padding: 12px 24px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  margin-bottom: 24px;
+}
+
+.ucal--full .ucal__grid {
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  flex: 1;
+  min-height: 350px;
+  gap: 8px;
+}
+
+.ucal--full .ucal__dia {
+  min-height: 85px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 8px;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+}
+
+.ucal--full .ucal__dia:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+/* En Full, el seleccionado no se pinta entero de verde, es más sutil y profesional */
+.ucal--full .ucal__dia.seleccionado {
+  background: #f0fdf4;
+  border-color: var(--cal-primary);
+  box-shadow: 0 0 0 1.5px var(--cal-primary);
+}
+
+.ucal--full .ucal__dia.seleccionado .ucal__num {
+  background: var(--cal-primary) !important;
+  color: white !important;
+}
+
+/* ── PUNTOS DE ESTADO (DOTS) ── */
+.ucal__dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  min-height: 6px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+/* En modo full, ponemos los dots abajo a la izquierda */
+.ucal--full .ucal__dots {
+  justify-content: flex-start;
+  align-items: flex-end;
+  flex: 1;
+  padding-bottom: 4px;
+  padding-left: 4px;
+}
+
+.ucal__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: block;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.ucal__dot--confirmada { background: #10b981; }
+.ucal__dot--pendiente  { background: #f59e0b; }
+.ucal__dot--cancelada  { background: #ef4444; }
+
+/* ── DETALLE INFERIOR ── */
+.ucal__detalle {
+  border-top: 1px solid var(--cal-border);
+  padding-top: 20px;
+  margin-top: 8px;
+}
+
+.ucal--full .ucal__detalle {
+  background: white;
+  padding: 24px;
+  border-radius: 20px;
+  border-top: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  margin-top: 24px;
+  max-height: 35vh;
+  overflow-y: auto;
+}
+
+.ucal__detalle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.ucal__detalle-header span {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--cal-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ucal__empty {
+  font-size: 0.95rem;
+  color: var(--cal-text-muted);
+  text-align: center;
+  padding: 30px 0;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px dashed #cbd5e1;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ── CITA ROW (Modo Full / Dashboard) ── */
+.ucal__cita-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.ucal__cita-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+}
+
+.ucal__cita-row:hover {
+  background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  border-color: #cbd5e1;
+}
+
+.ucal__cita-row.confirmada::before { background: #10b981; }
+.ucal__cita-row.pendiente::before  { background: #f59e0b; }
+.ucal__cita-row.cancelada::before  { background: #ef4444; }
+
+.ucal__cita-hora {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cal-text-main);
+  min-width: 50px;
+}
+
+.ucal__cita-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ucal__cita-nombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--cal-text-main);
+}
+
+.ucal__cita-meta {
+  font-size: 0.8rem;
+  color: var(--cal-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.ucal__cita-meta ion-icon {
+  font-size: 1rem;
+  color: var(--cal-primary);
+}
+
+.ucal__cita-row ion-badge {
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+}

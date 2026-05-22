@@ -1,0 +1,22 @@
+/* Importa los estilos comunes:
+   En tu build process añade @import '../shared-tab.css';
+   o copia el contenido de shared-tab.css aquí */
+
+:host {
+  --primary-medical: #2d6a4f;
+  --bg-subtle: #f8fafc;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.section-block { background: white; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: var(--card-shadow); border: 1px solid #f1f5f9; }
+
+.section-title { display: flex; align-items: center; font-size: 14px; font-weight: 800; color: var(--primary-medical); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; border-left: 4px solid var(--primary-medical); padding-left: 12px; }
+
+.toggle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+
+.toggle-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-subtle); padding: 10px 14px; border-radius: 12px; font-size: 14px; color: #475569; }
+
+.edit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.edit-grid .full-width { grid-column: 1 / -1; }
+
+.btn-guardar { --background: var(--primary-medical); --border-radius: 12px; height: 50px; margin-top: 10px; font-weight: 700; }

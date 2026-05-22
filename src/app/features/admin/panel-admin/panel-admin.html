@@ -1,0 +1,151 @@
+
+<!-- Componente header reutilizable que proporciona la barra superior de navegación -->
+<app-header></app-header>
+
+<!-- ion-content: contenedor principal del contenido scrollable de Ionic -->
+<ion-content class="ion-padding">
+
+  <!-- Título principal del panel de administración -->
+  <h2 class="section-header">Panel de administración</h2>
+
+  <!-- @if (loading): Directiva de control de flujo de Angular que muestra un indicador de carga -->
+  @if (loading) {
+  <div class="loading-container">
+    <!-- Spinner animado personalizado con emoji -->
+    <div class="avocado-spinner">🥑</div>
+  </div>
+  }
+
+  <!-- @if (!loading): Directiva que oculta el contenido mientras se cargan los datos -->
+  @if (!loading) {
+
+  <!-- SECCIÓN: NUTRICIONISTAS PENDIENTES DE VERIFICACIÓN -->
+  <!-- Bloque contenedor de la lista de solicitudes pendientes de aprobación -->
+  <div class="section-block">
+    <p class="section-title">⏳ Pendientes de verificación ({{ nutricionistasPendientes.length }})</p>
+
+    <!-- @if: Directiva que valida si la lista está vacía para mostrar mensaje alternativo -->
+    @if (nutricionistasPendientes.length === 0) {
+    <p class="empty-text">No hay solicitudes pendientes</p>
+    }
+
+    <!-- ion-list: Componente de Ionic que proporciona una lista estilizada -->
+    <ion-list>
+      <!-- @for: Directiva de Angular para iterar sobre arrays (reemplaza *ngFor)
+           track n.id: Especifica el identificador único para optimizar la renderización -->
+      @for (n of nutricionistasPendientes; track n.id) {
+      <!-- ion-item: Elemento de lista individual en Ionic -->
+      <ion-item class="nutricionista-item">
+        <!-- ion-avatar slot="start": Avatar colocado al inicio del item -->
+        <ion-avatar slot="start">
+          <!-- @if: Directiva que renderiza avatar personalizado si existe URL -->
+          @if (n.usuario?.avatar_url) {
+          <!-- [src]: Property binding para enlazar dinámicamente la URL de la imagen -->
+          <img [src]="n.usuario.avatar_url" alt="Avatar">
+          } @else {
+          <!-- ion-icon: Icono de fallback cuando no hay avatar disponible -->
+          <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
+          }
+        </ion-avatar>
+        <!-- ion-label: Contenedor de texto principal del item -->
+        <ion-label>
+          <!-- {{ }}: Interpolación de Angular para mostrar propiedades del componente -->
+          <h2>{{ n.usuario?.nombre }} {{ n.usuario?.apellidos }}</h2>
+          <p>{{ n.usuario?.email }}</p>
+          <!-- ||: Operador de coalesencia nula para mostrar valores por defecto -->
+          <p>{{ n.numero_colegiado || 'Sin nº colegiado' }} · {{ n.especialidad || 'Sin especialidad' }}</p>
+        </ion-label>
+        <!-- slot="end": Coloca los botones de acción al final del item -->
+        <div slot="end" class="action-buttons">
+          <!-- (click): Event binding para ejecutar métodos del componente al hacer clic -->
+          <ion-button color="success" fill="clear" (click)="aprobar(n.id)">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-button color="danger" fill="clear" (click)="rechazar(n.id)">
+            <ion-icon name="close-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-button color="warning" fill="clear" (click)="eliminar(n.id)">
+            <ion-icon name="ban-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
+
+  <!-- SECCIÓN: NUTRICIONISTAS ACTIVOS -->
+  <!-- Bloque contenedor de nutricionistas aprobados y en estado activo -->
+  <div class="section-block">
+    <p class="section-title">✅ Nutricionistas activos ({{ nutricionistasActivos.length }})</p>
+
+    @if (nutricionistasActivos.length === 0) {
+    <p class="empty-text">No hay nutricionistas activos</p>
+    }
+
+    <ion-list>
+      @for (n of nutricionistasActivos; track n.id) {
+      <ion-item class="nutricionista-item">
+        <ion-avatar slot="start">
+          @if (n.usuario?.avatar_url) {
+          <img [src]="n.usuario.avatar_url" alt="Avatar">
+          } @else {
+          <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
+          }
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ n.usuario?.nombre }} {{ n.usuario?.apellidos }}</h2>
+          <p>{{ n.usuario?.email }}</p>
+          <p>{{ n.numero_colegiado || 'Sin nº colegiado' }} · {{ n.especialidad || 'Sin especialidad' }}</p>
+        </ion-label>
+        <div slot="end" class="action-buttons">
+          <!-- ion-badge: Componente que muestra un distintivo de estado -->
+          <ion-badge color="success">Activo</ion-badge>
+          <ion-button color="warning" fill="clear" (click)="eliminar(n.id)">
+            <ion-icon name="ban-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
+
+  <!-- SECCIÓN: NUTRICIONISTAS INACTIVOS -->
+  <!-- Bloque contenedor de nutricionistas desactivados o suspendidos -->
+  <div class="section-block">
+    <p class="section-title">🚫 Nutricionistas inactivos ({{ nutricionistasInactivos.length }})</p>
+
+    @if (nutricionistasInactivos.length === 0) {
+    <p class="empty-text">No hay nutricionistas desactivados</p>
+    }
+
+    <ion-list>
+      @for (n of nutricionistasInactivos; track n.id) {
+      <!-- Clase CSS adicional 'inactivo' para aplicar estilos específicos a items desactivados -->
+      <ion-item class="nutricionista-item inactivo">
+        <ion-avatar slot="start">
+          @if (n.usuario?.avatar_url) {
+          <img [src]="n.usuario.avatar_url" alt="Avatar">
+          } @else {
+          <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
+          }
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ n.usuario?.nombre }} {{ n.usuario?.apellidos }}</h2>
+          <p>{{ n.usuario?.email }}</p>
+          <p>{{ n.numero_colegiado || 'Sin nº colegiado' }} · {{ n.especialidad || 'Sin especialidad' }}</p>
+        </ion-label>
+        <div slot="end" class="action-buttons">
+          <ion-badge color="medium">Inactivo</ion-badge>
+          <!-- Botón para reactivar un nutricionista inactivo -->
+          <ion-button color="success" fill="clear" (click)="aprobar(n.id)">
+            <ion-icon name="refresh-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
+
+  }
+
+</ion-content>

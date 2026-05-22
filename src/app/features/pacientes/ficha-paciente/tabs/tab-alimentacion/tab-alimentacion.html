@@ -1,0 +1,141 @@
+<div class="section-block">
+  <p class="section-title">🍽️ Hábitos y Entorno</p>
+  <div class="toggle-grid">
+    <div class="toggle-item">
+      <span>Come en casa</span>
+      <ion-toggle
+        [(ngModel)]="formEncuesta.come_en_casa"
+        (ngModelChange)="marcarCambios()"
+      ></ion-toggle>
+    </div>
+    <div class="toggle-item">
+      <span>Hace la comida</span>
+      <ion-toggle
+        [(ngModel)]="formEncuesta.hace_la_comida"
+        (ngModelChange)="marcarCambios()"
+      ></ion-toggle>
+    </div>
+    <div class="toggle-item">
+      <span>Le gusta cocinar</span>
+      <ion-toggle
+        [(ngModel)]="formEncuesta.le_gusta_cocinar"
+        (ngModelChange)="marcarCambios()"
+      ></ion-toggle>
+    </div>
+  </div>
+
+  <div class="edit-grid" style="margin-top: 12px">
+    <ion-item>
+      <ion-label position="stacked">Nº comidas al día</ion-label>
+      <ion-input
+        type="number"
+        [(ngModel)]="formEncuesta.num_comidas_dia"
+        min="1"
+        max="10"
+        (ngModelChange)="marcarCambios()"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Agua (litros)</ion-label>
+      <ion-input
+        type="number"
+        [(ngModel)]="formEncuesta.consumo_agua_litros"
+        min="0"
+        (ngModelChange)="marcarCambios()"
+      ></ion-input>
+    </ion-item>
+    <ion-item class="full-width">
+      <ion-label position="stacked">¿Come solo/a o viendo la TV?</ion-label>
+      <ion-input
+        [(ngModel)]="formEncuesta.come_solo_tv"
+        placeholder="Acompañado, frente a pantallas..."
+        (ngModelChange)="marcarCambios()"
+      ></ion-input>
+    </ion-item>
+  </div>
+</div>
+
+<div class="section-block">
+  <p class="section-title">🧠 Comportamiento y Preferencias</p>
+  <div class="toggle-grid">
+    <div class="toggle-item">
+      <span>Come tranquilo/a</span>
+      <ion-toggle
+        [(ngModel)]="formEncuesta.come_tranquilo"
+        (ngModelChange)="marcarCambios()"
+      ></ion-toggle>
+    </div>
+    <div class="toggle-item">
+      <span>Picotea</span>
+      <ion-toggle [(ngModel)]="formEncuesta.picotea" (ngModelChange)="marcarCambios()"></ion-toggle>
+    </div>
+  </div>
+
+  <div class="edit-grid" style="margin-top: 12px">
+    <ion-item>
+      <ion-label position="stacked">Apetito</ion-label>
+      <ion-input
+        [(ngModel)]="formEncuesta.apetito"
+        placeholder="Normal, aumentado..."
+        (ngModelChange)="marcarCambios()"
+      ></ion-input>
+    </ion-item>
+    <ion-item class="full-width">
+      <ion-label position="stacked">Ansiedad por la comida</ion-label>
+      <ion-input
+        [(ngModel)]="formEncuesta.ansiedad_comida"
+        placeholder="Generalmente dulce, de noche..."
+        (ngModelChange)="marcarCambios()"
+      ></ion-input>
+    </ion-item>
+    <ion-item class="full-width">
+      <ion-label position="stacked">Otras bebidas (Alcohol, refrescos...)</ion-label>
+      <ion-textarea
+        [(ngModel)]="formEncuesta.otras_bebidas"
+        rows="2"
+        (ngModelChange)="marcarCambios()"
+      ></ion-textarea>
+    </ion-item>
+    <ion-item class="full-width">
+      <ion-label position="stacked">Preferencias alimentarias</ion-label>
+      <ion-textarea
+        [(ngModel)]="formEncuesta.preferencias_alimentarias"
+        rows="2"
+        (ngModelChange)="marcarCambios()"
+      ></ion-textarea>
+    </ion-item>
+    <ion-item class="full-width">
+      <ion-label position="stacked">Aversiones alimentarias</ion-label>
+      <ion-textarea
+        [(ngModel)]="formEncuesta.aversiones_alimentarias"
+        rows="2"
+        (ngModelChange)="marcarCambios()"
+      ></ion-textarea>
+    </ion-item>
+  </div>
+</div>
+
+@if (cambios) {
+  <ion-fab
+    slot="fixed"
+    vertical="bottom"
+    horizontal="end"
+    style="margin-bottom: 20px; margin-right: 20px"
+  >
+    <ion-button
+      (click)="guardar()"
+      color="success"
+      shape="round"
+      [disabled]="guardando"
+      style="margin: 0; --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)"
+    >
+      @if (guardando) {
+        <ion-spinner name="crescent" slot="start"></ion-spinner>
+        Guardando...
+      } @else {
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        Guardar cambios
+      }
+    </ion-button>
+  </ion-fab>
+}

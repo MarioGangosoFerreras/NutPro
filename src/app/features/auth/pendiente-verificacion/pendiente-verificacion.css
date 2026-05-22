@@ -1,0 +1,48 @@
+.pending-content {
+  --background: linear-gradient(135deg, #e8f5e9 0%, #f0f4f8 100%);
+}
+
+.pending-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  padding: 24px;
+}
+
+.pending-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 48px 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  text-align: center;
+}
+
+.pending-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.pending-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #2d6a4f;
+  margin: 0 0 16px;
+}
+
+.pending-text {
+  color: #666;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.btn-logout {
+  --border-radius: 12px;
+  --background: #2d6a4f;
+  height: 52px;
+  font-size: 16px;
+  font-weight: 600;
+}

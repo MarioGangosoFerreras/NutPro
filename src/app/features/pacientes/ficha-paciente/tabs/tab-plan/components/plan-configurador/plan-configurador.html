@@ -1,0 +1,92 @@
+<ion-card class="section-block">
+    <ion-item lines="none">
+        <ion-label>
+            <h2>Enfoque del plan</h2>
+            <p>{{ tipo === 'cuantitativo' ? 'Basado en Calorías y Macros' : 'Cualitativo (Basado en porciones)' }}</p>
+        </ion-label>
+        <ion-toggle [checked]="tipo === 'cuantitativo'"
+            (ionChange)="tipo = $event.detail.checked ? 'cuantitativo' : 'cualitativo'">
+        </ion-toggle>
+    </ion-item>
+</ion-card>
+
+@if (tipo === 'cuantitativo') {
+<ion-card class="section-block">
+    <ion-card-header>
+        <ion-card-title class="section-title">
+            <ion-icon name="calculator-outline"></ion-icon> Gasto Energético
+        </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+        @if (!peso || !altura) {
+        <div
+            style="background: #fff3cd; color: #854d0e; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px;">
+            ⚠️ No hay mediciones registradas. Añade peso y altura en "Mediciones" para el cálculo automático.
+        </div>
+        }
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+            <ion-item>
+                <ion-label position="stacked">Actividad Física</ion-label>
+                <ion-select [(ngModel)]="factor_actividad" (ionChange)="recalcular()">
+                    <ion-select-option [value]="1.2">Sedentario</ion-select-option>
+                    <ion-select-option [value]="1.375">Ligero</ion-select-option>
+                    <ion-select-option [value]="1.55">Moderado</ion-select-option>
+                    <ion-select-option [value]="1.725">Activo</ion-select-option>
+                    <ion-select-option [value]="1.9">Muy activo</ion-select-option>
+                </ion-select>
+            </ion-item>
+
+            <ion-item>
+                <ion-label position="stacked">Objetivo</ion-label>
+                <ion-select [(ngModel)]="objetivo" (ionChange)="recalcular()">
+                    <ion-select-option value="mantenimiento">Mantenimiento</ion-select-option>
+                    <ion-select-option value="deficit_ligero">Déficit Ligero</ion-select-option>
+                    <ion-select-option value="deficit_moderado">Déficit Moderado</ion-select-option>
+                    <ion-select-option value="deficit_agresivo">Déficit Agresivo</ion-select-option>
+                    <ion-select-option value="superavit">Ganancia Muscular</ion-select-option>
+                </ion-select>
+            </ion-item>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+            <div style="flex: 1; background: #f8fafc; padding: 16px; border-radius: 12px; text-align: center;">
+                <span style="font-size: 11px; color: #64748b; font-weight: 700;">TDEE</span><br>
+                <strong style="font-size: 22px; color: #1e293b;">{{ tdee }} kcal</strong>
+            </div>
+
+            <div
+                style="flex: 1; background: #e8f5e9; border: 1px solid #b3edcb; padding: 16px; border-radius: 12px; text-align: center;">
+                <span style="font-size: 11px; color: #0d8a3c; font-weight: 700;">OBJETIVO</span><br>
+                <ion-input type="number" [(ngModel)]="calorias_objetivo"
+                    style="font-size: 22px; font-weight: 800; color: #095c28; text-align: center;"></ion-input>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+            <ion-item>
+                <ion-label position="stacked">Prot (g)</ion-label>
+                <ion-input type="number" [(ngModel)]="proteinas_g"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label position="stacked">Carbs (g)</ion-label>
+                <ion-input type="number" [(ngModel)]="carbohidratos_g"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label position="stacked">Grasa (g)</ion-label>
+                <ion-input type="number" [(ngModel)]="grasas_g"></ion-input>
+            </ion-item>
+        </div>
+    </ion-card-content>
+</ion-card>
+}
+
+<ion-button expand="block" (click)="guardar()" [disabled]="guardando" style="margin: 16px;">
+    @if (guardando) {
+    <ion-spinner name="crescent"></ion-spinner>
+    } @else {
+    <ion-icon slot="start" name="save-outline"></ion-icon>
+    Guardar Plan
+    }
+</ion-button>

@@ -1,0 +1,269 @@
+/* ─── 1. CONTROL DEL ANCHO DEL SPLIT PANE ─── */
+ion-split-pane {
+  --side-width: 240px;
+  --side-min-width: 240px;
+  --side-max-width: 240px;
+}
+
+ion-split-pane.menu-collapsed {
+  --side-width: 76px;
+  --side-min-width: 76px;
+  --side-max-width: 76px;
+}
+
+/* MAGIA: Forzamos la transición en la etiqueta interna de Ionic */
+ion-menu {
+  --border: none;
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+              min-width 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+              max-width 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* ─── 2. CONTENEDOR PRINCIPAL DEL MENÚ ─── */
+.sidebar-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+/* ─── 3. LOGO Y MARCA ─── */
+.brand {
+  display: flex;
+  align-items: center;
+  height: 76px;
+  padding: 0 20px;
+  gap: 12px;
+  flex-shrink: 0;
+  transition: padding 0.4s ease, gap 0.4s ease;
+}
+
+ion-split-pane.menu-collapsed .brand {
+  padding: 0;
+  gap: 0;
+  justify-content: center;
+}
+
+.logo {
+  width: 32px; 
+  height: 32px; 
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* ─── 4. ANIMACIÓN DE LOS TEXTOS (La clave de la fluidez) ─── */
+.brand-text, .nav-title, .nav-btn span, .user-details {
+  max-width: 200px;
+  opacity: 1;
+  transition: max-width 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+              opacity 0.3s ease, 
+              margin 0.4s ease,
+              padding 0.4s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 1.4;
+  padding-bottom: 2px;
+}
+
+/* Ocultar textos suavemente al colapsar */
+ion-split-pane.menu-collapsed .brand-text,
+ion-split-pane.menu-collapsed .nav-btn span,
+ion-split-pane.menu-collapsed .user-details,
+ion-split-pane.menu-collapsed .nav-title {
+  max-width: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── 5. NAVEGACIÓN ─── */
+.nav-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  gap: 6px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: padding 0.4s ease;
+}
+
+ion-split-pane.menu-collapsed .nav-container {
+  padding: 10px 8px; 
+}
+
+.nav-title {
+  font-size: 11px; 
+  font-weight: 700; 
+  color: #94a3b8;
+  text-transform: uppercase; 
+  padding: 12px 14px 8px;
+}
+
+.nav-btn {
+  display: flex; 
+  align-items: center; 
+  gap: 14px;
+  width: 100%; 
+  padding: 12px 14px;
+  background: transparent; 
+  border: none; 
+  border-radius: 8px;
+  color: #64748b; 
+  font-size: 14px; 
+  font-weight: 500;
+  cursor: pointer; 
+  transition: all 0.2s ease, gap 0.4s ease;
+  position: relative;
+}
+
+ion-split-pane.menu-collapsed .nav-btn {
+  justify-content: center; 
+  padding: 14px 0; 
+  gap: 0;
+}
+
+.nav-btn:hover { background: #f8fafc; color: #1e293b; }
+.nav-btn.active { background: #e8f5e9; color: #2d6a4f; font-weight: 600; }
+.nav-btn ion-icon { font-size: 22px; flex-shrink: 0; }
+
+/* ─── 6. ESPACIADOR Y FOOTER ─── */
+.spacer { flex: 1; }
+
+.footer-container {
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px;
+  padding: 16px 12px; 
+  border-top: 1px solid #f1f5f9;
+  transition: padding 0.4s ease;
+}
+
+ion-split-pane.menu-collapsed .footer-container {
+  padding: 16px 8px; 
+  align-items: center;
+}
+
+.user-profile {
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 8px;
+  transition: gap 0.4s ease;
+}
+
+ion-split-pane.menu-collapsed .user-profile {
+  padding: 8px 0; 
+  gap: 0;
+  justify-content: center;
+}
+
+ion-avatar {
+  width: 36px; 
+  height: 36px; 
+  background: #e8f5e9; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  flex-shrink: 0;
+}
+ion-avatar ion-icon { font-size: 36px; color: #2d6a4f; }
+
+.user-details {
+  display: flex; 
+  flex-direction: column;
+}
+.user-details .name {
+  font-size: 13px; 
+  font-weight: 700; 
+  color: #0f172a; 
+}
+.user-details .role {
+  font-size: 11px; 
+  color: #64748b;
+}
+
+.logout-btn { color: #ef4444; }
+.logout-btn:hover { background: #fef2f2; color: #dc2626; }
+
+/* Estilo para el nombre de la marca en el menú */
+.brand-text {
+  font-weight: 800; /* Negrita intensa como en el login */
+}
+
+.nut {
+  color: #a4752b; /* El color naranja/marrón del login */
+}
+
+.pro {
+  color: #738a64; /* El color verde del login */
+}
+
+/* ─── 7. LISTA DE CHATS EN EL SIDEBAR ─── */
+.chats-list {
+  padding-top: 0;
+  max-height: 250px; /* Para que si tienes muchos pacientes, se pueda scrollear solo esa parte */
+}
+
+.chat-item {
+  gap: 12px;
+  padding: 8px 14px;
+}
+
+ion-split-pane.menu-collapsed .chat-item {
+  padding: 8px 0;
+  justify-content: center;
+}
+
+.chat-avatar {
+  width: 26px;
+  height: 26px;
+  background: #e8f5e9;
+  flex-shrink: 0;
+}
+
+.chat-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0; /* Para que el text-overflow funcione */
+}
+
+.chat-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: left;
+}
+
+.chat-preview {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: left;
+}
+
+.chat-item:hover .chat-name {
+  color: #1e293b;
+}
+
+.badge-nav {
+  margin-left: auto;
+}
+
+ion-split-pane.menu-collapsed .badge-nav {
+  position: absolute;
+  top: 8px;    
+  right: 18px;  
+  font-size: 10px;
+  padding: 3px 5px;
+}

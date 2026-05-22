@@ -1,0 +1,266 @@
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+ion-card { margin: 6px 12px; }
+
+ion-card-title ion-icon {
+  vertical-align: middle;
+  font-size: 18px;
+  margin-right: 6px;
+  color: var(--np-green-400);
+}
+
+/* ── Estado cargando / error ─────────────────────────────────────────────── */
+.estado-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 12px;
+  color: var(--ion-color-medium);
+}
+
+.icono-error {
+  font-size: 64px;
+  opacity: 0.25;
+  margin-bottom: 4px;
+}
+
+/* ── Contenido ───────────────────────────────────────────────────────────── */
+.detalle-contenido {
+  padding: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Imagen en Detalle (Cuadrada sin recorte) ────────────────────────────── */
+.imagen-detalle-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.imagen-hero,
+.imagen-detalle {
+  width: 260px;
+  height: 260px;
+  object-fit: contain;          /* Sin recorte */
+  background: var(--np-green-50);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Cabecera y Contenido del Detalle ────────────────────────────────────── */
+.cabecera-receta {
+  padding: 16px 16px 12px;
+  text-align: center;
+}
+
+.info-rapida {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.descripcion {
+  text-align: left;
+  margin-top: 12px;
+}
+
+/* Ajuste de los macros en detalle */
+.macros-row {
+  justify-content: center;
+}
+
+/* ── Chips tipo comida ───────────────────────────────────────────────────── */
+.chips-tipo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+/* ── Info rápida ─────────────────────────────────────────────────────────── */
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--ion-color-medium);
+}
+
+.info-item ion-icon {
+  font-size: 18px;
+  color: var(--np-green-400);
+}
+
+.descripcion {
+  font-size: 14px;
+  color: var(--ion-color-medium);
+  line-height: 1.6;
+  margin-top: 10px;
+}
+
+/* ── Card macros totales ─────────────────────────────────────────────────── */
+.card-macros-total {
+  background: var(--np-green-400) !important;
+  box-shadow: 0 4px 18px rgba(29, 185, 84, 0.28) !important;
+}
+
+.card-macros-total ion-card-title {
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-macros-total ion-card-title ion-icon { color: #fff; }
+
+.macros-tabs {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+}
+
+.separador-macros {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  align-self: stretch;
+}
+
+.macro-titulo {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.macro-fila {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 3px 0;
+  color: #fff;
+  opacity: 0.92;
+}
+
+.macro-fila strong { font-weight: 600; }
+
+/* ── Macros por ración (4 pills de color) ────────────────────────────────── */
+.macros-row {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0;
+  flex-wrap: wrap;
+}
+
+.macro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 10px;
+  min-width: 62px;
+}
+
+.macro-kcal  { background: var(--np-green-50); }
+.macro-prot  { background: var(--np-coral-50); }
+.macro-carbs { background: var(--np-blue-50); }
+.macro-grasa { background: var(--np-amber-50); }
+
+.macro-valor {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.macro-kcal  .macro-valor { color: var(--np-green-600); }
+.macro-prot  .macro-valor { color: var(--np-coral-600); }
+.macro-carbs .macro-valor { color: var(--np-blue-600); }
+.macro-grasa .macro-valor { color: var(--np-amber-600); }
+
+.macro-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.macro-kcal  .macro-label { color: var(--np-green-600); }
+.macro-prot  .macro-label { color: var(--np-coral-600); }
+.macro-carbs .macro-label { color: var(--np-blue-600); }
+.macro-grasa .macro-label { color: var(--np-amber-600); }
+
+/* ── Ingredientes ────────────────────────────────────────────────────────── */
+.card-content-ingredientes { padding: 0 !important; }
+
+.ingrediente-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-bottom: 0.5px solid var(--ion-color-light);
+  gap: 8px;
+}
+
+.ingrediente-row:last-child { border-bottom: none; }
+
+.ingrediente-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ingrediente-nombre {
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ingrediente-cantidad { font-size: 12px; color: var(--ion-color-medium); }
+.cantidad-texto { font-style: italic; }
+
+.ingrediente-macros {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  flex-shrink: 0;
+}
+
+.ingrediente-kcal {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--np-green-600);
+}
+
+/* ── Instrucciones ───────────────────────────────────────────────────────── */
+.instrucciones-texto {
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-line;
+  margin: 0;
+}
+
+/* ── Etiquetas ───────────────────────────────────────────────────────────── */
+.etiquetas-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 16px 16px;
+}

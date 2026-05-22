@@ -1,0 +1,189 @@
+/* ── Variables ── */
+app-lista-pacientes {
+  --primary: #2d6a4f;
+  --primary-soft: #e8f5e9;
+  --primary-mid: #40916c;
+  --primary-dark: #1b4332;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --divider: #f1f5f9;
+}
+
+/* ── Layout general ── */
+ion-list {
+  background: transparent;
+  max-width: 1000px;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+/* ── Tarjeta paciente ── */
+.paciente-item {
+  --background: #ffffff;
+  --border-radius: 18px;
+  --padding-start: 16px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --inner-padding-end: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eef2f7;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.paciente-item:hover {
+  box-shadow: 0 6px 18px rgba(45, 106, 79, 0.13);
+  transform: translateY(-1px);
+}
+
+.paciente-item::part(native):active {
+  background: var(--primary-soft);
+}
+
+/* ── Avatar ── */
+ion-avatar {
+  width: 56px;
+  height: 56px;
+  margin-right: 14px;
+  border: 2.5px solid var(--primary-soft);
+  background: #f0fdf4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d8f3dc, #b7e4c7);
+}
+
+.avatar-icon {
+  font-size: 26px;
+  color: var(--primary);
+  display: block;
+}
+
+/* ── Tipografía ── */
+.paciente-item h2 {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #334155; /* antes #1b4332, ahora gris pizarra */
+  margin: 0 0 5px 0;
+  letter-spacing: -0.1px;
+}
+
+.paciente-item p {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: #94a3b8; /* antes #64748b, más claro */
+  margin: 2px 0;
+}
+
+ion-badge {
+  --background: #d8f3dc;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: #4b7a5e; /* antes #1b4332, verde más suave */
+  letter-spacing: 0.3px;
+}
+
+.paciente-item p ion-icon {
+  color: var(--primary-mid);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+
+/* ── Estado vacío ── */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 55vh;
+  gap: 12px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 3.5rem;
+  color: var(--primary-mid);
+  opacity: 0.3;
+}
+
+.empty-container p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ── Banner búsqueda ── */
+.busqueda-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-soft);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 0.875rem;
+  color: var(--primary);
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.busqueda-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.busqueda-banner span {
+  flex: 1;
+}
+
+.btn-limpiar {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.btn-limpiar:hover {
+  background: #c8e6c9;
+}
+
+/* ── FAB ── */
+ion-fab-button {
+  --background: var(--np-green-400) !important;
+}
+
+/* ── Opciones del Menú Desplegable (FAB List) ── */
+ion-fab-list ion-fab-button {
+  /* Hacemos el botón un pelín más grande para que respire el icono */
+  width: 48px; 
+  height: 48px;
+}
+
+ion-fab-list ion-fab-button ion-icon {
+  /* Aumentamos el tamaño del icono (por defecto es más pequeño) */
+  font-size: 26px; 
+}

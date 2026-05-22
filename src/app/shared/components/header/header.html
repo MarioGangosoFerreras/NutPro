@@ -1,0 +1,16 @@
+<ion-header class="header">
+  <ion-toolbar class="header-toolbar">
+    
+    <ion-buttons slot="start">
+      <div class="hamburger-container" (click)="toggleMenu()">
+        <div class="hamburger" [class.is-active]="!collapsed">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </div>
+      </div>
+    </ion-buttons>
+
+    <ion-title>{{ titulo }}</ion-title>
+  </ion-toolbar>
+</ion-header>

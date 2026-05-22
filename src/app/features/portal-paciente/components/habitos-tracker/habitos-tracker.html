@@ -1,0 +1,40 @@
+<ion-card class="dash-card habitos-card-compact">
+      <div class="habito-compact-row">
+        <div class="habito-compact-info">
+          <span class="habito-name">Agua</span>
+          <span class="habito-goal">{{ habitos.agua }} / 8 vasos</span>
+        </div>
+        <div class="habito-tracker">
+          <span *ngFor="let i of [1,2,3,4,5,6,7,8]" 
+                class="emoji-habito" 
+                [class.filled]="i <= habitos.agua" 
+                (click)="onToggle.emit({tipo: 'agua', valor: i})">💧</span>
+        </div>
+      </div>
+
+      <div class="habito-compact-row">
+        <div class="habito-compact-info">
+          <span class="habito-name">Fruta y Verdura</span>
+          <span class="habito-goal">{{ habitos.fruta }} / 5 piezas</span>
+        </div>
+        <div class="habito-tracker">
+          <span *ngFor="let i of [1,2,3,4,5]" 
+                class="emoji-habito" 
+                [class.filled]="i <= habitos.fruta" 
+                (click)="onToggle.emit({tipo: 'fruta', valor: i})">🍎</span>
+        </div>
+      </div>
+
+      <div class="habito-compact-row border-none">
+        <div class="habito-compact-info">
+          <span class="habito-name">Descanso</span>
+          <span class="habito-goal">{{ habitos.sueno }} / 8 horas</span>
+        </div>
+        <div class="habito-tracker">
+          <span *ngFor="let i of [1,2,3,4,5,6,7,8]" 
+                class="emoji-habito moon" 
+                [class.filled]="i <= habitos.sueno" 
+                (click)="onToggle.emit({tipo: 'sueno', valor: i})">🌙</span>
+        </div>
+      </div>
+    </ion-card>

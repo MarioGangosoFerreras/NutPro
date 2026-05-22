@@ -1,0 +1,73 @@
+.dashboard-main {
+  display: grid;
+  /* Cambia 340px por un valor mayor, por ejemplo 450px */
+  grid-template-columns: 1fr 550px;
+  gap: 16px;
+  margin-top: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+
+  /* Opcional: Ajusta el punto de ruptura si el calendario 
+     ahora es demasiado ancho para pantallas medianas */
+  .dashboard-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 👇 NUEVOS ESTILOS PARA LA TARJETA DE FACTURACIÓN 👇 */
+.dashboard-card {
+  background: white;
+  border-radius: 20px;
+  margin: 0 0 24px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f5f9;
+}
+
+.dashboard-card ion-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-card ion-card-title ion-icon {
+  font-size: 1.2rem;
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pending-invoice-card ion-card-header {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.pending-item {
+  --padding-start: 20px;
+  --inner-padding-end: 20px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+}
+
+.pending-item ion-button {
+  --border-radius: 8px;
+  font-weight: 600;
+  height: 32px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px 20px;
+  color: #94a3b8;
+  font-size: 14px;
+  background: #f8fafc;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}

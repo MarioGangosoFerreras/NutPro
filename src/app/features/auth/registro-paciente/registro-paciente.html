@@ -1,0 +1,122 @@
+<ion-content class="login-content">
+    <div class="login-container">
+        <div class="login-card">
+
+            <div class="logo-wrapper">
+                <img src="img/Logo_app.png" alt="NutPro" class="login-logo">
+                <h1 class="brand-title"><span class="nut">Nut</span><span class="pro">Pro</span></h1>
+                <p class="brand-subtitle">Formulario de Ingreso</p>
+            </div>
+
+            @if (errorMessage()) {
+            <div class="error-box">
+                <ion-text color="danger">{{ errorMessage() }}</ion-text>
+            </div>
+            }
+
+            @if (nutriId) {
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label">Nombre *</label>
+                    <ion-input class="form-input" [(ngModel)]="datos.nombre" placeholder="Nombre"
+                        fill="outline"></ion-input>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Apellidos *</label>
+                    <ion-input class="form-input" [(ngModel)]="datos.apellidos" placeholder="Apellidos"
+                        fill="outline"></ion-input>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label">DNI / NIF *</label>
+                    <ion-input class="form-input" [(ngModel)]="datos.dni" placeholder="12345678A"
+                        fill="outline"></ion-input>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Teléfono *</label>
+                    <ion-input class="form-input" type="tel" [(ngModel)]="datos.telefono" placeholder="600000000"
+                        fill="outline"></ion-input>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Fecha Nac. *</label>
+
+                <div class="datetime-container-global">
+                    <ion-datetime-button [datetime]="datetimeId"></ion-datetime-button>
+                </div>
+
+                <ion-modal [keepContentsMounted]="true">
+                    <ng-template>
+                        <ion-datetime [id]="datetimeId" presentation="date" [(ngModel)]="datos.fecha_nacimiento"
+                            [max]="maxDateNacimiento" [min]="minDateNacimiento" color="primary"
+                            [showDefaultButtons]="true" doneText="Aceptar" cancelText="Cancelar">
+                        </ion-datetime>
+                    </ng-template>
+                </ion-modal>
+            </div>
+
+
+            <div class="form-group">
+                <label class="form-label">Sexo *</label>
+                <ion-select class="form-input" [(ngModel)]="datos.sexo" interface="popover" placeholder="Elige">
+                    <ion-select-option value="masculino">Hombre</ion-select-option>
+                    <ion-select-option value="femenino">Mujer</ion-select-option>
+                    <ion-select-option value="otro">Otro</ion-select-option>
+                </ion-select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Dirección completa *</label>
+                <ion-input class="form-input" [(ngModel)]="datos.direccion" placeholder="Calle, portal, piso, ciudad"
+                    fill="outline"></ion-input>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Motivo principal de la consulta *</label>
+                <ion-input class="form-input" [(ngModel)]="datos.motivo_consulta"
+                    placeholder="Ej: Pérdida de peso, nutrición deportiva..." fill="outline"></ion-input>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label class="form-label">Email de acceso *</label>
+                <ion-input class="form-input" type="email" [(ngModel)]="datos.email" placeholder="paciente@email.com"
+                    fill="outline"></ion-input>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label">Contraseña *</label>
+                    <ion-input class="form-input" type="password" [(ngModel)]="datos.password" placeholder="••••••••"
+                        fill="outline"></ion-input>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirmar *</label>
+                    <ion-input class="form-input" type="password" [(ngModel)]="datos.confirmarPassword"
+                        placeholder="••••••••" fill="outline"></ion-input>
+                </div>
+            </div>
+
+            <ion-button expand="block" class="btn-primary" [disabled]="loading() || !formularioValido"
+                (click)="registrar()">
+                @if (loading()) {
+                <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                Completar Ingreso
+                }
+            </ion-button>
+            }
+
+            <div class="divider">
+                <span>¿Ya tienes cuenta?</span>
+            </div>
+            <ion-button expand="block" fill="outline" class="btn-secondary" routerLink="/login">
+                Iniciar Sesión
+            </ion-button>
+
+        </div>
+    </div>
+</ion-content>

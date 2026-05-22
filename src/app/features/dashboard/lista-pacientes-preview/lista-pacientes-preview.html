@@ -1,0 +1,83 @@
+<div class="preview-container">
+  <div class="preview-header">
+    <div class="preview-titulo">
+      <ion-icon name="people-outline" class="titulo-icon" />
+      <h3>Mis pacientes</h3>
+    </div>
+  </div>
+
+  <!-- Skeleton -->
+  @if (cargando) {
+    <div class="pacientes-list">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="paciente-row skeleton-row">
+          <ion-skeleton-text [animated]="true" class="skeleton-avatar" />
+          <div class="skeleton-info">
+            <ion-skeleton-text
+              [animated]="true"
+              style="width: 50%; height: 13px; border-radius: 6px"
+            />
+            <ion-skeleton-text
+              [animated]="true"
+              style="width: 35%; height: 11px; border-radius: 6px; margin-top: 5px"
+            />
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Lista real -->
+  @if (!cargando && pacientes.length > 0) {
+    <div class="pacientes-list">
+      @for (paciente of pacientes; track paciente.id; let last = $last) {
+        <div class="paciente-row" [class.last]="last" (click)="irAFicha(paciente.id)">
+          <div class="paciente-avatar">
+            @if (paciente.usuario?.avatar_url) {
+              <img [src]="paciente.usuario.avatar_url" [alt]="paciente.usuario?.nombre" />
+            } @else {
+              <span>{{ paciente.usuario?.nombre?.[0] }}{{ paciente.usuario?.apellidos?.[0] }}</span>
+            }
+          </div>
+
+          <div class="paciente-info">
+            <p class="paciente-nombre">
+              {{ paciente.usuario?.nombre }} {{ paciente.usuario?.apellidos }}
+            </p>
+
+            @if (paciente.proximaCita) {
+              <p class="paciente-sub proxima-cita">
+                <ion-icon name="calendar-outline" class="sub-icon" />
+
+                @if (esHoy(paciente.proximaCita.fecha_hora)) {
+                  <span class="badge-hoy">HOY</span>
+                }
+
+                {{ paciente.proximaCita.fecha_hora | date: 'd MMM · HH:mm' : '' : 'es' }}
+              </p>
+            } @else {
+              <p class="paciente-sub sin-cita">
+                <ion-icon name="calendar-outline" class="sub-icon" />
+                Sin cita programada
+              </p>
+            }
+          </div>
+
+          <ion-icon name="chevron-forward-outline" class="item-arrow" />
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Estado vacío -->
+  @if (!cargando && pacientes.length === 0) {
+    <div class="estado-vacio">
+      <ion-icon name="people-outline" class="vacio-icon" />
+      <p>Aún no tienes pacientes registrados</p>
+    </div>
+  }
+
+  <div class="preview-footer">
+    <button class="btn-ver-todos" (click)="verTodos()">Ver todos los pacientes</button>
+  </div>
+</div>

@@ -1,0 +1,358 @@
+/* ─── CONTENEDOR SUPERIOR (Grid 2 columnas) ─── */
+.top-row-container {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr; /* La tarjeta del nutri es ligeramente más ancha */
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .top-row-container {
+    grid-template-columns: 1fr; /* En móviles se apilan una sobre otra */
+  }
+}
+
+/* ─── GENERALES Y CABECERA ─── */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+}
+
+.welcome-header { 
+  margin-bottom: 8px; 
+  padding: 5px 5px; 
+}
+
+.welcome-header h2 { 
+  font-size: 24px; 
+  font-weight: 800; 
+  color: #1e293b; 
+  margin: 0; 
+  letter-spacing: -0.5px; 
+}
+
+.welcome-header p { 
+  color: #64748b; 
+  margin: 4px 0 0; 
+  font-size: 15px; 
+}
+
+.section-title { 
+  font-size: 13px; 
+  font-weight: 800; 
+  color: #2d6a4f; 
+  text-transform: uppercase; 
+  margin: 20px 0 10px 5px; 
+  letter-spacing: 0.5px; 
+}
+
+.dash-card { 
+  border-radius: 16px; 
+  border: 1px solid #f1f5f9; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+  margin: 0 0 20px 0; 
+  background: white; 
+}
+
+/* ─── TARJETA NUTRICIONISTA ─── */
+.nutri-card-top ion-card-content { 
+  padding: 16px; 
+}
+
+.nutri-profile-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.nutri-avatar-v2 {
+  width: 52px;
+  height: 52px;
+  border: 2px solid #f0fdf4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background: #f8fafc;
+}
+
+.nutri-info-v2 h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+/* Etiqueta "Nutricionista" elegante */
+.nutri-info-v2 ion-badge {
+  --background: #f0fdf4;
+  --color: #166534;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #dcfce7;
+}
+
+.nutri-contact-inline {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed #f1f5f9;
+}
+
+.contact-item-v2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.contact-item-v2 ion-icon {
+  color: #10b981;
+  font-size: 16px;
+}
+
+.btn-chat-primary {
+  --background: #2d6a4f;
+  --border-radius: 12px;
+  height: 40px;
+  font-size: 14px;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* ─── TARJETA CITA OPTIMIZADA E IMAGEN PLACEHOLDER ─── */
+.appointment-card-v2 {
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.appointment-card-v2 ion-card-header { 
+  padding: 16px 16px 8px 16px; 
+}
+
+.appointment-card-v2 ion-card-title {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #475569 !important; /* Gris oscuro para parecerse a la imagen */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.appointment-card-v2 ion-card-title ion-icon {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.appointment-content-pad, 
+.placeholder-content {
+  padding: 8px 16px 20px 16px !important;
+}
+
+/* Cuando HAY CITA */
+.appointment-layout { 
+  display: flex; 
+  align-items: center; 
+  gap: 16px; 
+}
+
+.date-badge-v2 {
+  background: var(--np-green-600);
+  color: white;
+  padding: 8px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  height: 50px;
+  box-shadow: 0 4px 10px rgba(45, 106, 79, 0.2);
+}
+
+.date-badge-v2 .day { font-size: 18px; font-weight: 800; line-height: 1; }
+.date-badge-v2 .month { font-size: 10px; font-weight: 700; margin-top: 2px; }
+
+.details-v2 strong { font-size: 15px; font-weight: 700; color: #1e293b; }
+.details-v2 p { margin: 4px 0 0; font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 4px; }
+
+/* Cuando NO HAY CITA (Diseño de tu imagen) */
+.placeholder-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.no-date-icon {
+  background: #f8fafc;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+}
+
+.no-date-icon ion-icon {
+  color: #94a3b8;
+  font-size: 22px;
+}
+
+.no-date-text strong { 
+  font-size: 15px; 
+  font-weight: 700; 
+  color: #334155; 
+  display: block;
+}
+
+.no-date-text p { 
+  margin: 2px 0 0; 
+  font-size: 13px; 
+  color: #94a3b8; 
+}
+
+/* ─── HÁBITOS ANIMADOS COMPACTOS ─── */
+.habitos-card-compact { 
+  border-radius: 16px; 
+  margin-bottom: 16px; 
+}
+
+.habito-compact-row {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 10px;
+}
+
+.habito-compact-row.border-none { 
+  border-bottom: none; 
+}
+
+.habito-compact-info { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+}
+
+.habito-name { 
+  font-size: 14px; 
+  font-weight: 700; 
+  color: #1e293b; 
+}
+
+.habito-goal {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2d6a4f;
+  background: #e8f5e9;
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+
+.habito-tracker { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 6px; 
+}
+
+.emoji-habito { 
+  font-size: 24px; 
+  cursor: pointer; 
+  transition: all 0.2s ease; 
+  opacity: 0.25; 
+  filter: grayscale(100%); 
+  transform: scale(0.9); 
+  user-select: none;
+}
+
+.emoji-habito.moon { font-size: 20px; }
+
+.emoji-habito.filled { 
+  opacity: 1; 
+  filter: grayscale(0%); 
+  transform: scale(1.1); 
+}
+
+/* ─── MENÚ "QUÉ COMER HOY" ─── */
+.menu-today-card {
+  padding-bottom: 8px;
+}
+
+.meal-item { 
+  --padding-start: 16px; 
+  --inner-padding-end: 16px; 
+  --padding-top: 10px; 
+  --padding-bottom: 10px; 
+}
+
+.meal-image-container {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-right: 14px;
+  flex-shrink: 0;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+}
+
+.meal-real-img { width: 100%; height: 100%; object-fit: cover; }
+.meal-icon-placeholder { font-size: 24px; }
+
+.meal-type { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+.meal-name { font-size: 14px; font-weight: 700; color: #1e293b; margin: 0; }
+.meal-name.empty { color: #cbd5e1; font-weight: 500; font-style: italic; }
+
+.meal-action { display: flex; align-items: center; gap: 8px; }
+.meal-action ion-badge { font-weight: 700; border-radius: 8px; font-size: 11px; padding: 6px 8px; }
+.meal-action ion-icon { color: #cbd5e1; font-size: 18px; }
+
+/* ─── MODAL RECETA ─── */
+.modal-bg { --background: #f8fafc; }
+
+.receta-hero { 
+  width: 100%; 
+  height: 200px; 
+  border-radius: 20px; 
+  overflow: hidden; 
+  background: #e8f5e9; 
+  margin-bottom: 20px; 
+}
+.receta-img-full { width: 100%; height: 100%; object-fit: cover; }
+.receta-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 60px; color: #2d6a4f; opacity: 0.3; }
+
+.receta-title-modal { font-size: 22px; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 20px; }
+
+.macros-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 24px; }
+.macro-box { background: white; padding: 10px 2px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; border: 1px solid #e2e8f0; }
+.macro-val { font-size: 16px; font-weight: 800; margin-bottom: 2px; }
+.macro-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #94a3b8; }
+
+.macro-val.kcal { color: #2d6a4f; }
+.macro-val.prot { color: #e11d48; }
+.macro-val.carbs { color: #2563eb; }
+.macro-val.grasa { color: #d97706; }
+
+.instrucciones-box { background: white; padding: 20px; border-radius: 18px; border: 1px solid #e2e8f0; }
+.instrucciones-box h3 { font-size: 14px; font-weight: 800; text-transform: uppercase; margin: 0 0 12px 0; color: #1e293b; }
+.instrucciones-box p { font-size: 14px; color: #475569; line-height: 1.6; white-space: pre-line; margin: 0; }

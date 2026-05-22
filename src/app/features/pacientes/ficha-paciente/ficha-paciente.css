@@ -1,0 +1,179 @@
+/* Variables y Contenedor Raíz */
+app-ficha-paciente {
+  --primary-medical: #2d6a4f;
+  --primary-soft: #e8f5e9;
+  --bg-subtle: #f8fafc;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: block;
+}
+
+/* Estructura General */
+.ficha-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 10px 20px 40px 20px;
+}
+
+/* Tarjeta Hero (Paciente) */
+.paciente-hero {
+  overflow: visible !important;
+  position: relative;
+  margin-bottom: 30px;
+  border-radius: 20px;
+  --background: white;
+  height: auto;
+  min-height: 160px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.hero-item {
+  --background: transparent;
+  --padding-start: 10px;
+  width: 100%;
+}
+
+.paciente-avatar {
+  width: 90px;
+  height: 90px;
+  margin-right: 20px;
+  border: 3px solid var(--primary-soft);
+}
+
+/* Tipografía e Información */
+.paciente-info h1 {
+  margin: 0 0 2px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.paciente-info p {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  color: #64748b;
+}
+
+.email-text {
+  margin-bottom: 5px;
+  color: #64748b;
+}
+
+/* Componentes Ionic */
+ion-segment-button {
+  --color: #64748b;
+  --color-checked: #2d6a4f;
+  --indicator-color: #ffffff;
+  font-weight: 600;
+  min-height: 45px;
+}
+
+ion-badge {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+}
+
+.badge-motivo {
+  margin-top: 8px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  white-space: normal;
+  text-align: left;
+  max-width: 90%;
+}
+
+/* Menú de Acciones y Dropdown */
+.acciones-edicion {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.btn-dots {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 35px;
+  width: 180px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  z-index: 1000;
+  overflow: hidden;
+  border: 1px solid #edf2f7;
+}
+
+.dropdown-item {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #334155;
+}
+
+.dropdown-item:hover {
+  background-color: #f8fafc;
+}
+
+.dropdown-item.danger {
+  color: #ef4444;
+}
+
+/* Navegación y Otros */
+.ficha-tabs {
+  background: #f1f5f9;
+  border-radius: 14px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.header-acciones {
+  margin-bottom: 5px;
+}
+
+.btn-volver {
+  --color: #006432;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --background: transparent;
+  --background-hover: transparent;
+  --background-focused: transparent;
+  
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: none;
+  
+  /* Eliminamos restricciones de altura que provocan el recorte */
+  height: auto; 
+  min-height: 32px; /* Tamaño táctil recomendado pero sin recortar contenido */
+  margin: 0;
+  overflow: visible;
+}
+
+.btn-volver ion-icon {
+  /* Usamos font-size en lugar de width/height para evitar deformación */
+  font-size: 1rem; 
+  color: #006432;
+  margin-right: 2px;
+}
+
+/* Efecto visual al pasar el ratón o pulsar */
+.btn-volver:hover {
+  opacity: 0.7;
+}
+
+
